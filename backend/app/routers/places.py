@@ -2,6 +2,7 @@ from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy import func, select
 from sqlalchemy.orm import Session, joinedload
 
+from .. import place_extras
 from ..categories import CATEGORIES
 from ..db import get_db
 from ..geo import distance_m
@@ -66,4 +67,6 @@ def place_detail(place_id: int, db: Session = Depends(get_db)):
                                 created_at=c.created_at) for c in photos],
         rank_in_category=better + 1,
         splat_mb=splat_size_mb(place.splat_url),
+        story=place_extras.story(place.name),
+        old_photo=place_extras.old_photo(place.name),
     )

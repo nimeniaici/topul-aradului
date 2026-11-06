@@ -62,7 +62,12 @@ data class PlaceDetail(
     val recentPhotos: List<Photo>,
     val rankInCategory: Int,
     val splatMb: Double?,
+    val story: String? = null,
+    val oldPhoto: OldPhoto? = null,
 )
+
+/** Poză veche (liberă de drepturi) pentru „Trecut vs prezent”. */
+data class OldPhoto(val url: String, val year: String, val credit: String)
 
 data class Badge(val code: String, val title: String, val description: String, val earnedAt: String) {
     /** Serverul trimite 1970-01-01 pentru insignele încă neobținute. */
@@ -127,6 +132,12 @@ data class LiveEvent(
     val oldMayorId: Int?,
     val newMayorId: Int?,
     val newMayorName: String?,
+    // pentru „report_status” (Primăria a schimbat statusul unei sesizări)
+    val userId: Int? = null,
+    val status: String? = null,
+    val statusLabel: String? = null,
+    val xpGained: Int? = null,
+    val note: String? = null,
 )
 
 /** Sesizare de la cetățeni (groapă, iluminat...). Poziția e a problemei. */
@@ -141,6 +152,8 @@ data class Report(
     val status: String,
     val userName: String,
     val createdAt: String,
+    val statusLabel: String? = null,
+    val adminNote: String? = null,
 )
 
 data class ReportCreated(val report: Report, val xpGained: Int, val totalXp: Int, val level: Int)

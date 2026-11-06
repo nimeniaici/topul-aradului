@@ -1,5 +1,7 @@
 package ro.hack4arad.topul.ui.place
 
+import androidx.compose.material.icons.rounded.Share
+import ro.hack4arad.topul.util.ShareCard
 import androidx.compose.material.icons.rounded.ViewInAr
 import androidx.compose.material.icons.rounded.PhotoCamera
 import androidx.compose.material.icons.rounded.WorkspacePremium
@@ -205,8 +207,11 @@ fun PlaceScreen(onBack: () -> Unit, onTour3D: (Int) -> Unit = {}, vm: PlaceViewM
                                 if (place.mayorName == null) {
                                     Text("Tron liber", color = Gold, fontWeight = FontWeight.Black, fontSize = 18.sp)
                                     Text("Primul check-in te face Primar.", color = Lilac)
+                                } else if (place.mayorId == Network.session.userId) {
+                                    Text("Tu ești Primarul aici", color = Gold, fontWeight = FontWeight.Black, fontSize = 18.sp)
+                                    Text("Revino des ca să nu-ți ia nimeni tronul.", color = Lilac)
                                 } else {
-                                    Text("Primar: ${place.mayorName}", color = Color.White, fontWeight = FontWeight.Black, fontSize = 18.sp)
+                                    Text("Primar: @${place.mayorName}", color = Color.White, fontWeight = FontWeight.Black, fontSize = 18.sp)
                                     Text("Fă mai multe check-in-uri ca să-i iei tronul.", color = Lilac)
                                 }
                             }
@@ -215,6 +220,15 @@ fun PlaceScreen(onBack: () -> Unit, onTour3D: (Int) -> Unit = {}, vm: PlaceViewM
 
                     if (place.description.isNotBlank()) {
                         Text(place.description, color = Lilac, modifier = Modifier.padding(top = 14.dp))
+                    }
+
+                    // ghid audio în română (doar la obiective, mănăstiri, natură)
+                    place.story?.let { AudioGuide(it, Modifier.padding(top = 14.dp)) }
+
+                    // trecut vs prezent: poza veche peste cea de azi
+                    place.oldPhoto?.let { old ->
+                        SectionTitle("Trecut vs prezent")
+                        ThenAndNow(place, old)
                     }
 
                     if (place.splatUrl != null) {
@@ -265,6 +279,16 @@ fun PlaceScreen(onBack: () -> Unit, onTour3D: (Int) -> Unit = {}, vm: PlaceViewM
                         enabled = !vm.busy,
                         modifier = Modifier.fillMaxWidth().padding(top = 8.dp).height(52.dp),
                     ) { Icon(Icons.Rounded.PhotoCamera, null, tint = Color.White); Text("  Check-in cu poză · +5 XP bonus", color = Color.White) }
+
+                    // ești Primar aici? arată-le prietenilor (card pentru Instagram Story)
+                    if (place.mayorId != null && place.mayorId == Network.session.userId) {
+                        val shareContext = LocalContext.current
+                        val shareScope = rememberCoroutineScope()
+                        OutlinedButton(
+                            onClick = { shareScope.launch { ShareCard.share(shareContext, place.id, mayor = true) } },
+                            modifier = Modifier.fillMaxWidth().padding(top = 8.dp).height(52.dp),
+                        ) { Icon(Icons.Rounded.Share, null, tint = Gold); Text("  Distribuie: sunt Primarul aici", color = Gold) }
+                    }
 
                     if (place.recentPhotos.isNotEmpty()) {
                         SectionTitle("Poze de la comunitate")

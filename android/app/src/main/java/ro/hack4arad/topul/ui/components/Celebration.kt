@@ -1,5 +1,10 @@
 package ro.hack4arad.topul.ui.components
 
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.material3.OutlinedButton
+import androidx.compose.material.icons.rounded.Share
+import ro.hack4arad.topul.util.ShareCard
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.Spring
@@ -142,6 +147,16 @@ fun CheckinCelebration(result: CheckinResult, placeName: String, onDismiss: () -
                 Pill("Insignă nouă: ${b.title}", Violet, Color.White)
             }
             Spacer(Modifier.height(32.dp))
+            val context = LocalContext.current
+            val scope = rememberCoroutineScope()
+            OutlinedButton(
+                onClick = { scope.launch { ShareCard.share(context, result.placeId, mayor = result.becameMayor) } },
+                modifier = Modifier.fillMaxWidth().height(54.dp),
+            ) {
+                Icon(Icons.Rounded.Share, null, tint = Gold)
+                Text("  Arată-le prietenilor", color = Gold)
+            }
+            Spacer(Modifier.height(10.dp))
             Button(onClick = onDismiss, modifier = Modifier.fillMaxWidth().height(54.dp)) {
                 Text(if (result.becameMayor) "Stăpânesc orașul" else "Mai departe")
             }

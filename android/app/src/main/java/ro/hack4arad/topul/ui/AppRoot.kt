@@ -76,11 +76,15 @@ private fun MainScaffold() {
                     "${e.newMayorName} ți-a luat titlul de Primar la ${e.placeName}"
                 e.type == "mayor" && e.newMayorId == me.userId ->
                     "Ești noul Primar la ${e.placeName}"
+                e.type == "report_status" && e.userId == me.userId && e.status == "rezolvat" ->
+                    "Primăria a rezolvat sesizarea ta (${e.placeName})! +${e.xpGained ?: 0} XP"
+                e.type == "report_status" && e.userId == me.userId ->
+                    "Sesizarea ta (${e.placeName}) e acum: ${e.statusLabel}" + (e.note?.let { ". Primăria: $it" } ?: "")
                 e.type == "checkin" && e.userName != me.userName ->
                     "${e.userName} a făcut check-in la ${e.placeName}"
                 else -> null
             }
-            if (text != null) scope.launch { snackbar.showSnackbar(text, duration = SnackbarDuration.Short) }
+            if (text != null) scope.launch { snackbar.showSnackbar(text, duration = if (e.type == "report_status") SnackbarDuration.Long else SnackbarDuration.Short) }
         }
     }
 

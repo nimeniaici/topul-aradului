@@ -99,10 +99,20 @@ class PhotoOut(BaseModel):
     created_at: datetime
 
 
+class OldPhotoOut(BaseModel):
+    url: str
+    year: str
+    credit: str
+
+
 class PlaceDetailOut(PlaceOut):
     recent_photos: list[PhotoOut]
     rank_in_category: int
     splat_mb: float | None = None  # cât se descarcă la „Explorează în 3D” (afișat pe buton)
+    story: str | None = None  # textul pentru ghidul audio („Ascultă povestea”)
+    old_photo: OldPhotoOut | None = None  # „Trecut vs prezent”
+
+
 
 
 # ---------- Check-in ----------

@@ -1,0 +1,26 @@
+{
+  "Palatul Administrativ (Primăria)": {
+    "url": "/static/old/primaria-1901.jpg",
+    "year": "1901",
+    "credit": "Fortepan / Schoch Frigyes · domeniu public",
+    "source": "https://upload.wikimedia.org/wikipedia/commons/thumb/b/b2/Andr%C3%A1ssy_t%C3%A9r_%28ma_Bulevardul_Revolutiei%29%2C_Csan%C3%A1di_palota_%C3%A9s_a_V%C3%A1rosh%C3%A1za_tornyos_%C3%A9p%C3%BClete._El%C5%91t%C3%A9rben_az_Arad-Csan%C3%A1di_vas%C3%BAt._Fortepan_17683.jpg/1280px-Andr%C3%A1ssy_t%C3%A9r_%28ma_Bulevardul_Revolutiei%29%2C_Csan%C3%A1di_palota_%C3%A9s_a_V%C3%A1rosh%C3%A1za_tornyos_%C3%A9p%C3%BClete._El%C5%91t%C3%A9rben_az_Arad-Csan%C3%A1di_vas%C3%BAt._Fortepan_17683.jpg"
+  },
+  "Teatrul Clasic „Ioan Slavici”": {
+    "url": "/static/old/teatrul-1874.jpg",
+    "year": "1874",
+    "credit": "Gravură de Elischer Lajos, Magyarország és a Nagyvilág · domeniu public",
+    "source": "https://upload.wikimedia.org/wikipedia/commons/thumb/2/2b/Aradi_%C3%BAj_sz%C3%ADnh%C3%A1z_%28ma_Ioan_Slavici_Sz%C3%ADnh%C3%A1z%29._Mo._%C3%A9s_a_Nagyvil%C3%A1g%2C_1874.jpg/1280px-Aradi_%C3%BAj_sz%C3%ADnh%C3%A1z_%28ma_Ioan_Slavici_Sz%C3%ADnh%C3%A1z%29._Mo._%C3%A9s_a_Nagyvil%C3%A1g%2C_1874.jpg"
+  },
+  "Palatul Cultural": {
+    "url": "/static/old/palatul-cultural-1931.jpg",
+    "year": "1931",
+    "credit": "Fortepan / Gyöngyi · CC BY-SA 3.0",
+    "source": "https://upload.wikimedia.org/wikipedia/commons/thumb/4/45/Kult%C3%BArpalota._Fortepan_6196.jpg/1280px-Kult%C3%BArpalota._Fortepan_6196.jpg"
+  },
+  "Statuia Libertății": {
+    "url": "/static/old/statuia-libertatii.jpg",
+    "year": "înainte de 1925",
+    "credit": "Autor necunoscut · domeniu public",
+    "source": "https://upload.wikimedia.org/wikipedia/commons/a/ad/Arad_Szabads%C3%A1g-szobor.jpg"
+  }
+}

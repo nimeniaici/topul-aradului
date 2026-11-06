@@ -19,6 +19,7 @@ def ensure_columns() -> None:
     new_cols = {
         "users": {"google_sub": "VARCHAR(64)", "avatar_emoji": "VARCHAR(16)", "avatar_color": "VARCHAR(16)", "avatar_path": "VARCHAR(80)"},
         "places": {"splat_url": "VARCHAR(300)"},
+        "reports": {"admin_note": "TEXT", "updated_at": "TIMESTAMP"},
     }
     with engine.begin() as conn:
         for table, cols in new_cols.items():

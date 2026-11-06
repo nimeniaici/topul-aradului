@@ -1,4 +1,5 @@
 """Topul Aradului - API. Rulează cu:  uvicorn app.main:app --reload --host 0.0.0.0"""
+from pathlib import Path
 from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
@@ -8,7 +9,7 @@ from fastapi.staticfiles import StaticFiles
 from . import config
 from .db import Base, SessionLocal, engine, ensure_columns, scrub_checkin_gps
 from . import usernames
-from .routers import auth, checkins, crashes, download, duels, leaderboard, live, pages, places, reports, tour3d, users
+from .routers import auth, checkins, crashes, primarie, download, duels, leaderboard, live, pages, places, reports, tour3d, users
 from .seed import seed_places
 
 
@@ -35,8 +36,11 @@ app.add_middleware(CORSMiddleware, allow_origins=["*"], allow_methods=["*"], all
 
 config.UPLOAD_DIR.mkdir(parents=True, exist_ok=True)
 app.mount("/uploads", StaticFiles(directory=config.UPLOAD_DIR), name="uploads")
+# poze vechi (libere de drepturi) pentru „Trecut vs prezent”
+app.mount("/static", StaticFiles(directory=Path(__file__).parent / "static"), name="static")
 
-for r in (auth, places, leaderboard, checkins, duels, users, live, pages, tour3d, download, reports, crashes):
+app.include_router(reports.admin_router)
+for r in (auth, places, leaderboard, checkins, duels, users, live, pages, tour3d, download, reports, crashes, primarie):
     app.include_router(r.router)
 
 

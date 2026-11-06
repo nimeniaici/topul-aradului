@@ -214,6 +214,11 @@ class MapViewModel : ViewModel() {
                         pushTicker("Sesizare nouă: ${e.placeName}")
                         loadReports()
                     }
+                    "report_status" -> {
+                        pushTicker("Primăria: ${e.placeName} e acum „${e.statusLabel}”")
+                        loadReports()
+                        if (e.userId == Network.session.userId) loadProfile()
+                    }
                 }
             }
         }
@@ -602,13 +607,21 @@ private fun PlacesMap(
         if (clusterManager != null) Clustering(items = items, clusterManager = clusterManager)
 
         // sesizările (gropi etc.) - markere roșii separate
-        vm.reports.forEach { r ->
-            key("r${r.id}") {
+        // roșu = nouă, portocaliu = Primăria lucrează, verde = rezolvată (cele respinse nu le arătăm)
+        vm.reports.filter { it.status != "respins" }.forEach { r ->
+            key("r${r.id}-${r.status}") {
                 Marker(
                     state = remember { MarkerState(LatLng(r.lat, r.lng)) },
-                    title = r.categoryLabel,
-                    snippet = listOf(r.description, "semnalat de ${r.userName}").filter { it.isNotBlank() }.joinToString(" · "),
-                    icon = BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED),
+                    title = "${r.categoryLabel} · ${r.statusLabel ?: r.status}",
+                    snippet = listOfNotNull(r.adminNote?.let { "Primăria: $it" }, r.description.takeIf { it.isNotBlank() }, "semnalat de @${r.userName}")
+                        .joinToString(" · "),
+                    icon = BitmapDescriptorFactory.defaultMarker(
+                        when (r.status) {
+                            "rezolvat" -> BitmapDescriptorFactory.HUE_GREEN
+                            "in_lucru" -> BitmapDescriptorFactory.HUE_ORANGE
+                            else -> BitmapDescriptorFactory.HUE_RED
+                        }
+                    ),
                     alpha = 0.9f,
                 )
             }

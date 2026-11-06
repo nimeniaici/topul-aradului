@@ -161,3 +161,17 @@ def test_maintenance_sync_keeps_users(client, auth, tmp_path, monkeypatch):
     monkeypatch.setattr(maintenance, "SEED_FILE", seed.SEED_FILE)
     with SessionLocal() as db:
         maintenance.sync_places(db)
+
+
+def test_poveste_si_poza_veche(client):
+    places = client.get("/places", params={"category": "obiectiv"}).json()
+    primaria = next(p for p in places if p["name"].startswith("Palatul Administrativ"))
+    d = client.get(f"/places/{primaria['id']}").json()
+    assert d["story"] and "1872" in d["story"]
+    assert d["old_photo"]["year"] == "1901" and client.get(d["old_photo"]["url"]).status_code == 200
+    # toate poveștile și pozele vechi corespund unor locuri care există
+    import json
+    from app import place_extras
+    names = {p["name"] for p in json.load(open(place_extras._DIR / "seed_places.json", encoding="utf-8"))}
+    assert set(place_extras._load("place_stories.json")) <= names
+    assert set(place_extras._load("old_photos.json")) <= names

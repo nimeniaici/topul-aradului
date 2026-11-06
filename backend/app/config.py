@@ -63,4 +63,6 @@ RESET_CODE_MINUTES = int(os.getenv("RESET_CODE_MINUTES", "15"))
 
 # Cheie pentru operațiile de administrare (ex. urcarea scenelor 3D). Fără ea, rutele /admin sunt dezactivate.
 ADMIN_TOKEN = os.getenv("ADMIN_TOKEN", "")
+# cheia pentru panoul Primăriei (/primarie); separată de ADMIN_TOKEN, ca să poată fi dată funcționarilor
+PRIMARIE_TOKEN = os.getenv("PRIMARIE_TOKEN", "")
 MAX_SPLAT_MB = int(os.getenv("MAX_SPLAT_MB", "300"))

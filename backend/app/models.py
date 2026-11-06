@@ -96,6 +96,9 @@ class Report(Base):
     photo_path: Mapped[str | None] = mapped_column(String(300), nullable=True)
     status: Mapped[str] = mapped_column(String(20), default="nou")
     created_at: Mapped[datetime] = mapped_column(DateTime, default=utcnow, index=True)
+    # răspunsul Primăriei (ex. „Echipa ajunge marți”) și când s-a schimbat ultima dată statusul
+    admin_note: Mapped[str | None] = mapped_column(Text, nullable=True)
+    updated_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
 
     user: Mapped[User] = relationship()
 
