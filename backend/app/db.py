@@ -15,14 +15,19 @@ class Base(DeclarativeBase):
 def ensure_columns() -> None:
     """Mini-migrare: adaugă coloanele noi în tabele create de o versiune mai veche."""
     insp = inspect(engine)
-    if "users" not in insp.get_table_names():
-        return
-    have = {c["name"] for c in insp.get_columns("users")}
-    new_cols = {"google_sub": "VARCHAR(64)", "avatar_emoji": "VARCHAR(16)", "avatar_color": "VARCHAR(16)"}
+    tables = set(insp.get_table_names())
+    new_cols = {
+        "users": {"google_sub": "VARCHAR(64)", "avatar_emoji": "VARCHAR(16)", "avatar_color": "VARCHAR(16)"},
+        "places": {"splat_url": "VARCHAR(300)"},
+    }
     with engine.begin() as conn:
-        for name, sql_type in new_cols.items():
-            if name not in have:
-                conn.execute(text(f"ALTER TABLE users ADD COLUMN {name} {sql_type}"))
+        for table, cols in new_cols.items():
+            if table not in tables:
+                continue
+            have = {c["name"] for c in insp.get_columns(table)}
+            for name, sql_type in cols.items():
+                if name not in have:
+                    conn.execute(text(f"ALTER TABLE {table} ADD COLUMN {name} {sql_type}"))
 
 
 def get_db():

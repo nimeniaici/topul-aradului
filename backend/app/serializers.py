@@ -20,6 +20,7 @@ def place_out(p: Place, distance: float | None = None) -> PlaceOut:
         lat=p.lat,
         lng=p.lng,
         photo_url=p.photo_url,
+        splat_url=p.splat_url,
         rating=round(p.rating, 1),
         duels=p.duels,
         wins=p.wins,

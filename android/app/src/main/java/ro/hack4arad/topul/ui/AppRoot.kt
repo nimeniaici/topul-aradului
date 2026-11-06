@@ -41,6 +41,7 @@ import ro.hack4arad.topul.ui.duels.DuelScreen
 import ro.hack4arad.topul.ui.leaderboard.LeaderboardScreen
 import ro.hack4arad.topul.ui.map.MapScreen
 import ro.hack4arad.topul.ui.place.PlaceScreen
+import ro.hack4arad.topul.ui.place.Tour3DScreen
 import ro.hack4arad.topul.ui.profile.ProfileScreen
 
 private data class Tab(val route: String, val label: String, val icon: ImageVector)
@@ -122,7 +123,11 @@ private fun MainScaffold() {
             composable(
                 "place/{id}",
                 arguments = listOf(navArgument("id") { type = NavType.IntType }),
-            ) { PlaceScreen(onBack = { nav.popBackStack() }) }
+            ) { PlaceScreen(onBack = { nav.popBackStack() }, onTour3D = { id -> nav.navigate("tour/$id") }) }
+            composable(
+                "tour/{id}",
+                arguments = listOf(navArgument("id") { type = NavType.IntType }),
+            ) { entry -> Tour3DScreen(placeId = entry.arguments?.getInt("id") ?: 0, onBack = { nav.popBackStack() }) }
         }
     }
 }

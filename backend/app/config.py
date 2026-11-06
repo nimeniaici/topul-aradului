@@ -58,3 +58,7 @@ SMTP_USER = os.getenv("SMTP_USER", "")
 SMTP_PASSWORD = os.getenv("SMTP_PASSWORD", "")
 SMTP_FROM = os.getenv("SMTP_FROM", SMTP_USER or "Topul Aradului <no-reply@topularadului.ro>")
 RESET_CODE_MINUTES = int(os.getenv("RESET_CODE_MINUTES", "15"))
+
+# Cheie pentru operațiile de administrare (ex. urcarea scenelor 3D). Fără ea, rutele /admin sunt dezactivate.
+ADMIN_TOKEN = os.getenv("ADMIN_TOKEN", "")
+MAX_SPLAT_MB = int(os.getenv("MAX_SPLAT_MB", "300"))

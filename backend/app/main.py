@@ -7,7 +7,7 @@ from fastapi.staticfiles import StaticFiles
 
 from . import config
 from .db import Base, SessionLocal, engine, ensure_columns
-from .routers import auth, checkins, duels, leaderboard, live, pages, places, users
+from .routers import auth, checkins, duels, leaderboard, live, pages, places, tour3d, users
 from .seed import seed_places
 
 
@@ -33,7 +33,7 @@ app.add_middleware(CORSMiddleware, allow_origins=["*"], allow_methods=["*"], all
 config.UPLOAD_DIR.mkdir(parents=True, exist_ok=True)
 app.mount("/uploads", StaticFiles(directory=config.UPLOAD_DIR), name="uploads")
 
-for r in (auth, places, leaderboard, checkins, duels, users, live, pages):
+for r in (auth, places, leaderboard, checkins, duels, users, live, pages, tour3d):
     app.include_router(r.router)
 
 

@@ -3,7 +3,7 @@ from datetime import timedelta
 from pathlib import Path
 
 from fastapi import APIRouter, BackgroundTasks, Depends, File, Form, HTTPException, Query, UploadFile
-from sqlalchemy import select
+from sqlalchemy import select, update
 from sqlalchemy.orm import Session, joinedload
 
 from .. import config
@@ -76,9 +76,12 @@ async def create_checkin(
 
     checkin = Checkin(user_id=user.id, place_id=place.id, lat=lat, lng=lng, photo_path=photo_path)
     db.add(checkin)
-    place.checkin_count += 1
-    user.xp += xp
     db.flush()
+    # Adunare atomică în baza de date: două check-in-uri în aceeași secundă nu pierd niciun +1.
+    db.execute(update(Place).where(Place.id == place.id).values(checkin_count=Place.checkin_count + 1))
+    db.execute(update(User).where(User.id == user.id).values(xp=User.xp + xp))
+    db.refresh(place)
+    db.refresh(user)
 
     mayor_change = update_mayor(db, place)
     new_badges = award_badges(db, user)

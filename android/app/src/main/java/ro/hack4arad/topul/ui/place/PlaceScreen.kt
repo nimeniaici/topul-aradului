@@ -66,6 +66,8 @@ import ro.hack4arad.topul.ui.components.PlaceImage
 import ro.hack4arad.topul.ui.components.SectionTitle
 import ro.hack4arad.topul.ui.components.categoryColor
 import ro.hack4arad.topul.ui.theme.Gold
+import ro.hack4arad.topul.ui.theme.Electric
+import androidx.compose.material3.ButtonDefaults
 import ro.hack4arad.topul.ui.theme.GoldDark
 import ro.hack4arad.topul.ui.theme.Lilac
 import ro.hack4arad.topul.ui.theme.Night
@@ -118,7 +120,7 @@ class PlaceViewModel(handle: SavedStateHandle) : ViewModel() {
 }
 
 @Composable
-fun PlaceScreen(onBack: () -> Unit, vm: PlaceViewModel = viewModel()) {
+fun PlaceScreen(onBack: () -> Unit, onTour3D: (Int) -> Unit = {}, vm: PlaceViewModel = viewModel()) {
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
     var photoUri by rememberSaveable { mutableStateOf<Uri?>(null) }
@@ -197,6 +199,14 @@ fun PlaceScreen(onBack: () -> Unit, vm: PlaceViewModel = viewModel()) {
 
                     if (place.description.isNotBlank()) {
                         Text(place.description, color = Lilac, modifier = Modifier.padding(top = 14.dp))
+                    }
+
+                    if (place.splatUrl != null) {
+                        Button(
+                            onClick = { onTour3D(place.id) },
+                            colors = ButtonDefaults.buttonColors(containerColor = Electric, contentColor = Color.White),
+                            modifier = Modifier.fillMaxWidth().padding(top = 16.dp).height(56.dp),
+                        ) { Text("🧊 Explorează în 3D", fontSize = 17.sp) }
                     }
 
                     vm.actionError?.let {

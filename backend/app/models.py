@@ -40,6 +40,8 @@ class Place(Base):
     lat: Mapped[float] = mapped_column(Float)
     lng: Mapped[float] = mapped_column(Float)
     photo_url: Mapped[str | None] = mapped_column(String(300), nullable=True)
+    # scena 3D (Gaussian splat: .ply / .splat / .ksplat) pentru „Turul 3D”
+    splat_url: Mapped[str | None] = mapped_column(String(300), nullable=True)
     # coordonatele au fost verificate pe hartă de echipă?
     verified: Mapped[bool] = mapped_column(Boolean, default=False)
 

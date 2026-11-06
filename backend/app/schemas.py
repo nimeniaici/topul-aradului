@@ -78,6 +78,7 @@ class PlaceOut(BaseModel):
     lat: float
     lng: float
     photo_url: str | None
+    splat_url: str | None = None
     rating: float
     duels: int
     wins: int

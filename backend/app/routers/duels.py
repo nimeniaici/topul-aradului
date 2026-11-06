@@ -2,7 +2,7 @@ import random
 from datetime import timedelta
 
 from fastapi import APIRouter, Depends, HTTPException
-from sqlalchemy import func, or_, and_, select
+from sqlalchemy import and_, func, or_, select, update
 from sqlalchemy.orm import Session, joinedload
 
 from .. import config, elo
@@ -45,8 +45,13 @@ def next_duel(category: str | None = None, db: Session = Depends(get_db)):
 def vote(body: VoteIn, user: User = Depends(get_current_user), db: Session = Depends(get_db)):
     if body.winner_id == body.loser_id:
         raise HTTPException(400, "Alege două locuri diferite.")
-    winner = db.get(Place, body.winner_id)
-    loser = db.get(Place, body.loser_id)
+    # Blocăm cele două rânduri (în ordinea id-ului, ca să nu apară deadlock) cât timp recalculăm Elo:
+    # două voturi simultane pe același loc se aplică pe rând, nu se suprascriu.
+    locked = {p.id: p for p in db.scalars(
+        select(Place).where(Place.id.in_([body.winner_id, body.loser_id])).order_by(Place.id).with_for_update()
+    )}
+    winner = locked.get(body.winner_id)
+    loser = locked.get(body.loser_id)
     if not winner or not loser:
         raise HTTPException(404, "Locul nu există.")
     if winner.category != loser.category:
@@ -65,8 +70,9 @@ def vote(body: VoteIn, user: User = Depends(get_current_user), db: Session = Dep
     winner.wins += 1
     loser.duels += 1
     db.add(Vote(user_id=user.id, winner_id=winner.id, loser_id=loser.id, category=winner.category))
-    user.xp += XP_VOTE
     db.flush()
+    db.execute(update(User).where(User.id == user.id).values(xp=User.xp + XP_VOTE))
+    db.refresh(user)
     new_badges = award_badges(db, user)
     db.commit()
     return VoteOut(winner=place_out(winner), loser=place_out(loser), xp_gained=XP_VOTE,
