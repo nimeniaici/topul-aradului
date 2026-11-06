@@ -72,6 +72,11 @@ import androidx.compose.foundation.shape.GenericShape
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.maps.android.clustering.ClusterItem
 import com.google.maps.android.compose.clustering.Clustering
+import com.google.maps.android.compose.clustering.rememberClusterManager
+import com.google.maps.android.compose.clustering.rememberClusterRenderer
+import com.google.maps.android.clustering.algo.NonHierarchicalDistanceBasedAlgorithm
+import com.google.maps.android.clustering.view.DefaultClusterRenderer
+import androidx.compose.runtime.SideEffect
 import com.google.maps.android.compose.MapsComposeExperimentalApi
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
@@ -404,7 +409,7 @@ private fun PlaceCard(place: Place, busy: Boolean, onDetails: () -> Unit, onClos
 private fun PlacesMap(vm: MapViewModel, hasPermission: Boolean, showHeat: Boolean) {
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
-    val camera = rememberCameraPositionState { position = CameraPosition.fromLatLngZoom(ARAD, 14f) }
+    val camera = rememberCameraPositionState { position = CameraPosition.fromLatLngZoom(ARAD, 13.6f) }
     val style = remember { MapStyleOptions.loadRawResourceStyle(context, R.raw.map_style_night) }
     val me = Network.session.userId
     GoogleMap(
@@ -415,26 +420,39 @@ private fun PlacesMap(vm: MapViewModel, hasPermission: Boolean, showHeat: Boolea
         uiSettings = MapUiSettings(zoomControlsEnabled = false, myLocationButtonEnabled = false, mapToolbarEnabled = false),
         onMapClick = { vm.selectPlace(null) },
     ) {
-        // locurile apropiate se grupează într-o bulă cu număr; la zoom se desfac
+        // Locurile apropiate se grupează într-o bulă (cu emoji-urile categoriilor din ea); la zoom se desfac.
+        // Grupare mai agresivă decât implicit: rază mare și bule chiar și din 2 locuri.
         val items = remember(vm.places) { vm.places.map(::PlaceItem) }
-        Clustering(
-            items = items,
-            onClusterClick = { cluster ->
-                scope.launch {
-                    camera.animate(CameraUpdateFactory.newLatLngZoom(cluster.position, camera.position.zoom + 2f), 500)
-                }
-                true
-            },
-            onClusterItemClick = { item ->
-                vm.selectPlace(item.place)
-                true // nu deschide fereastra standard Google
-            },
-            clusterContent = { cluster -> ClusterBubble(cluster.size) },
+        val clusterManager = rememberClusterManager<PlaceItem>()
+        LaunchedEffect(clusterManager) {
+            clusterManager?.algorithm = NonHierarchicalDistanceBasedAlgorithm<PlaceItem>().apply {
+                maxDistanceBetweenClusteredItems = CLUSTER_RADIUS_DP
+            }
+        }
+        val renderer = rememberClusterRenderer(
+            clusterContent = { cluster -> ClusterBubble(cluster.items.map { it.place.category }) },
             clusterItemContent = { item ->
                 val p = item.place
                 PlaceMarker(categoryEmoji(p.category), categoryColor(p.category), mine = p.mayorId == me, noMayor = p.mayorId == null)
             },
+            clusterManager = clusterManager,
         )
+        SideEffect {
+            val manager = clusterManager ?: return@SideEffect
+            (renderer as? DefaultClusterRenderer<PlaceItem>)?.minClusterSize = 2
+            if (renderer != null && manager.renderer != renderer) manager.renderer = renderer
+            manager.setOnClusterClickListener { cluster ->
+                scope.launch {
+                    camera.animate(CameraUpdateFactory.newLatLngZoom(cluster.position, camera.position.zoom + 2f), 500)
+                }
+                true
+            }
+            manager.setOnClusterItemClickListener { item ->
+                vm.selectPlace(item.place)
+                true // nu deschide fereastra standard Google
+            }
+        }
+        if (clusterManager != null) Clustering(items = items, clusterManager = clusterManager)
         if (showHeat && vm.heat.isNotEmpty()) {
             key(vm.heatVersion) {
                 val provider = remember {
@@ -463,32 +481,28 @@ private class PlaceItem(val place: Place) : ClusterItem {
     override fun getZIndex(): Float = if (place.mayorId == Network.session.userId) 2f else 1f
 }
 
-/** Marker: pătrat rotunjit în culoarea categoriei, cu emoji; auriu cu coroană unde ești Primar. */
+/** Cât de departe (în dp pe ecran) se adună locurile într-o bulă. Implicit Google: 100. */
+private const val CLUSTER_RADIUS_DP = 120
+
+/** Marker mic și rotund: emoji pe fundal închis, cu inel în culoarea categoriei; auriu cu coroană unde ești Primar. */
 @Composable
 private fun PlaceMarker(emoji: String, color: Color, mine: Boolean, noMayor: Boolean) {
-    Box {
-        Column(horizontalAlignment = Alignment.CenterHorizontally) {
-            Box(
-                Modifier
-                    .size(38.dp)
-                    .clip(RoundedCornerShape(11.dp))
-                    .background(if (mine) Gold else color)
-                    .border(2.dp, if (mine) Color.White else NightDeep, RoundedCornerShape(11.dp)),
-                contentAlignment = Alignment.Center,
-            ) { Text(if (mine) "👑" else emoji, fontSize = 18.sp) }
-            Box(
-                Modifier
-                    .size(10.dp, 6.dp)
-                    .clip(TriangleShape)
-                    .background(if (mine) Gold else color)
-            )
-        }
+    Box(Modifier.size(36.dp)) {
+        Box(
+            Modifier
+                .align(Alignment.Center)
+                .size(30.dp)
+                .clip(CircleShape)
+                .background(if (mine) Gold else NightDeep)
+                .border(2.5.dp, if (mine) Color.White else color, CircleShape),
+            contentAlignment = Alignment.Center,
+        ) { Text(if (mine) "👑" else emoji, fontSize = 15.sp) }
         if (noMayor && !mine) {
+            // bulina aurie = „tron liber”
             Box(
                 Modifier
                     .align(Alignment.TopEnd)
-                    .offset(x = 4.dp, y = (-4).dp)
-                    .size(12.dp)
+                    .size(11.dp)
                     .clip(CircleShape)
                     .background(Gold)
                     .border(2.dp, NightDeep, CircleShape)
@@ -497,24 +511,22 @@ private fun PlaceMarker(emoji: String, color: Color, mine: Boolean, noMayor: Boo
     }
 }
 
-private val TriangleShape = GenericShape { size, _ ->
-    moveTo(0f, 0f)
-    lineTo(size.width, 0f)
-    lineTo(size.width / 2f, size.height)
-    close()
-}
-
-/** Bulă pentru mai multe locuri apropiate. */
+/** Bulă pentru mai multe locuri apropiate: numărul + emoji-urile celor mai frecvente categorii. */
 @Composable
-private fun ClusterBubble(count: Int) {
-    Box(
+private fun ClusterBubble(categories: List<String>) {
+    val top = categories.groupingBy { it }.eachCount().entries
+        .sortedByDescending { it.value }.take(3).joinToString("") { categoryEmoji(it.key) }
+    Column(
         Modifier
-            .size(if (count >= 10) 52.dp else 44.dp)
-            .clip(CircleShape)
+            .clip(RoundedCornerShape(50))
             .background(Violet)
-            .border(3.dp, Gold, CircleShape),
-        contentAlignment = Alignment.Center,
-    ) { Text("$count", color = Color.White, fontWeight = FontWeight.Black, fontSize = 17.sp) }
+            .border(2.5.dp, Gold, RoundedCornerShape(50))
+            .padding(horizontal = 12.dp, vertical = 5.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+    ) {
+        Text("${categories.size}", color = Color.White, fontWeight = FontWeight.Black, fontSize = 16.sp, lineHeight = 17.sp)
+        Text(top, fontSize = 12.sp, lineHeight = 14.sp)
+    }
 }
 
 private fun formatDistance(m: Double): String =
