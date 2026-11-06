@@ -7,6 +7,10 @@ Durată totală: cam 25–30 de minute.
 
 ---
 
+> ✅ **Pașii 1 și 2 sunt gata.** Codul e pe https://github.com/nimeniaici/topul-aradului, iar serverul rulează
+> pe **https://api-production-a749.up.railway.app** (Railway, proiect `topul-aradului`: PostgreSQL + volum `/data`).
+> Actualizare server: din folderul `backend`, rulează `railway up --service api --detach`.
+
 ## Pasul 1: urcă proiectul pe GitHub (~5 min)
 
 Railway ia codul de pe GitHub, așa că primul pas e să-l pui acolo.
