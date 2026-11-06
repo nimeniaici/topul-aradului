@@ -74,7 +74,9 @@ async def create_checkin(
     if photo_path:
         xp += XP_PHOTO_BONUS
 
-    checkin = Checkin(user_id=user.id, place_id=place.id, lat=lat, lng=lng, photo_path=photo_path)
+    # Minimizarea datelor (GDPR): poziția exactă a utilizatorului servește doar la verificarea distanței
+    # de mai sus și nu se salvează. În baza de date rămân doar coordonatele locului.
+    checkin = Checkin(user_id=user.id, place_id=place.id, lat=place.lat, lng=place.lng, photo_path=photo_path)
     db.add(checkin)
     db.flush()
     # Adunare atomică în baza de date: două check-in-uri în aceeași secundă nu pierd niciun +1.

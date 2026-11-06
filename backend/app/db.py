@@ -30,6 +30,20 @@ def ensure_columns() -> None:
                     conn.execute(text(f"ALTER TABLE {table} ADD COLUMN {name} {sql_type}"))
 
 
+def scrub_checkin_gps() -> None:
+    """Înlocuiește pozițiile GPS exacte salvate de versiunile vechi cu coordonatele locului (idempotent)."""
+    if "checkins" not in inspect(engine).get_table_names():
+        return
+    with engine.begin() as conn:
+        conn.execute(text(
+            "UPDATE checkins SET "
+            "lat = (SELECT places.lat FROM places WHERE places.id = checkins.place_id), "
+            "lng = (SELECT places.lng FROM places WHERE places.id = checkins.place_id) "
+            "WHERE EXISTS (SELECT 1 FROM places WHERE places.id = checkins.place_id "
+            "AND (places.lat <> checkins.lat OR places.lng <> checkins.lng))"
+        ))
+
+
 def get_db():
     db = SessionLocal()
     try:

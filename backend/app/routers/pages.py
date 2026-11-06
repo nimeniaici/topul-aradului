@@ -65,8 +65,9 @@ def privacy():
 <ul>
 <li><b>Datele contului:</b> numele afișat, adresa de email și parola (salvată doar criptat, sub formă de hash).
 Dacă intri cu Google, primim de la Google numele, emailul și un identificator al contului Google. Nu primim parola ta Google.</li>
-<li><b>Locația, doar la check-in:</b> când apeși „Check-in”, aplicația trimite poziția GPS din acel moment,
-ca să verifice că ești lângă loc. Nu urmărim locația în fundal.</li>
+<li><b>Locația, doar la check-in, și nu o păstrăm:</b> când apeși „Check-in”, aplicația trimite poziția GPS
+din acel moment, iar serverul o folosește <b>doar</b> ca să verifice că ești la cel mult 100 m de loc. Apoi o aruncă:
+salvăm doar <i>ce loc</i> ai vizitat și când, nu unde te aflai exact. Nu urmărim locația în fundal.</li>
 <li><b>Poze:</b> doar dacă alegi să faci check-in cu poză. Pozele sunt vizibile celorlalți utilizatori pe pagina locului.</li>
 <li><b>Activitatea în joc:</b> check-in-urile, voturile din dueluri, punctele XP, insignele și avatarul ales.</li>
 </ul>
@@ -83,8 +84,13 @@ Emailul nu este afișat niciodată altor utilizatori.</p>
 </ul>
 <p>Nu vindem date, nu afișăm reclame și nu folosim datele pentru publicitate.</p>
 
-<h2>Unde sunt stocate</h2>
-<p>Datele sunt stocate pe serverele furnizorului de găzduire Railway. Comunicarea dintre aplicație și server este criptată (HTTPS).</p>
+<h2>Cum le protejăm</h2>
+<ul>
+<li>Comunicarea dintre aplicație și server este criptată (HTTPS).</li>
+<li>Parolele nu sunt salvate niciodată în clar, ci doar ca hash criptografic (PBKDF2 cu „salt”), pe care nici noi nu-l putem inversa.</li>
+<li>Păstrăm doar datele strict necesare jocului (minimizarea datelor).</li>
+<li>Datele sunt stocate pe serverele furnizorului de găzduire Railway.</li>
+</ul>
 
 <h2>Cât le păstrăm și cum le ștergi</h2>
 <p>Păstrăm datele cât timp ai cont. Poți șterge oricând contul din aplicație:

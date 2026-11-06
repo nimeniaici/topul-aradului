@@ -60,6 +60,7 @@ class Checkin(Base):
     id: Mapped[int] = mapped_column(primary_key=True)
     user_id: Mapped[int] = mapped_column(ForeignKey("users.id"), index=True)
     place_id: Mapped[int] = mapped_column(ForeignKey("places.id"), index=True)
+    # coordonatele LOCULUI (nu ale utilizatorului: poziția lui exactă nu se păstrează)
     lat: Mapped[float] = mapped_column(Float)
     lng: Mapped[float] = mapped_column(Float)
     photo_path: Mapped[str | None] = mapped_column(String(300), nullable=True)

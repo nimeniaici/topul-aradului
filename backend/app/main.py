@@ -6,7 +6,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 
 from . import config
-from .db import Base, SessionLocal, engine, ensure_columns
+from .db import Base, SessionLocal, engine, ensure_columns, scrub_checkin_gps
 from .routers import auth, checkins, duels, leaderboard, live, pages, places, tour3d, users
 from .seed import seed_places
 
@@ -15,6 +15,7 @@ from .seed import seed_places
 async def lifespan(_app: FastAPI):
     Base.metadata.create_all(engine)
     ensure_columns()
+    scrub_checkin_gps()
     config.UPLOAD_DIR.mkdir(parents=True, exist_ok=True)
     if config.SEED_ON_STARTUP:
         with SessionLocal() as db:
