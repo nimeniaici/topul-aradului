@@ -10,6 +10,10 @@ Durată totală: cam 25–30 de minute.
 > ✅ **Pașii 1 și 2 sunt gata.** Codul e pe https://github.com/nimeniaici/topul-aradului, iar serverul rulează
 > pe **https://api-production-a749.up.railway.app** (Railway, proiect `topul-aradului`: PostgreSQL + volum `/data`).
 > Actualizare server: din folderul `backend`, rulează `railway up --service api --detach`.
+>
+> ✅ **Pasul 3 e gata.** Clienții OAuth Web și Android sunt creați, aplicația e publicată, `GOOGLE_CLIENT_IDS`
+> e setat pe Railway și `GOOGLE_WEB_CLIENT_ID` e în `android/local.properties`.
+> Pagini publice: `/despre`, `/confidentialitate`, `/termeni`.
 
 ## Pasul 1: urcă proiectul pe GitHub (~5 min)
 
