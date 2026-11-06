@@ -14,6 +14,11 @@ Durată totală: cam 25–30 de minute.
 > ✅ **Pasul 3 e gata.** Clienții OAuth Web și Android sunt creați, aplicația e publicată, `GOOGLE_CLIENT_IDS`
 > e setat pe Railway și `GOOGLE_WEB_CLIENT_ID` e în `android/local.properties`.
 > Pagini publice: `/despre`, `/confidentialitate`, `/termeni`.
+>
+> 📲 **Descărcare aplicație:** https://api-production-a749.up.railway.app/app (cod QR: `prezentare/qr-descarca-aplicatia.png`).
+> Urcarea unui APK nou (cheia e în `backend/.env.admin`, exclus din git):
+> `curl -X POST https://api-production-a749.up.railway.app/admin/apk -H "X-Admin-Token: CHEIA" -F "file=@android/app/build/outputs/apk/debug/app-debug.apk"`
+> Tur 3D: `curl -X POST .../admin/places/ID/splat -H "X-Admin-Token: CHEIA" -F "file=@scena.splat"`
 
 ## Pasul 1: urcă proiectul pe GitHub (~5 min)
 
