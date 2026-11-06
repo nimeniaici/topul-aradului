@@ -8,6 +8,8 @@ android/   aplicația (Kotlin + Jetpack Compose)      → deschide în Android S
 backend/   API-ul (Python + FastAPI + SQLAlchemy)     → deschide în VS Code
 ```
 
+**Publicare online, login cu Google și email: vezi [GHID-PUBLICARE.md](GHID-PUBLICARE.md).**
+
 ---
 
 ## 1. Backend (Python)
@@ -43,6 +45,9 @@ Creează 6 utilizatori demo (parola `demo1234`) cu check-in-uri în ultima oră 
 | Metodă | Endpoint | Ce face |
 |---|---|---|
 | POST | `/auth/register`, `/auth/login` | cont nou / login → token |
+| POST | `/auth/google` | login cu Google (`id_token` din aplicație) |
+| POST | `/auth/forgot-password`, `/auth/reset-password` | cod de 6 cifre pe email → parolă nouă |
+| PATCH / DELETE | `/users/me` | editare nume și avatar / ștergere definitivă a contului |
 | GET | `/places?category=&lat=&lng=&radius_km=` | locuri (sortate după distanță dacă dai lat/lng) |
 | GET | `/places/categories` | categoriile existente |
 | GET | `/places/{id}` | detalii + poze recente + locul în clasament |
