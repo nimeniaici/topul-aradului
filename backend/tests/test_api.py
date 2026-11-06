@@ -14,7 +14,7 @@ def _checkin(client, auth, place, photo=False, **extra):
 def test_health_and_seed(client):
     assert client.get("/").json()["status"] == "ok"
     cats = {c["code"] for c in client.get("/places/categories").json()}
-    assert {"pizza", "cafenea", "obiectiv"} <= cats
+    assert {"fastfood", "cafenea", "obiectiv", "manastire", "mall", "gelaterie"} <= cats
 
 
 def test_public_pages(client):
@@ -90,7 +90,7 @@ def test_mayor_changes(client, auth):
 
 
 def test_duel_vote_updates_elo(client, auth):
-    duel = client.get("/duels/next", params={"category": "pizza"}).json()
+    duel = client.get("/duels/next", params={"category": "fastfood"}).json()
     a, b = duel["a"], duel["b"]
     r = client.post("/duels/vote", json={"winner_id": a["id"], "loser_id": b["id"]}, headers=auth)
     assert r.status_code == 200, r.text
@@ -99,12 +99,12 @@ def test_duel_vote_updates_elo(client, auth):
     assert abs(r.json()["loser"]["rating"] - exp_b) < 0.2
     # același duel imediat -> refuzat
     assert client.post("/duels/vote", json={"winner_id": b["id"], "loser_id": a["id"]}, headers=auth).status_code == 429
-    top = client.get("/leaderboard/places", params={"category": "pizza"}).json()
+    top = client.get("/leaderboard/places", params={"category": "fastfood"}).json()
     assert top[0]["id"] == a["id"]
 
 
 def test_duel_validation(client, auth):
-    pizza = _place(client, "pizza")
+    pizza = _place(client, "fastfood")
     cafe = _place(client, "cafenea")
     assert client.post("/duels/vote", json={"winner_id": pizza["id"], "loser_id": cafe["id"]}, headers=auth).status_code == 400
     assert client.post("/duels/vote", json={"winner_id": pizza["id"], "loser_id": pizza["id"]}, headers=auth).status_code == 400
@@ -117,7 +117,7 @@ def test_user_leaderboard(client):
 
 
 def test_live_websocket_receives_checkin(client, auth):
-    place = _place(client, "burger")
+    place = _place(client, "restaurant")
     with client.websocket_connect("/live") as ws:
         assert _checkin(client, auth, place).status_code == 201
         msg = ws.receive_json()

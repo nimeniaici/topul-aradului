@@ -44,6 +44,7 @@ import ro.hack4arad.topul.ui.theme.Electric
 import ro.hack4arad.topul.ui.theme.Gold
 import ro.hack4arad.topul.ui.theme.GoldDark
 import ro.hack4arad.topul.ui.theme.Leaf
+import ro.hack4arad.topul.ui.theme.Lilac
 import ro.hack4arad.topul.ui.theme.Mint
 import ro.hack4arad.topul.ui.theme.Panel
 import ro.hack4arad.topul.ui.theme.Pink
@@ -52,27 +53,35 @@ import ro.hack4arad.topul.ui.theme.Violet
 
 /** Emoji per categorie - arată bine și nu cere iconițe extra. */
 fun categoryEmoji(code: String): String = when (code) {
-    "pizza" -> "🍕"
-    "burger" -> "🍔"
+    "fastfood" -> "🍔"
     "restaurant" -> "🍽️"
     "cafenea" -> "☕"
-    "desert" -> "🍰"
-    "terasa" -> "🌿"
-    "bar" -> "🍸"
-    "producator" -> "🍯"
+    "cofetarie" -> "🍰"
+    "gelaterie" -> "🍦"
+    "terasa" -> "🍹"
+    "bar" -> "🍺"
     "obiectiv" -> "🏛️"
+    "manastire" -> "⛪"
     "natura" -> "🌳"
+    "mall" -> "🛍️"
     "eveniment" -> "🎉"
     else -> "📍"
 }
 
 /** Culoarea neon a fiecărei categorii (markere, carduri, chenare). */
 fun categoryColor(code: String): Color = when (code) {
-    "pizza", "burger", "restaurant", "desert" -> Pink
-    "cafenea", "bar", "terasa" -> Mint
+    "fastfood" -> Color(0xFFFF8A3D)
+    "restaurant" -> Pink
+    "cafenea" -> Color(0xFFC08A5B)
+    "cofetarie" -> Color(0xFFFF9ECF)
+    "gelaterie" -> Color(0xFF7FE3FF)
+    "terasa" -> Mint
+    "bar" -> Violet
     "obiectiv" -> Electric
+    "manastire" -> Lilac
     "natura" -> Leaf
-    "producator", "eveniment" -> Gold
+    "mall" -> Gold
+    "eveniment" -> Gold
     else -> Violet
 }
 

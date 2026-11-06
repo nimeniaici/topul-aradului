@@ -1,101 +1,174 @@
-"""Construiește seed_places.json din datele OpenStreetMap (© OpenStreetMap contributors, ODbL)."""
-import json, sys, math
+"""Construiește app/seed_places.json din date OpenStreetMap (© OpenStreetMap contributors, ODbL).
+
+Folosire:  python tools/build_seed_from_osm.py arad.json arad2.json app/seed_places.json
+  arad.json  = restaurante, cafenele, baruri, obiective, parcuri (Overpass, orașul Arad)
+  arad2.json = fast food, cofetării, gelaterii, terase, mall-uri (Overpass, orașul Arad)
+Locurile din județ (cetăți, mănăstiri, Moneasa) au coordonatele din OpenStreetMap trecute direct mai jos.
+"""
+import json
+import math
+import sys
+from collections import Counter
+
 sys.stdout.reconfigure(encoding="utf-8")
-osm_file, out_file = sys.argv[1], sys.argv[2]
-els = json.load(open(osm_file, encoding="utf-8"))["elements"]
-C = (46.1745, 21.3185)
+*osm_files, out_file = sys.argv[1:]
+els = [e for f in osm_files for e in json.load(open(f, encoding="utf-8"))["elements"] if "tags" in e]
+CENTER = (46.1745, 21.3185)
+
 
 def coords(e):
     return (e.get("lat") or e["center"]["lat"], e.get("lon") or e["center"]["lon"])
 
-def find(name, near=C):
+
+def find(name, near=CENTER):
     cands = [e for e in els if e["tags"].get("name") == name]
     if not cands:
-        raise SystemExit(f"NU găsesc: {name}")
+        raise SystemExit(f"NU găsesc în OSM: {name}")
     return min(cands, key=lambda e: math.dist(coords(e), near))
 
-CUISINE = {"pizza": "pizza", "italian": "italian", "burger": "burgeri", "regional": "local", "german": "german",
-           "seafood": "pește & fructe de mare", "steak_house": "steak", "coffee_shop": "cafea", "cake": "prăjituri",
-           "brunch": "brunch", "chicken": "pui", "salad": "salate", "lebanese": "libanez", "asian": "asiatic"}
 
 def address(t):
     s = " ".join(x for x in (t.get("addr:street", ""), t.get("addr:housenumber", "")) if x).strip()
-    return (s + ", Arad") if s else "Arad"
+    return f"{s}, Arad" if s else "Arad"
 
-def desc(t, default):
-    cs = [CUISINE[c] for c in t.get("cuisine", "").replace(",", ";").split(";") if c in CUISINE]
-    return (f"Bucătărie: {', '.join(dict.fromkeys(cs))}." if cs else default)
 
+# categorie -> [(nume în OSM, nume afișat sau None, descriere, aproape de (lat, lng) sau None)]
 PICKS = {
-    "pizza": ["Pizzeria Milano", "MONDOPIZZA", "Pizzeria Don", "Pizza Drive", "Pizza Ruby", "Venezzia Pizza Express"],
-    "burger": ["KHARMA", "Eat like a man", "La Casa de Burger", "Foodie The Van", "La Raul", "McDonald's"],
-    "restaurant": ["Euphoria Biergarten Arad", "Mantua", "Cine Citta", "Ema Del Mar", "La Bottega", "Restaurant Picasso",
-                   "Vegan Time", "Restaurant Coandi", "Taverna Libaneză", "Casa Bulzan", "Restaurant Transilvania", "Asia Wok"],
-    "cafenea": ["Snooze Coffee", "Corso", "Makor Specialty Coffee", "5 to go", "Boeme Cafe", "Le Petit café",
-                "Kaffeine", "Just Blvck Coffee"],
-    "desert": ["Cofetăria Libelula", "Gelateria Coandi", "Boema Delice", "Caprice", "Delizioso", "Semico Gourmet Pastry"],
-    "terasa": ["Restaurant Belvedere", "Ratio Beach", "La Ponton", "Falezza"],
-    "bar": ["Jad Café", "Sky", "Luci Bar", "One More Beer", "Art Cafe", "Wings"],
+    "fastfood": [
+        ("KFC", "KFC Atrium", "Pui crocant, lângă Atrium Center.", (46.1903, 21.3202)),
+        ("KFC", "KFC Aurel Vlaicu", "Pui crocant.", (46.1853, 21.3152)),
+        ("Big Chicken", None, "Pui crocant și burgeri.", None),
+        ("McDonald's", "McDonald's Centru", "Burgeri, în centru.", (46.1754, 21.3177)),
+        ("McDonald's", "McDonald's Aurel Vlaicu", "Burgeri.", (46.1911, 21.3159)),
+        ("Burger King", None, "Burgeri.", None),
+        ("Mr. Paco", None, "Pui și cartofi prăjiți.", None),
+        ("Shock Kebab Teatru", None, "Kebab, lângă teatru.", None),
+        ("Mesopotamia", None, "Kebab.", None),
+        ("La Raul", None, "Burgeri, hot-dog, kebab.", None),
+        ("Foodie The Van", None, "Street food din food-truck.", None),
+        ("Eat like a man", None, "Burgeri și salate.", None),
+        ("Noodle Pack", None, "Noodles la cutie.", None),
+        ("Pizza 5 Colțuri", None, "Pizza la felie.", (46.1919, 21.3171)),
+    ],
+    "restaurant": [
+        ("Euphoria Biergarten Arad", None, "Bucătărie germană și locală.", None),
+        ("Mantua", None, "Restaurant în centru.", None),
+        ("Cine Citta", None, "Restaurant în centru.", None),
+        ("KHARMA", None, "Steak, burgeri, bucătărie italiană.", None),
+        ("Pizzeria Milano", None, "Pizzerie italiană pe Bulevardul Revoluției.", None),
+        ("MONDOPIZZA", None, "Pizza, paste, salate.", None),
+        ("Pizzeria Don", None, "Pizzerie.", None),
+        ("Ema Del Mar", None, "Pește și fructe de mare.", None),
+        ("La Bottega", None, "Restaurant în centru.", None),
+        ("Restaurant Picasso", None, "Restaurant.", None),
+        ("Vegan Time", None, "Mâncare vegană.", None),
+        ("Restaurant Coandi", None, "Restaurant.", None),
+        ("Taverna Libaneză", None, "Bucătărie libaneză.", None),
+        ("Casa Bulzan", None, "Bucătărie tradițională.", None),
+        ("Restaurant Transilvania", None, "Restaurant.", None),
+        ("Asia Wok", None, "Bucătărie asiatică.", None),
+        ("Restaurant Belvedere", None, "Restaurant pe malul Mureșului.", None),
+        ("Falezza", None, "Restaurant lângă Mureș.", None),
+    ],
+    "cafenea": [
+        ("Snooze Coffee", None, "Cafenea cu terasă.", None),
+        ("Corso", None, "Cafenea pe strada Cloșca.", None),
+        ("Makor Specialty Coffee", None, "Cafea de specialitate.", None),
+        ("5 to go", None, "Cafea la pahar.", None),
+        ("Boeme Cafe", None, "Cafenea.", None),
+        ("Le Petit café", None, "Cafenea.", None),
+        ("Kaffeine", None, "Cafenea.", None),
+        ("Just Blvck Coffee", None, "Cafea de specialitate.", None),
+    ],
+    "cofetarie": [
+        ("Cofetăria Libelula", None, "Prăjituri și torturi.", None),
+        ("Boema Delice", None, "Cofetărie.", None),
+        ("Cofetăria Boema", None, "Cofetărie.", None),
+        ("Cofetăria Crișan", None, "Cofetărie clasică.", (46.1789, 21.3185)),
+        ("Caprice", None, "Cofetărie.", None),
+        ("Semico Gourmet Pastry", None, "Patiserie fină.", None),
+        ("Venetia", None, "Cofetărie.", None),
+    ],
+    "gelaterie": [
+        ("Gelateria Coandi", None, "Înghețată artizanală.", None),
+        ("Delizioso", None, "Înghețată.", None),
+    ],
+    "terasa": [
+        ("Jelen Terasa de Vară", None, "Terasă de vară.", None),
+        ("Port Arthur", None, "Grădină de bere, lângă Mureș.", None),
+        ("La Ponton", None, "Terasă pe ponton, pe Mureș.", None),
+        ("Ratio Beach", None, "Terasă de plajă pe malul Mureșului.", None),
+    ],
+    "bar": [
+        ("Jad Café", None, "Pub.", None),
+        ("Sky", None, "Pub.", None),
+        ("Luci Bar", None, "Bar.", None),
+        ("One More Beer", None, "Bere și terasă.", None),
+        ("Art Cafe", None, "Bar.", None),
+        ("Wings", None, "Pub în Piața Avram Iancu.", None),
+    ],
+    "obiectiv": [
+        ("Palatul Cultural", None, "Complexul Muzeal și Filarmonica de Stat.", None),
+        ("Teatrul Clasic Ioan Slavici", "Teatrul Clasic „Ioan Slavici”", "Teatrul din centrul Aradului.", None),
+        ("Statuia libertății", "Statuia Libertății", "Monumentul celor 13 generali martiri de la 1849.", None),
+        ("Cetatea Aradului", None, "Cetate în stil Vauban din secolul al XVIII-lea.", None),
+        ("Catedrala Arhiepiscopală ,,Sfânta Treime\"", "Catedrala „Sfânta Treime”", "Catedrala ortodoxă din Piața Caius Iacob.", None),
+        ("Arcul de Triumf", None, "Lângă Parcul Reconcilierii.", None),
+        ("Palatul Neumann", None, "Palat istoric din centru.", None),
+        ("Casa cu lacăt", None, "Clădire istorică cu legenda lacătului.", None),
+        ("Palatul Băncii Naționale", None, "Clădire istorică pe Bulevardul Revoluției.", None),
+        ("Muzeul de Istoria Calculatoarelor", None, "Pentru pasionații de tehnologie.", None),
+        ("Turnul de apă", None, "Turn de apă transformat în muzeu.", None),
+        ("Teatrul de Marionete", None, "Spectacole pentru copii.", None),
+    ],
+    "natura": [
+        ("Parcul Europa", None, "Parc pe malul Mureșului.", None),
+        ("Ștrandul Neptun", None, "Ștrand și zonă de agrement.", None),
+        ("Parcul Pădurice", None, "Parc cu mulți copaci, aproape de centru.", None),
+        ("Parcul Mihai Eminescu", None, "Parc pe malul Mureșului.", None),
+        ("Parcul Copiilor", None, "Loc de joacă și plimbare.", None),
+        ("Parcul Reconcilierii", None, "Parcul cu Statuia Libertății.", None),
+        ("Parcul Alfa", None, "Parc de cartier.", None),
+    ],
+    "mall": [
+        ("Atrium Center", "Atrium Mall", "Centru comercial.", None),
+        ("Ziridava Shopping Center", None, "Centru comercial în centru.", None),
+        ("Agora Arad", None, "Centru comercial.", None),
+        ("Galleria", "Galleria Mall", "Centru comercial.", None),
+    ],
 }
-DEFAULT_DESC = {"pizza": "Pizzerie din Arad.", "burger": "Burgeri în Arad.", "restaurant": "Restaurant din Arad.",
-                "cafenea": "Cafenea din Arad.", "desert": "Dulciuri și prăjituri.", "terasa": "Local cu terasă.",
-                "bar": "Bar / pub din Arad."}
 
-LANDMARKS = [  # (nume OSM, nume afișat, categorie, descriere)
-    ("Palatul Cultural", "Palatul Cultural", "obiectiv", "Complexul Muzeal și Filarmonica de Stat, lângă Mureș."),
-    ("Teatrul Clasic Ioan Slavici", "Teatrul Clasic „Ioan Slavici”", "obiectiv", "Teatrul din centrul Aradului."),
-    ("Statuia libertății", "Statuia Libertății", "obiectiv", "Monumentul dedicat celor 13 generali martiri de la 1849."),
-    ("Cetatea Aradului", "Cetatea Aradului", "obiectiv", "Cetate în stil Vauban din secolul al XVIII-lea."),
-    ("Catedrala Arhiepiscopală ,,Sfânta Treime\"", "Catedrala „Sfânta Treime”", "obiectiv", "Catedrala ortodoxă din Piața Caius Iacob."),
-    ("Arcul de Triumf", "Arcul de Triumf", "obiectiv", "Lângă Parcul Reconcilierii."),
-    ("Palatul Neumann", "Palatul Neumann", "obiectiv", "Palat istoric din centru."),
-    ("Casa cu lacăt", "Casa cu lacăt", "obiectiv", "Clădire istorică cu legenda lacătului."),
-    ("Palatul Băncii Naționale", "Palatul Băncii Naționale", "obiectiv", "Clădire istorică pe Bulevardul Revoluției."),
-    ("Muzeul de Istoria Calculatoarelor", "Muzeul de Istoria Calculatoarelor", "obiectiv", "Pentru pasionații de tehnologie."),
-    ("Turnul de apă", "Turnul de apă", "obiectiv", "Turn de apă transformat în muzeu."),
-    ("Teatrul de Marionete", "Teatrul de Marionete", "obiectiv", "Spectacole pentru copii."),
-    ("Parcul Europa", "Parcul Europa", "natura", "Parc pe malul Mureșului."),
-    ("Ștrandul Neptun", "Ștrandul Neptun", "natura", "Ștrand și zonă de agrement."),
-    ("Parcul Pădurice", "Parcul Pădurice", "natura", "Parc cu mulți copaci, aproape de centru."),
-    ("Parcul Mihai Eminescu", "Parcul Mihai Eminescu", "natura", "Parc pe malul Mureșului, lângă centru."),
-    ("Parcul Copiilor", "Parcul Copiilor", "natura", "Loc de joacă și plimbare."),
-    ("Parcul Reconcilierii", "Parcul Reconcilierii", "natura", "Parcul cu Statuia Libertății."),
-    ("Parcul Alfa", "Parcul Alfa", "natura", "Parc de cartier."),
-]
-
-# Din Nominatim (OpenStreetMap), coordonate verificate
+# Locuri din afara orașului sau fără nume potrivit în OSM: coordonate din OSM/Nominatim
 EXTRA = [
-    {"name": "Hack4Arad @ Complex M (UAV)", "category": "eveniment",
-     "description": "Locul hackathonului Hack4Arad 2026! Fă check-in aici.",
-     "address": "Str. Elena Drăgoi nr. 2, Arad", "lat": 46.17665, "lng": 21.34360},
-    {"name": "Palatul Administrativ (Primăria)", "category": "obiectiv",
-     "description": "Clădirea Primăriei, simbol al Bulevardului Revoluției.",
-     "address": "Bulevardul Revoluției 75, Arad", "lat": 46.17537, "lng": 21.31930},
-    {"name": "Cetatea Șoimoș", "category": "obiectiv", "description": "Ruinele cetății de lângă Lipova, cu vedere spre Mureș.",
-     "address": "Lipova, jud. Arad", "lat": 46.10877, "lng": 21.72299},
-    {"name": "Cetatea Ineului", "category": "obiectiv", "description": "Cetate și muzeu în orașul Ineu.",
-     "address": "Strada Ioan Slavici, Ineu, jud. Arad", "lat": 46.42825, "lng": 21.84123},
-    {"name": "Mănăstirea Hodoș-Bodrog", "category": "obiectiv", "description": "Una dintre cele mai vechi mănăstiri din România.",
-     "address": "jud. Arad", "lat": 46.13365, "lng": 21.18374},
-    {"name": "Stațiunea Moneasa", "category": "natura", "description": "Stațiune balneară în Munții Codru-Moma.",
-     "address": "Moneasa, jud. Arad", "lat": 46.46111, "lng": 22.25674},
-    {"name": "Podgoria Miniș-Măderat", "category": "producator", "description": "Podgoria cu tradiție a județului: vinuri locale.",
-     "address": "Miniș, jud. Arad", "lat": 46.13502, "lng": 21.60452},
+    ("eveniment", "Hack4Arad @ Complex M (UAV)", "Locul hackathonului Hack4Arad 2026! Fă check-in aici.",
+     "Str. Elena Drăgoi nr. 2, Arad", 46.17665, 21.34360),
+    ("obiectiv", "Palatul Administrativ (Primăria)", "Clădirea Primăriei, simbol al Bulevardului Revoluției.",
+     "Bulevardul Revoluției 75, Arad", 46.17537, 21.31930),
+    ("obiectiv", "Cetatea Șoimoș", "Ruinele cetății de lângă Lipova, cu vedere spre Mureș.", "Lipova, jud. Arad", 46.10877, 21.72299),
+    ("obiectiv", "Cetatea Ineului", "Cetate și muzeu în orașul Ineu.", "Ineu, jud. Arad", 46.42825, 21.84123),
+    ("obiectiv", "Podgoria Miniș-Măderat", "Podgoria cu tradiție a județului: vinuri locale.", "Miniș, jud. Arad", 46.13502, 21.60452),
+    ("manastire", "Mănăstirea Hodoș-Bodrog", "Una dintre cele mai vechi mănăstiri ortodoxe din România.", "jud. Arad", 46.13370, 21.18382),
+    ("manastire", "Mănăstirea Gai", "Mănăstire ortodoxă în cartierul Gai din Arad.", "Gai, Arad", 46.21871, 21.27349),
+    ("manastire", "Mănăstirea „Maria Radna”", "Mănăstire franciscană și sanctuar marian, lângă Lipova.", "Radna, Lipova, jud. Arad", 46.09887, 21.68611),
+    ("manastire", "Mănăstirea Bezdin", "Mănăstire ortodoxă sârbă, în pădurea de lângă Mureș.", "Munar, jud. Arad", 46.13959, 21.02770),
+    ("manastire", "Mănăstirea Feredeu", "Mănăstire ortodoxă în Munții Zărandului.", "Feredeu, jud. Arad", 46.24146, 21.65526),
+    ("natura", "Stațiunea Moneasa", "Stațiune balneară în Munții Codru-Moma.", "Moneasa, jud. Arad", 46.46111, 22.25674),
 ]
 
 out = []
-for cat, names in PICKS.items():
-    for n in names:
-        e = find(n); t = e["tags"]; lat, lng = coords(e)
-        out.append({"name": n, "category": cat, "description": desc(t, DEFAULT_DESC[cat]),
-                    "address": address(t), "lat": round(lat, 6), "lng": round(lng, 6), "verified": True})
-for osm_name, shown, cat, d in LANDMARKS:
-    e = find(osm_name); lat, lng = coords(e)
-    out.append({"name": shown, "category": cat, "description": d, "address": address(e["tags"]),
-                "lat": round(lat, 6), "lng": round(lng, 6), "verified": True})
-for x in EXTRA:
-    out.append({**x, "verified": True})
+for cat, picks in PICKS.items():
+    for osm_name, shown, desc, near in picks:
+        e = find(osm_name, near or CENTER)
+        lat, lng = coords(e)
+        out.append({"name": shown or osm_name, "category": cat, "description": desc,
+                    "address": address(e["tags"]), "lat": round(lat, 6), "lng": round(lng, 6), "verified": True})
+for cat, name, desc, addr, lat, lng in EXTRA:
+    out.append({"name": name, "category": cat, "description": desc, "address": addr,
+                "lat": lat, "lng": lng, "verified": True})
 
+names = Counter(p["name"] for p in out)
+dupes = [n for n, c in names.items() if c > 1]
+if dupes:
+    raise SystemExit(f"Nume duplicate: {dupes}")
 json.dump(out, open(out_file, "w", encoding="utf-8"), ensure_ascii=False, indent=1)
-from collections import Counter
-print(len(out), Counter(p["category"] for p in out))
+print(len(out), dict(Counter(p["category"] for p in out)))

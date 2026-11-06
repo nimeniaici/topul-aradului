@@ -119,7 +119,7 @@ private fun badgeEmoji(code: String) = when (code) {
     "cafegiu" -> "☕"
     "gurmand" -> "🍽️"
     "turist" -> "🏛️"
-    "local" -> "🍯"
+    "pelerin" -> "⛪"
     "fotograf" -> "📸"
     "primar" -> "👑"
     "judecator" -> "⚖️"
