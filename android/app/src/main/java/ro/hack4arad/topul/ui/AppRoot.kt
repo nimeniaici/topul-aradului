@@ -73,11 +73,11 @@ private fun MainScaffold() {
             val me = Network.session
             val text = when {
                 e.type == "mayor" && e.oldMayorId != null && e.oldMayorId == me.userId ->
-                    "👑 ${e.newMayorName} ți-a luat titlul de Primar la ${e.placeName}!"
+                    "${e.newMayorName} ți-a luat titlul de Primar la ${e.placeName}"
                 e.type == "mayor" && e.newMayorId == me.userId ->
-                    "👑 Ești noul Primar la ${e.placeName}!"
+                    "Ești noul Primar la ${e.placeName}"
                 e.type == "checkin" && e.userName != me.userName ->
-                    "📍 ${e.userName} a făcut check-in la ${e.placeName}"
+                    "${e.userName} a făcut check-in la ${e.placeName}"
                 else -> null
             }
             if (text != null) scope.launch { snackbar.showSnackbar(text, duration = SnackbarDuration.Short) }

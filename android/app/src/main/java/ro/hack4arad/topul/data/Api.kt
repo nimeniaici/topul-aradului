@@ -79,6 +79,23 @@ interface Api {
     @GET("users/me")
     suspend fun me(): Profile
 
+    @GET("checkins/mine")
+    suspend fun myCheckins(): List<MyCheckin>
+
+    @GET("reports")
+    suspend fun reports(@Query("days") days: Int = 30): List<Report>
+
+    @Multipart
+    @POST("reports")
+    suspend fun createReport(
+        @Part("category") category: RequestBody,
+        @Part("lat") lat: RequestBody,
+        @Part("lng") lng: RequestBody,
+        @Part("description") description: RequestBody,
+        @Part("is_mock") isMock: RequestBody,
+        @Part photo: MultipartBody.Part?,
+    ): ReportCreated
+
     @PATCH("users/me")
     suspend fun updateMe(@Body body: UpdateMeIn): Profile
 

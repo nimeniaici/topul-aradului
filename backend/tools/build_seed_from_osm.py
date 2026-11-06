@@ -48,7 +48,6 @@ PICKS = {
         ("Foodie The Van", None, "Street food din food-truck.", None),
         ("Eat like a man", None, "Burgeri și salate.", None),
         ("Noodle Pack", None, "Noodles la cutie.", None),
-        ("Pizza 5 Colțuri", None, "Pizza la felie.", (46.1919, 21.3171)),
     ],
     "restaurant": [
         ("Euphoria Biergarten Arad", None, "Bucătărie germană și locală.", None),
@@ -134,7 +133,6 @@ PICKS = {
         ("Atrium Center", "Atrium Mall", "Centru comercial.", None),
         ("Ziridava Shopping Center", None, "Centru comercial în centru.", None),
         ("Agora Arad", None, "Centru comercial.", None),
-        ("Galleria", "Galleria Mall", "Centru comercial.", None),
     ],
 }
 

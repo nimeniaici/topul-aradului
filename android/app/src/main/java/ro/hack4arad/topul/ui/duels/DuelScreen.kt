@@ -2,29 +2,40 @@ package ro.hack4arad.topul.ui.duels
 
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.ColumnScope
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.EmojiEvents
+import androidx.compose.material.icons.rounded.LocalFireDepartment
+import androidx.compose.material.icons.rounded.SkipNext
+import androidx.compose.material.icons.rounded.Star
+import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.key
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -36,6 +47,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.ViewModel
@@ -51,7 +63,7 @@ import ro.hack4arad.topul.data.VoteIn
 import ro.hack4arad.topul.ui.components.CategoryChips
 import ro.hack4arad.topul.ui.components.ErrorState
 import ro.hack4arad.topul.ui.components.Loading
-import ro.hack4arad.topul.ui.components.PlaceImage
+import ro.hack4arad.topul.ui.components.PlacePhoto
 import ro.hack4arad.topul.ui.components.categoryColor
 import ro.hack4arad.topul.ui.theme.Gold
 import ro.hack4arad.topul.ui.theme.GoldDark
@@ -76,7 +88,7 @@ class DuelViewModel : ViewModel() {
         private set
     var error by mutableStateOf<String?>(null)
         private set
-    var streak by mutableStateOf(0)
+    var streak by mutableIntStateOf(0)
         private set
 
     init {
@@ -106,11 +118,11 @@ class DuelViewModel : ViewModel() {
                 .onSuccess { r ->
                     streak++
                     val delta = (r.winner.rating - winner.rating).roundToInt()
-                    message = "${r.winner.name} +$delta ★   ·   +${r.xpGained} XP" +
-                        r.newBadges.joinToString("") { "\n🏅 Insignă nouă: ${it.title}" }
+                    message = "${r.winner.name} +$delta puncte  ·  +${r.xpGained} XP" +
+                        r.newBadges.joinToString("") { "  ·  Insignă nouă: ${it.title}" }
                 }
                 .onFailure { message = it.userMessage() }
-            delay(900) // lăsăm animația să se vadă
+            delay(1000) // lăsăm animația să se vadă
             next()
         }
     }
@@ -119,106 +131,100 @@ class DuelViewModel : ViewModel() {
 @Composable
 fun DuelScreen(vm: DuelViewModel = viewModel()) {
     Column(Modifier.fillMaxSize().padding(top = 8.dp)) {
-        CategoryChips(vm.categories, vm.category, vm::pick, allLabel = "🎲 Aleatoriu")
+        CategoryChips(vm.categories, vm.category, vm::pick, allLabel = "Aleatoriu")
         val duel = vm.duel
         when {
             duel == null && vm.error != null -> ErrorState(vm.error!!, onRetry = vm::next)
             duel == null -> Loading()
-            else -> Column(
-                Modifier.fillMaxSize().padding(horizontal = 16.dp, vertical = 8.dp),
-                horizontalAlignment = Alignment.CenterHorizontally,
-            ) {
-                Text(
-                    "DUEL · ${duel.categoryLabel.uppercase()}",
-                    color = Gold, fontWeight = FontWeight.Black, fontSize = 13.sp, letterSpacing = 2.sp,
-                )
-                Text(
-                    "Care e mai tare?",
-                    color = Color.White, fontSize = 26.sp, fontWeight = FontWeight.Black, textAlign = TextAlign.Center,
-                )
-                if (vm.streak > 0) Text("🔥 Serie: ${vm.streak} voturi", color = TextMuted, fontSize = 13.sp)
-                Spacer(Modifier.height(8.dp))
+            else -> Column(Modifier.fillMaxSize().padding(horizontal = 12.dp, vertical = 10.dp)) {
+                Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+                    Column(Modifier.weight(1f)) {
+                        Text("DUEL · ${duel.categoryLabel.uppercase()}", color = Gold, fontWeight = FontWeight.Black, fontSize = 12.sp, letterSpacing = 2.sp)
+                        Text("Care e mai tare?", color = Color.White, fontSize = 24.sp, fontWeight = FontWeight.Black)
+                    }
+                    if (vm.streak > 0) {
+                        Row(
+                            Modifier.clip(RoundedCornerShape(50)).background(Color(0x33FF8A3D)).padding(horizontal = 10.dp, vertical = 5.dp),
+                            verticalAlignment = Alignment.CenterVertically,
+                        ) {
+                            Icon(Icons.Rounded.LocalFireDepartment, null, tint = Color(0xFFFF8A3D), modifier = Modifier.size(16.dp))
+                            Text(" ${vm.streak}", color = Color.White, fontWeight = FontWeight.Black)
+                        }
+                    }
+                }
+                Spacer(Modifier.height(12.dp))
 
-                // key: animațiile pornesc de la zero la fiecare duel nou
+                // ecran împărțit: stânga contra dreapta, ca un meci
                 key(duel.a.id, duel.b.id) {
                     Box(Modifier.weight(1f).fillMaxWidth()) {
-                        Column(Modifier.fillMaxSize()) {
-                            DuelCard(duel.a, vm.winnerId, fromLeft = true) { vm.vote(duel.a, duel.b) }
-                            Spacer(Modifier.height(14.dp))
-                            DuelCard(duel.b, vm.winnerId, fromLeft = false) { vm.vote(duel.b, duel.a) }
+                        Row(Modifier.fillMaxSize(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                            DuelHalf(duel.a, vm.winnerId, fromLeft = true) { vm.vote(duel.a, duel.b) }
+                            DuelHalf(duel.b, vm.winnerId, fromLeft = false) { vm.vote(duel.b, duel.a) }
                         }
-                        Box(
-                            Modifier
-                                .align(Alignment.Center)
-                                .size(64.dp)
-                                .clip(CircleShape)
-                                .background(Gold)
-                                .border(4.dp, Night, CircleShape),
-                            contentAlignment = Alignment.Center,
-                        ) { Text("VS", color = GoldDark, fontWeight = FontWeight.Black, fontSize = 22.sp) }
+                        VsBadge(Modifier.align(Alignment.Center))
                     }
                 }
 
                 Text(
-                    vm.message ?: "Atinge-ți favoritul",
+                    vm.message ?: "Atinge partea pe care o preferi",
                     color = if (vm.message != null) Mint else TextMuted,
                     fontWeight = FontWeight.Bold, textAlign = TextAlign.Center,
-                    modifier = Modifier.padding(top = 10.dp),
+                    modifier = Modifier.fillMaxWidth().padding(top = 10.dp),
+                    maxLines = 2,
                 )
-                TextButton(onClick = vm::next) { Text("Nu știu, sari peste →", color = Lilac) }
+                TextButton(onClick = vm::next, modifier = Modifier.align(Alignment.CenterHorizontally)) {
+                    Icon(Icons.Rounded.SkipNext, null, tint = Lilac)
+                    Text(" Sari peste", color = Lilac)
+                }
             }
         }
     }
 }
 
 @Composable
-private fun ColumnScope.DuelCard(place: Place, winnerId: Int?, fromLeft: Boolean, onClick: () -> Unit) {
-    // intrare din lateral + reacție la vot (câștigătorul crește, pierzătorul se stinge)
-    val enter = remember { Animatable(if (fromLeft) -600f else 600f) }
-    val scale = remember { Animatable(1f) }
-    val fade = remember { Animatable(1f) }
-    LaunchedEffect(Unit) { enter.animateTo(0f, spring(dampingRatio = 0.7f, stiffness = Spring.StiffnessLow)) }
-    LaunchedEffect(winnerId) {
-        when (winnerId) {
-            null -> Unit
-            place.id -> scale.animateTo(1.05f, spring(dampingRatio = Spring.DampingRatioMediumBouncy))
-            else -> {
-                launch { fade.animateTo(0.25f, tween(400)) }
-                scale.animateTo(0.92f, tween(400))
-            }
-        }
-    }
-    val color = categoryColor(place.category)
-    val won = winnerId == place.id
+private fun VsBadge(modifier: Modifier) {
+    // pulsează ușor, ca să atragă privirea
+    var pulse by remember { mutableStateOf(false) }
+    LaunchedEffect(Unit) { while (true) { pulse = !pulse; delay(900) } }
+    val scale by animateFloatAsState(if (pulse) 1.08f else 1f, tween(900), label = "vs")
     Box(
-        Modifier
-            .fillMaxWidth()
-            .weight(1f)
-            .graphicsLayer {
-                translationX = enter.value
-                scaleX = scale.value
-                scaleY = scale.value
-                alpha = fade.value
-            }
+        modifier.graphicsLayer { scaleX = scale; scaleY = scale }
+            .size(66.dp).clip(CircleShape).background(Gold).border(5.dp, Night, CircleShape),
+        contentAlignment = Alignment.Center,
+    ) { Text("VS", color = GoldDark, fontWeight = FontWeight.Black, fontSize = 22.sp) }
+}
+
+@Composable
+private fun RowScope.DuelHalf(place: Place, winnerId: Int?, fromLeft: Boolean, onClick: () -> Unit) {
+    val won = winnerId == place.id
+    val lost = winnerId != null && !won
+    // intrare din lateral; la vot, câștigătorul ocupă mai mult loc, pierzătorul se stinge
+    val enter = remember { Animatable(if (fromLeft) -500f else 500f) }
+    LaunchedEffect(Unit) { enter.animateTo(0f, spring(dampingRatio = 0.75f, stiffness = Spring.StiffnessLow)) }
+    val weight by animateFloatAsState(if (won) 1.6f else if (lost) 0.6f else 1f, spring(dampingRatio = 0.8f), label = "w")
+    val alpha by animateFloatAsState(if (lost) 0.35f else 1f, tween(350), label = "a")
+    val color = categoryColor(place.category)
+
+    Box(
+        Modifier.weight(weight).fillMaxHeight()
+            .graphicsLayer { translationX = enter.value; this.alpha = alpha }
             .clip(RoundedCornerShape(24.dp))
-            .border(3.dp, if (won) Gold else color, RoundedCornerShape(24.dp))
+            .border(3.dp, if (won) Gold else color.copy(alpha = 0.7f), RoundedCornerShape(24.dp))
             .clickable(enabled = winnerId == null, onClick = onClick),
     ) {
-        PlaceImage(place.photoUrl, place.category, place.id, Modifier.fillMaxSize(), emojiSize = 64)
-        Column(
-            Modifier
-                .align(Alignment.BottomStart)
-                .fillMaxWidth()
-                .background(Brush.verticalGradient(listOf(Color.Transparent, Night.copy(alpha = 0.95f))))
-                .padding(16.dp),
-        ) {
-            Text(place.name, color = Color.White, fontSize = 22.sp, fontWeight = FontWeight.Black)
-            Text("★ ${place.rating.roundToInt()} · ${place.checkinCount} check-in-uri", color = Lilac)
+        PlacePhoto(place, Modifier.fillMaxSize(), iconSize = 56.dp)
+        Box(Modifier.fillMaxSize().background(Brush.verticalGradient(0.45f to Color.Transparent, 1f to Night.copy(alpha = 0.97f))))
+        Column(Modifier.align(Alignment.BottomStart).fillMaxWidth().padding(12.dp)) {
+            Text(place.name, color = Color.White, fontSize = 18.sp, fontWeight = FontWeight.Black, maxLines = 3, overflow = TextOverflow.Ellipsis)
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Icon(Icons.Rounded.Star, null, tint = Gold, modifier = Modifier.size(14.dp))
+                Text(" ${place.rating.roundToInt()}", color = Lilac, fontSize = 13.sp)
+            }
         }
         if (won) {
-            Text(
-                "👑", fontSize = 44.sp,
-                modifier = Modifier.align(Alignment.TopEnd).padding(12.dp).offset(y = (-4).dp),
+            Icon(
+                Icons.Rounded.EmojiEvents, null, tint = Gold,
+                modifier = Modifier.align(Alignment.TopCenter).padding(top = 14.dp).size(44.dp),
             )
         }
     }

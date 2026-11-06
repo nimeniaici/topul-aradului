@@ -38,8 +38,32 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
+import coil.request.ImageRequest
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.AccountBalance
+import androidx.compose.material.icons.rounded.Cake
+import androidx.compose.material.icons.rounded.Celebration
+import androidx.compose.material.icons.rounded.Church
+import androidx.compose.material.icons.rounded.CloudOff
+import androidx.compose.material.icons.rounded.Deck
+import androidx.compose.material.icons.rounded.Icecream
+import androidx.compose.material.icons.rounded.LocalCafe
+import androidx.compose.material.icons.rounded.LocalMall
+import androidx.compose.material.icons.rounded.Park
+import androidx.compose.material.icons.rounded.Place
+import androidx.compose.material.icons.rounded.Restaurant
+import androidx.compose.material.icons.rounded.SportsBar
+import androidx.compose.material.icons.rounded.TakeoutDining
+import androidx.compose.material3.Icon
+import androidx.compose.runtime.produceState
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalContext
 import ro.hack4arad.topul.data.Category
 import ro.hack4arad.topul.data.Network
+import ro.hack4arad.topul.data.Place
+import ro.hack4arad.topul.data.PlacePhotos
+import ro.hack4arad.topul.ui.theme.TextMuted
 import ro.hack4arad.topul.ui.theme.Electric
 import ro.hack4arad.topul.ui.theme.Gold
 import ro.hack4arad.topul.ui.theme.GoldDark
@@ -51,21 +75,21 @@ import ro.hack4arad.topul.ui.theme.Pink
 import ro.hack4arad.topul.ui.theme.Track
 import ro.hack4arad.topul.ui.theme.Violet
 
-/** Emoji per categorie - arată bine și nu cere iconițe extra. */
-fun categoryEmoji(code: String): String = when (code) {
-    "fastfood" -> "🍔"
-    "restaurant" -> "🍽️"
-    "cafenea" -> "☕"
-    "cofetarie" -> "🍰"
-    "gelaterie" -> "🍦"
-    "terasa" -> "🍹"
-    "bar" -> "🍺"
-    "obiectiv" -> "🏛️"
-    "manastire" -> "⛪"
-    "natura" -> "🌳"
-    "mall" -> "🛍️"
-    "eveniment" -> "🎉"
-    else -> "📍"
+/** Iconița (Material Symbols) a fiecărei categorii, folosită acolo unde nu avem încă poză. */
+fun categoryIcon(code: String): ImageVector = when (code) {
+    "fastfood" -> Icons.Rounded.TakeoutDining
+    "restaurant" -> Icons.Rounded.Restaurant
+    "cafenea" -> Icons.Rounded.LocalCafe
+    "cofetarie" -> Icons.Rounded.Cake
+    "gelaterie" -> Icons.Rounded.Icecream
+    "terasa" -> Icons.Rounded.Deck
+    "bar" -> Icons.Rounded.SportsBar
+    "obiectiv" -> Icons.Rounded.AccountBalance
+    "manastire" -> Icons.Rounded.Church
+    "natura" -> Icons.Rounded.Park
+    "mall" -> Icons.Rounded.LocalMall
+    "eveniment" -> Icons.Rounded.Celebration
+    else -> Icons.Rounded.Place
 }
 
 /** Culoarea neon a fiecărei categorii (markere, carduri, chenare). */
@@ -85,19 +109,40 @@ fun categoryColor(code: String): Color = when (code) {
     else -> Violet
 }
 
-/** Poza locului sau, dacă nu are, un pătrat în culoarea categoriei cu emoji-ul ei. */
+/**
+ * Poza reală a locului: întâi cea din aplicație (dacă există), altfel cea de pe Google Maps,
+ * cerută abia când locul apare pe ecran (lazy loading). Până se încarcă: gradient + iconița categoriei.
+ */
 @Composable
-fun PlaceImage(photoUrl: String?, category: String, id: Int, modifier: Modifier = Modifier, emojiSize: Int = 40) {
-    val url = Network.fullUrl(photoUrl)
-    if (url != null) {
-        AsyncImage(model = url, contentDescription = null, contentScale = ContentScale.Crop, modifier = modifier)
-    } else {
-        Box(
-            modifier.background(categoryColor(category).copy(alpha = 0.22f)),
-            contentAlignment = Alignment.Center,
-        ) { Text(categoryEmoji(category), fontSize = emojiSize.sp) }
+fun PlacePhoto(
+    id: Int, name: String, lat: Double, lng: Double, category: String, photoUrl: String?,
+    modifier: Modifier = Modifier, iconSize: Dp = 28.dp,
+) {
+    val own = Network.fullUrl(photoUrl)
+    val google by produceState<String?>(initialValue = null, id) {
+        if (own == null) value = PlacePhotos.url(id, name, lat, lng)
+    }
+    val url = own ?: google
+    val color = categoryColor(category)
+    Box(
+        modifier.background(Brush.linearGradient(listOf(color.copy(alpha = 0.55f), Panel))),
+        contentAlignment = Alignment.Center,
+    ) {
+        Icon(categoryIcon(category), contentDescription = null, tint = Color.White.copy(alpha = 0.85f), modifier = Modifier.size(iconSize))
+        if (url != null) {
+            AsyncImage(
+                model = ImageRequest.Builder(LocalContext.current).data(url).crossfade(250).build(),
+                contentDescription = name,
+                contentScale = ContentScale.Crop,
+                modifier = Modifier.fillMaxSize(),
+            )
+        }
     }
 }
+
+@Composable
+fun PlacePhoto(p: Place, modifier: Modifier = Modifier, iconSize: Dp = 28.dp) =
+    PlacePhoto(p.id, p.name, p.lat, p.lng, p.category, p.photoUrl, modifier, iconSize)
 
 @Composable
 fun CategoryChips(
@@ -110,8 +155,10 @@ fun CategoryChips(
     val colors = FilterChipDefaults.filterChipColors(
         containerColor = Panel,
         labelColor = Color.White,
+        iconColor = TextMuted,
         selectedContainerColor = Gold,
         selectedLabelColor = GoldDark,
+        selectedLeadingIconColor = GoldDark,
     )
     LazyRow(
         modifier = modifier.fillMaxWidth(),
@@ -128,7 +175,11 @@ fun CategoryChips(
         items(categories, key = { it.code }) { c ->
             FilterChip(
                 selected = selected == c.code, onClick = { onSelect(c.code) },
-                label = { Text("${categoryEmoji(c.code)} ${c.label}", fontWeight = FontWeight.Bold) },
+                label = { Text(c.label, fontWeight = FontWeight.Bold) },
+                leadingIcon = {
+                    Icon(categoryIcon(c.code), contentDescription = null, modifier = Modifier.size(18.dp),
+                        tint = if (selected == c.code) GoldDark else categoryColor(c.code))
+                },
                 colors = colors, border = null, shape = RoundedCornerShape(50),
             )
         }
@@ -228,7 +279,7 @@ fun ErrorState(message: String, onRetry: () -> Unit, modifier: Modifier = Modifi
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
-        Text("😵", fontSize = 48.sp)
+        Icon(Icons.Rounded.CloudOff, contentDescription = null, tint = TextMuted, modifier = Modifier.size(56.dp))
         Text(message, textAlign = TextAlign.Center, modifier = Modifier.padding(vertical = 16.dp))
         Button(onClick = onRetry) { Text("Încearcă din nou") }
     }

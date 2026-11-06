@@ -1,5 +1,8 @@
 package ro.hack4arad.topul.ui.place
 
+import androidx.compose.material.icons.rounded.ViewInAr
+import androidx.compose.material.icons.rounded.PhotoCamera
+import androidx.compose.material.icons.rounded.WorkspacePremium
 import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -62,7 +65,7 @@ import ro.hack4arad.topul.ui.components.ErrorState
 import ro.hack4arad.topul.ui.components.GamePanel
 import ro.hack4arad.topul.ui.components.Loading
 import ro.hack4arad.topul.ui.components.Pill
-import ro.hack4arad.topul.ui.components.PlaceImage
+import ro.hack4arad.topul.ui.components.PlacePhoto
 import ro.hack4arad.topul.ui.components.SectionTitle
 import ro.hack4arad.topul.ui.components.categoryColor
 import ro.hack4arad.topul.ui.theme.Gold
@@ -166,11 +169,12 @@ fun PlaceScreen(onBack: () -> Unit, onTour3D: (Int) -> Unit = {}, vm: PlaceViewM
             place == null && vm.loadError != null -> ErrorState(vm.loadError!!, onRetry = vm::load)
             place == null -> Loading()
             else -> Column(Modifier.fillMaxSize().verticalScroll(rememberScrollState())) {
-                // copertă cu poza / emoji și gradient spre fundal
+                // copertă cu poza reală (Google sau comunitate) și gradient spre fundal
                 Box(Modifier.fillMaxWidth().height(250.dp)) {
-                    PlaceImage(
+                    PlacePhoto(
+                        place.id, place.name, place.lat, place.lng, place.category,
                         place.photoUrl ?: place.recentPhotos.firstOrNull()?.photoUrl,
-                        place.category, place.id, Modifier.fillMaxSize(), emojiSize = 96,
+                        Modifier.fillMaxSize(), iconSize = 72.dp,
                     )
                     Box(
                         Modifier.fillMaxSize().background(
@@ -185,17 +189,17 @@ fun PlaceScreen(onBack: () -> Unit, onTour3D: (Int) -> Unit = {}, vm: PlaceViewM
                 }
                 Column(Modifier.padding(horizontal = 16.dp)) {
                     Text(place.name, color = Color.White, fontSize = 30.sp, fontWeight = FontWeight.Black)
-                    if (place.address.isNotBlank()) Text("📍 ${place.address}", color = TextMuted)
+                    if (place.address.isNotBlank()) Text(place.address, color = TextMuted)
 
                     Row(Modifier.fillMaxWidth().padding(vertical = 16.dp), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                        Stat("★ ${place.rating.roundToInt()}", "rating", Gold, Modifier.weight(1f))
+                        Stat("${place.rating.roundToInt()}", "rating", Gold, Modifier.weight(1f))
                         Stat("${place.checkinCount}", "check-in-uri", Color.White, Modifier.weight(1f))
                         Stat("${place.wins}/${place.duels}", "dueluri", Pink, Modifier.weight(1f))
                     }
 
                     GamePanel(Modifier.fillMaxWidth(), borderColor = if (place.mayorId == null) Gold else Violet) {
                         Row(verticalAlignment = Alignment.CenterVertically) {
-                            Text("👑", fontSize = 34.sp)
+                            Icon(Icons.Rounded.WorkspacePremium, null, tint = Gold, modifier = Modifier.size(36.dp))
                             Spacer(Modifier.width(12.dp))
                             Column {
                                 if (place.mayorName == null) {
@@ -220,8 +224,9 @@ fun PlaceScreen(onBack: () -> Unit, onTour3D: (Int) -> Unit = {}, vm: PlaceViewM
                             colors = ButtonDefaults.buttonColors(containerColor = Electric, contentColor = Color.White),
                             modifier = Modifier.fillMaxWidth().padding(top = 16.dp).height(56.dp),
                         ) {
+                            Icon(Icons.Rounded.ViewInAr, null)
                             Text(
-                                "🧊 Explorează în 3D" + (place.splatMb?.let { " · ${formatMb(it)}" } ?: ""),
+                                "  Explorează în 3D" + (place.splatMb?.let { " · ${formatMb(it)}" } ?: ""),
                                 fontSize = 17.sp,
                             )
                         }
@@ -245,7 +250,7 @@ fun PlaceScreen(onBack: () -> Unit, onTour3D: (Int) -> Unit = {}, vm: PlaceViewM
                         modifier = Modifier.fillMaxWidth().height(56.dp),
                     ) {
                         if (vm.busy) CircularProgressIndicator(Modifier.size(22.dp), strokeWidth = 2.dp, color = GoldDark)
-                        else Text(if (place.mayorId == null) "👑 Cucerește tronul" else "📍 Fac check-in aici", fontSize = 17.sp)
+                        else Text(if (place.mayorId == null) "Cucerește tronul" else "Fac check-in aici", fontSize = 17.sp)
                     }
                     OutlinedButton(
                         onClick = {
@@ -259,10 +264,10 @@ fun PlaceScreen(onBack: () -> Unit, onTour3D: (Int) -> Unit = {}, vm: PlaceViewM
                         },
                         enabled = !vm.busy,
                         modifier = Modifier.fillMaxWidth().padding(top = 8.dp).height(52.dp),
-                    ) { Text("📸 Check-in cu poză · +5 XP bonus", color = Color.White) }
+                    ) { Icon(Icons.Rounded.PhotoCamera, null, tint = Color.White); Text("  Check-in cu poză · +5 XP bonus", color = Color.White) }
 
                     if (place.recentPhotos.isNotEmpty()) {
-                        SectionTitle("📸 Poze de la comunitate")
+                        SectionTitle("Poze de la comunitate")
                         LazyRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                             items(place.recentPhotos) { photo ->
                                 Column(Modifier.width(140.dp)) {
@@ -292,7 +297,7 @@ fun PlaceScreen(onBack: () -> Unit, onTour3D: (Int) -> Unit = {}, vm: PlaceViewM
         if (confirm3D && p3d != null) {
             AlertDialog(
                 onDismissRequest = { confirm3D = false },
-                title = { Text("🧊 Tur 3D pe date mobile") },
+                title = { Text("Tur 3D pe date mobile") },
                 text = {
                     Text(
                         "Ești pe date mobile. Scena 3D are " +

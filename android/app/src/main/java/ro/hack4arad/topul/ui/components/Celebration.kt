@@ -18,7 +18,12 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.Place
+import androidx.compose.material.icons.rounded.WorkspacePremium
 import androidx.compose.material3.Button
+import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -113,10 +118,11 @@ fun CheckinCelebration(result: CheckinResult, placeName: String, onDismiss: () -
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center,
         ) {
-            Text(
-                if (result.becameMayor) "👑" else "📍",
-                fontSize = 96.sp,
-                modifier = Modifier.graphicsLayer {
+            Icon(
+                if (result.becameMayor) Icons.Rounded.WorkspacePremium else Icons.Rounded.Place,
+                contentDescription = null,
+                tint = Gold,
+                modifier = Modifier.size(110.dp).graphicsLayer {
                     translationY = drop.value
                     scaleX = pop.value
                     scaleY = pop.value
@@ -133,11 +139,11 @@ fun CheckinCelebration(result: CheckinResult, placeName: String, onDismiss: () -
             Text("Nivel ${result.level} · ${result.totalXp} XP în total", color = Lilac)
             result.newBadges.forEach { b ->
                 Spacer(Modifier.height(12.dp))
-                Pill("🏅 Insignă nouă: ${b.title}", Violet, Color.White)
+                Pill("Insignă nouă: ${b.title}", Violet, Color.White)
             }
             Spacer(Modifier.height(32.dp))
             Button(onClick = onDismiss, modifier = Modifier.fillMaxWidth().height(54.dp)) {
-                Text(if (result.becameMayor) "Stăpânesc orașul 😎" else "Mai departe")
+                Text(if (result.becameMayor) "Stăpânesc orașul" else "Mai departe")
             }
         }
     }

@@ -117,15 +117,6 @@
   "verified": true
  },
  {
-  "name": "Pizza 5 Colțuri",
-  "category": "fastfood",
-  "description": "Pizza la felie.",
-  "address": "Arad",
-  "lat": 46.191939,
-  "lng": 21.317141,
-  "verified": true
- },
- {
   "name": "Euphoria Biergarten Arad",
   "category": "restaurant",
   "description": "Bucătărie germană și locală.",
@@ -726,15 +717,6 @@
   "address": "Calea Aurel Vlaicu 225-235, Arad",
   "lat": 46.200458,
   "lng": 21.288207,
-  "verified": true
- },
- {
-  "name": "Galleria Mall",
-  "category": "mall",
-  "description": "Centru comercial.",
-  "address": "Arad",
-  "lat": 46.201064,
-  "lng": 21.291944,
   "verified": true
  },
  {

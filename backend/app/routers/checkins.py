@@ -55,7 +55,8 @@ async def create_checkin(
         raise HTTPException(403, "Am detectat o locație simulată. Check-in refuzat.")
 
     dist = distance_m(lat, lng, place.lat, place.lng)
-    if dist > config.CHECKIN_RADIUS_M and not config.SKIP_DISTANCE_CHECK:
+    is_tester = user.email.lower() in config.TESTER_EMAILS
+    if dist > config.CHECKIN_RADIUS_M and not config.SKIP_DISTANCE_CHECK and not is_tester:
         raise HTTPException(
             400, f"Ești la {dist:.0f} m de {place.name}. Trebuie să fii la cel mult "
                  f"{config.CHECKIN_RADIUS_M:.0f} m.")

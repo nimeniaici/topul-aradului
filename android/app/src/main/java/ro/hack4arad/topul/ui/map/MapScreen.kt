@@ -1,13 +1,17 @@
 package ro.hack4arad.topul.ui.map
 
+import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
+import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -22,28 +26,55 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.pager.HorizontalPager
+import androidx.compose.foundation.pager.PageSize
+import androidx.compose.foundation.pager.rememberPagerState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.CameraAlt
+import androidx.compose.material.icons.rounded.ChevronRight
+import androidx.compose.material.icons.rounded.Flag
+import androidx.compose.material.icons.rounded.Layers
+import androidx.compose.material.icons.rounded.LocalFireDepartment
+import androidx.compose.material.icons.rounded.Map
+import androidx.compose.material.icons.rounded.MyLocation
+import androidx.compose.material.icons.rounded.ReportProblem
+import androidx.compose.material.icons.rounded.Sensors
+import androidx.compose.material.icons.rounded.ViewAgenda
+import androidx.compose.material.icons.rounded.WorkspacePremium
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FilterChip
+import androidx.compose.material3.FilterChipDefaults
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.SmallFloatingActionButton
 import androidx.compose.material3.Text
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
@@ -53,33 +84,33 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.google.android.gms.maps.CameraUpdateFactory
+import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MapStyleOptions
+import com.google.maps.android.clustering.algo.NonHierarchicalDistanceBasedAlgorithm
+import com.google.maps.android.compose.CameraPositionState
 import com.google.maps.android.compose.GoogleMap
+import com.google.maps.android.compose.MapEffect
 import com.google.maps.android.compose.MapProperties
+import com.google.maps.android.compose.MapType
 import com.google.maps.android.compose.MapUiSettings
 import com.google.maps.android.compose.Marker
 import com.google.maps.android.compose.MarkerState
+import com.google.maps.android.compose.MapsComposeExperimentalApi
 import com.google.maps.android.compose.TileOverlay
+import com.google.maps.android.compose.clustering.Clustering
+import com.google.maps.android.compose.clustering.rememberClusterManager
 import com.google.maps.android.compose.rememberCameraPositionState
 import com.google.maps.android.heatmaps.Gradient
 import com.google.maps.android.heatmaps.HeatmapTileProvider
-import androidx.compose.foundation.border
-import androidx.compose.foundation.layout.offset
-import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.GenericShape
-import com.google.android.gms.maps.CameraUpdateFactory
-import com.google.maps.android.clustering.ClusterItem
-import com.google.maps.android.compose.clustering.Clustering
-import com.google.maps.android.compose.clustering.rememberClusterManager
-import com.google.maps.android.compose.clustering.rememberClusterRenderer
-import com.google.maps.android.clustering.algo.NonHierarchicalDistanceBasedAlgorithm
-import com.google.maps.android.clustering.view.DefaultClusterRenderer
-import androidx.compose.runtime.SideEffect
-import com.google.maps.android.compose.MapsComposeExperimentalApi
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.launch
+import okhttp3.MediaType.Companion.toMediaType
+import okhttp3.MultipartBody
+import okhttp3.RequestBody.Companion.toRequestBody
 import ro.hack4arad.topul.BuildConfig
 import ro.hack4arad.topul.R
 import ro.hack4arad.topul.data.Category
@@ -88,31 +119,38 @@ import ro.hack4arad.topul.data.Checkins
 import ro.hack4arad.topul.data.Network
 import ro.hack4arad.topul.data.Place
 import ro.hack4arad.topul.data.Profile
+import ro.hack4arad.topul.data.Report
 import ro.hack4arad.topul.ui.components.Avatar
 import ro.hack4arad.topul.ui.components.CategoryChips
 import ro.hack4arad.topul.ui.components.CheckinCelebration
-import ro.hack4arad.topul.ui.components.GamePanel
-import ro.hack4arad.topul.ui.components.Pill
-import ro.hack4arad.topul.ui.components.PlaceImage
+import ro.hack4arad.topul.ui.components.PlacePhoto
 import ro.hack4arad.topul.ui.components.ProgressBar
 import ro.hack4arad.topul.ui.components.categoryColor
-import ro.hack4arad.topul.ui.components.categoryEmoji
+import ro.hack4arad.topul.ui.components.categoryIcon
 import ro.hack4arad.topul.ui.theme.Gold
 import ro.hack4arad.topul.ui.theme.GoldDark
 import ro.hack4arad.topul.ui.theme.Lilac
+import ro.hack4arad.topul.ui.theme.Mint
+import ro.hack4arad.topul.ui.theme.Night
 import ro.hack4arad.topul.ui.theme.NightDeep
 import ro.hack4arad.topul.ui.theme.Panel
+import ro.hack4arad.topul.ui.theme.PanelHigh
 import ro.hack4arad.topul.ui.theme.Pink
 import ro.hack4arad.topul.ui.theme.TextMuted
 import ro.hack4arad.topul.ui.theme.Violet
-import ro.hack4arad.topul.ui.theme.VioletDeep
+import ro.hack4arad.topul.util.Fix
 import ro.hack4arad.topul.util.LOCATION_PERMISSIONS
+import ro.hack4arad.topul.util.compressPhoto
 import ro.hack4arad.topul.util.currentFix
 import ro.hack4arad.topul.util.hasLocationPermission
+import ro.hack4arad.topul.util.newPhotoUri
 import ro.hack4arad.topul.util.userMessage
 import kotlin.math.roundToInt
 
 private val ARAD = LatLng(46.1745, 21.3185)
+
+/** Stilul hărții: întunecată (implicit), luminoasă sau satelit. */
+enum class MapLook(val label: String) { DARK("Întunecată"), LIGHT("Luminoasă"), SATELLITE("Satelit") }
 
 class MapViewModel : ViewModel() {
     var places by mutableStateOf<List<Place>>(emptyList())
@@ -126,66 +164,76 @@ class MapViewModel : ViewModel() {
     /** Crește la fiecare schimbare a heatmap-ului, ca harta să-l redeseneze. */
     var heatVersion by mutableIntStateOf(0)
         private set
+    var reports by mutableStateOf<List<Report>>(emptyList())
+        private set
     var profile by mutableStateOf<Profile?>(null)
         private set
-    var selectedPlace by mutableStateOf<Place?>(null)
-        private set
+    /** Bandă live: ultimele întâmplări din oraș. */
+    val ticker = mutableStateListOf<String>()
     var celebration by mutableStateOf<Pair<CheckinResult, String>?>(null)
     var busy by mutableStateOf(false)
         private set
     var message by mutableStateOf<String?>(null)
+    var myLocation by mutableStateOf<LatLng?>(null)
+        private set
 
-    private var myLat: Double? = null
-    private var myLng: Double? = null
     private var loadJob: Job? = null
 
     init {
         load()
         loadHeat()
         loadProfile()
+        loadReports()
         viewModelScope.launch {
             Network.live.events.collect { e ->
                 val lat = e.lat
                 val lng = e.lng
-                if (e.type == "checkin" && lat != null && lng != null) {
-                    heat = heat + LatLng(lat, lng)
-                    heatVersion++
-                    updatePlace(e.placeId) { it.copy(checkinCount = it.checkinCount + 1) }
-                }
-                if (e.type == "mayor") {
-                    updatePlace(e.placeId) { it.copy(mayorId = e.newMayorId, mayorName = e.newMayorName) }
-                    if (e.oldMayorId == Network.session.userId || e.newMayorId == Network.session.userId) loadProfile()
+                when (e.type) {
+                    "checkin" -> {
+                        if (lat != null && lng != null) { heat = heat + LatLng(lat, lng); heatVersion++ }
+                        updatePlace(e.placeId) { it.copy(checkinCount = it.checkinCount + 1) }
+                        pushTicker("${e.userName} a făcut check-in la ${e.placeName}")
+                    }
+                    "mayor" -> {
+                        updatePlace(e.placeId) { it.copy(mayorId = e.newMayorId, mayorName = e.newMayorName) }
+                        pushTicker("${e.newMayorName} e noul Primar la ${e.placeName}")
+                        if (e.oldMayorId == Network.session.userId || e.newMayorId == Network.session.userId) loadProfile()
+                    }
+                    "report" -> {
+                        pushTicker("Sesizare nouă: ${e.placeName}")
+                        loadReports()
+                    }
                 }
             }
         }
     }
 
-    private fun updatePlace(id: Int?, change: (Place) -> Place) {
-        places = places.map { if (it.id == id) change(it) else it }
-        selectedPlace = selectedPlace?.let { if (it.id == id) change(it) else it }
+    private fun pushTicker(text: String) {
+        ticker.add(0, text)
+        while (ticker.size > 5) ticker.removeAt(ticker.lastIndex)
     }
 
-    /** Cu locația cunoscută, serverul sortează locurile după distanță. */
+    private fun updatePlace(id: Int?, change: (Place) -> Place) {
+        places = places.map { if (it.id == id) change(it) else it }
+    }
+
+    /** Cu locația cunoscută, serverul sortează locurile după distanță (caruselul arată întâi ce e aproape). */
     fun setLocation(lat: Double, lng: Double) {
-        myLat = lat
-        myLng = lng
+        myLocation = LatLng(lat, lng)
         load()
     }
 
     fun selectCategory(category: String?) {
         selectedCategory = category
-        selectedPlace = null
         load()
     }
-
-    fun selectPlace(place: Place?) { selectedPlace = place }
 
     fun load() {
         loadJob?.cancel() // un răspuns vechi nu are voie să-l suprascrie pe cel nou
         loadJob = viewModelScope.launch {
             runCatching {
                 if (categories.isEmpty()) categories = Network.api.categories()
-                places = Network.api.places(category = selectedCategory, lat = myLat, lng = myLng)
+                places = Network.api.places(category = selectedCategory, lat = myLocation?.latitude, lng = myLocation?.longitude)
             }.onFailure { message = it.userMessage() }
         }
     }
@@ -193,18 +241,19 @@ class MapViewModel : ViewModel() {
     fun loadHeat() {
         viewModelScope.launch {
             runCatching { Network.api.recentCheckins(minutes = 60) }
-                .onSuccess { points ->
-                    heat = points.map { LatLng(it.lat, it.lng) }
-                    heatVersion++
-                }
+                .onSuccess { points -> heat = points.map { LatLng(it.lat, it.lng) }; heatVersion++ }
         }
+    }
+
+    fun loadReports() {
+        viewModelScope.launch { runCatching { Network.api.reports() }.onSuccess { reports = it } }
     }
 
     fun loadProfile() {
         viewModelScope.launch { runCatching { Network.api.me() }.onSuccess { profile = it } }
     }
 
-    fun checkIn(place: Place, fix: ro.hack4arad.topul.util.Fix?) {
+    fun checkIn(place: Place, fix: Fix?) {
         if (fix == null) {
             message = "Nu am putut afla locația. Pornește GPS-ul și încearcă din nou."
             return
@@ -212,18 +261,39 @@ class MapViewModel : ViewModel() {
         viewModelScope.launch {
             busy = true
             runCatching { Checkins.checkIn(place.id, fix) }
-                .onSuccess {
-                    celebration = it to place.name
-                    selectedPlace = null
-                    loadProfile()
-                    load()
-                }
+                .onSuccess { celebration = it to place.name; loadProfile(); load() }
                 .onFailure { message = it.userMessage() }
+            busy = false
+        }
+    }
+
+    fun sendReport(category: String, description: String, fix: Fix?, photo: ByteArray?, onDone: () -> Unit) {
+        if (fix == null) {
+            message = "Nu am putut afla locația problemei. Pornește GPS-ul."
+            return
+        }
+        viewModelScope.launch {
+            busy = true
+            val text = "text/plain".toMediaType()
+            runCatching {
+                Network.api.createReport(
+                    category = category.toRequestBody(text),
+                    lat = fix.lat.toString().toRequestBody(text),
+                    lng = fix.lng.toString().toRequestBody(text),
+                    description = description.toRequestBody(text),
+                    isMock = fix.isMock.toString().toRequestBody(text),
+                    photo = photo?.let { MultipartBody.Part.createFormData("photo", "sesizare.jpg", it.toRequestBody("image/jpeg".toMediaType())) },
+                )
+            }.onSuccess {
+                message = "Sesizare trimisă. Mulțumim! +${it.xpGained} XP"
+                loadReports(); loadProfile(); onDone()
+            }.onFailure { message = it.userMessage() }
             busy = false
         }
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MapScreen(onPlace: (Int) -> Unit, vm: MapViewModel = viewModel()) {
     val context = LocalContext.current
@@ -237,117 +307,160 @@ fun MapScreen(onPlace: (Int) -> Unit, vm: MapViewModel = viewModel()) {
         if (hasPermission) currentFix(context)?.let { vm.setLocation(it.lat, it.lng) }
     }
     LaunchedEffect(vm.message) {
-        if (vm.message != null) {
-            kotlinx.coroutines.delay(3500)
-            vm.message = null
+        if (vm.message != null) { kotlinx.coroutines.delay(3500); vm.message = null }
+    }
+
+    var look by rememberSaveable { mutableStateOf(MapLook.DARK) }
+    var listMode by rememberSaveable { mutableStateOf(false) }
+    var showHeat by rememberSaveable { mutableStateOf(false) }
+    var reporting by remember { mutableStateOf(false) }
+    val camera = rememberCameraPositionState { position = CameraPosition.fromLatLngZoom(ARAD, 13.6f) }
+    val pager = rememberPagerState(pageCount = { vm.places.size })
+    val carouselPlace = vm.places.getOrNull(pager.currentPage)
+
+    // Tragi caruselul -> harta zboară (scurt, ferm) la locul respectiv
+    LaunchedEffect(pager, vm.places) {
+        snapshotFlow { pager.settledPage }.distinctUntilChanged().collect { page ->
+            val p = vm.places.getOrNull(page) ?: return@collect
+            if (!listMode && pager.pageCount > 0) {
+                camera.animate(CameraUpdateFactory.newLatLngZoom(LatLng(p.lat, p.lng), maxOf(camera.position.zoom, 15.5f)), 350)
+            }
         }
     }
 
-    var showHeat by rememberSaveable { mutableStateOf(true) }
-
     Box(Modifier.fillMaxSize()) {
-        if (BuildConfig.HAS_MAPS_KEY) {
-            PlacesMap(vm, hasPermission, showHeat)
+        if (listMode || !BuildConfig.HAS_MAPS_KEY) {
+            PlacesFeed(vm.places, onPlace, topPadding = 200.dp)
         } else {
-            PlacesList(vm.places, onPlace)
+            PlacesMap(
+                vm = vm, camera = camera, look = look, hasPermission = hasPermission, showHeat = showHeat,
+                highlightedId = carouselPlace?.id,
+                onPlaceTap = { p -> vm.places.indexOfFirst { it.id == p.id }.takeIf { it >= 0 }?.let { scope.launch { pager.animateScrollToPage(it) } } },
+            )
         }
 
+        // ---- sus: jucător, bandă live, categorii
         Column(Modifier.fillMaxWidth().padding(top = 8.dp)) {
             vm.profile?.let { PlayerHud(it, Modifier.padding(horizontal = 12.dp)) }
-            Spacer(Modifier.height(8.dp))
+            LiveTicker(vm.ticker.firstOrNull(), Modifier.padding(horizontal = 12.dp, vertical = 8.dp))
             CategoryChips(vm.categories, vm.selectedCategory, vm::selectCategory)
             vm.message?.let {
                 Text(
-                    it,
-                    color = Color.White,
-                    modifier = Modifier
-                        .padding(12.dp)
-                        .fillMaxWidth()
-                        .clip(RoundedCornerShape(14.dp))
-                        .background(Pink.copy(alpha = 0.9f))
-                        .padding(12.dp),
+                    it, color = Color.White,
+                    modifier = Modifier.padding(12.dp).fillMaxWidth().clip(RoundedCornerShape(14.dp))
+                        .background(Violet.copy(alpha = 0.95f)).padding(12.dp),
                 )
             }
         }
 
-        if (BuildConfig.HAS_MAPS_KEY && vm.selectedPlace == null) {
-            SmallFloatingActionButton(
-                onClick = {
+        // ---- dreapta: unelte hartă
+        Column(
+            Modifier.align(Alignment.CenterEnd).padding(end = 12.dp, top = 120.dp),
+            verticalArrangement = Arrangement.spacedBy(10.dp),
+        ) {
+            MapTool(if (listMode) Icons.Rounded.Map else Icons.Rounded.ViewAgenda, if (listMode) "Hartă" else "Listă") { listMode = !listMode }
+            if (!listMode) {
+                MapTool(Icons.Rounded.Layers, look.label) { look = MapLook.entries[(look.ordinal + 1) % MapLook.entries.size] }
+                MapTool(Icons.Rounded.LocalFireDepartment, "Agitație", active = showHeat) {
                     showHeat = !showHeat
                     if (showHeat) vm.loadHeat()
-                },
-                containerColor = if (showHeat) Pink else Panel,
-                contentColor = Color.White,
-                modifier = Modifier.align(Alignment.BottomEnd).padding(16.dp),
-            ) { Text("🔥", fontSize = 20.sp) }
+                }
+                if (hasPermission) MapTool(Icons.Rounded.MyLocation, "Eu") {
+                    vm.myLocation?.let { scope.launch { camera.animate(CameraUpdateFactory.newLatLngZoom(it, 16f), 350) } }
+                }
+            }
+            MapTool(Icons.Rounded.ReportProblem, "Semnalează", tint = Pink) { reporting = true }
         }
 
-        AnimatedVisibility(
-            visible = vm.selectedPlace != null,
-            enter = slideInVertically { it } + fadeIn(),
-            exit = slideOutVertically { it } + fadeOut(),
-            modifier = Modifier.align(Alignment.BottomCenter),
-        ) {
-            vm.selectedPlace?.let { place ->
-                PlaceCard(
-                    place = place,
-                    busy = vm.busy,
-                    onDetails = { onPlace(place.id) },
-                    onClose = { vm.selectPlace(null) },
+        // ---- jos: carusel cu poze (tragi și harta te urmează)
+        if (!listMode && vm.places.isNotEmpty()) {
+            HorizontalPager(
+                state = pager,
+                pageSize = PageSize.Fixed(300.dp),
+                contentPadding = PaddingValues(horizontal = 20.dp),
+                pageSpacing = 12.dp,
+                modifier = Modifier.align(Alignment.BottomCenter).padding(bottom = 12.dp),
+            ) { page ->
+                val p = vm.places[page]
+                CarouselCard(
+                    p, busy = vm.busy,
+                    onOpen = { onPlace(p.id) },
                     onCheckIn = {
                         if (!hasLocationPermission(context)) permissionLauncher.launch(LOCATION_PERMISSIONS)
-                        else scope.launch { vm.checkIn(place, currentFix(context)) }
+                        else scope.launch { vm.checkIn(p, currentFix(context)) }
                     },
                 )
             }
         }
 
-        vm.celebration?.let { (result, name) ->
-            CheckinCelebration(result, name, onDismiss = { vm.celebration = null })
+        vm.celebration?.let { (result, name) -> CheckinCelebration(result, name, onDismiss = { vm.celebration = null }) }
+    }
+
+    if (reporting) {
+        ModalBottomSheet(
+            onDismissRequest = { reporting = false },
+            sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true),
+            containerColor = Night,
+        ) {
+            ReportForm(busy = vm.busy) { category, description, photo ->
+                scope.launch {
+                    val fix = if (hasLocationPermission(context)) currentFix(context) else null
+                    if (fix == null && !hasLocationPermission(context)) permissionLauncher.launch(LOCATION_PERMISSIONS)
+                    vm.sendReport(category, description, fix, photo) { reporting = false }
+                }
+            }
         }
     }
 }
 
-/** Bara de jucător de sus: avatar, nivel, XP și misiunea curentă. */
+@Composable
+private fun MapTool(icon: androidx.compose.ui.graphics.vector.ImageVector, label: String, active: Boolean = false,
+                    tint: Color = Color.White, onClick: () -> Unit) {
+    SmallFloatingActionButton(
+        onClick = onClick,
+        containerColor = if (active) Gold else NightDeep.copy(alpha = 0.92f),
+        contentColor = if (active) GoldDark else tint,
+    ) { Icon(icon, contentDescription = label) }
+}
+
+/** Bara de jucător: avatar, nivel, XP. */
 @Composable
 private fun PlayerHud(p: Profile, modifier: Modifier = Modifier) {
-    Column(
-        modifier
-            .fillMaxWidth()
-            .clip(RoundedCornerShape(18.dp))
-            .background(NightDeep.copy(alpha = 0.92f))
-            .padding(12.dp),
+    Row(
+        modifier.fillMaxWidth().clip(RoundedCornerShape(18.dp)).background(NightDeep.copy(alpha = 0.92f))
+            .padding(horizontal = 12.dp, vertical = 10.dp),
+        verticalAlignment = Alignment.CenterVertically,
     ) {
-        Row(verticalAlignment = Alignment.CenterVertically) {
-            Avatar(p.name, 40.dp, emoji = p.avatarEmoji, colorKey = p.avatarColor)
-            Spacer(Modifier.width(10.dp))
-            Column(Modifier.weight(1f)) {
-                Row {
-                    Text("Nivel ${p.level}", color = Color.White, fontWeight = FontWeight.Black)
-                    Text(" · ${levelTitle(p.level)}", color = TextMuted, maxLines = 1, overflow = TextOverflow.Ellipsis)
-                }
-                Spacer(Modifier.height(6.dp))
-                ProgressBar(p.xpIntoLevel / p.xpPerLevel.toFloat())
+        Avatar(p.name, 38.dp, emoji = p.avatarEmoji, colorKey = p.avatarColor)
+        Spacer(Modifier.width(10.dp))
+        Column(Modifier.weight(1f)) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Text("Nivel ${p.level}", color = Color.White, fontWeight = FontWeight.Black)
+                Text("  ${levelTitle(p.level)}", color = TextMuted, fontSize = 13.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
             }
-            Spacer(Modifier.width(10.dp))
-            Text("${p.xp} XP", color = Gold, fontWeight = FontWeight.Black)
+            Spacer(Modifier.height(6.dp))
+            ProgressBar(p.xpIntoLevel / p.xpPerLevel.toFloat(), height = 6.dp)
         }
-        p.missions.firstOrNull()?.let { m ->
-            Spacer(Modifier.height(10.dp))
-            Row(
-                Modifier
-                    .fillMaxWidth()
-                    .clip(RoundedCornerShape(12.dp))
-                    .background(VioletDeep)
-                    .padding(horizontal = 10.dp, vertical = 8.dp),
-                verticalAlignment = Alignment.CenterVertically,
-            ) {
-                Text("🎯", fontSize = 16.sp)
-                Spacer(Modifier.width(8.dp))
-                Text(m.title, color = Lilac, fontSize = 13.sp, modifier = Modifier.weight(1f), maxLines = 1, overflow = TextOverflow.Ellipsis)
-                Text("${m.progress}/${m.target}", color = Gold, fontSize = 13.sp, fontWeight = FontWeight.Bold)
-            }
-        }
+        Spacer(Modifier.width(10.dp))
+        Text("${p.xp} XP", color = Gold, fontWeight = FontWeight.Black)
+    }
+}
+
+/** Banda live: ultima întâmplare din oraș, cu tranziție de jos în sus. */
+@Composable
+private fun LiveTicker(latest: String?, modifier: Modifier = Modifier) {
+    Row(
+        modifier.fillMaxWidth().clip(RoundedCornerShape(50)).background(NightDeep.copy(alpha = 0.88f))
+            .padding(horizontal = 12.dp, vertical = 7.dp),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Icon(Icons.Rounded.Sensors, contentDescription = null, tint = Mint, modifier = Modifier.size(16.dp))
+        Spacer(Modifier.width(8.dp))
+        AnimatedContent(
+            targetState = latest ?: "Harta e live: aici apar check-in-urile din oraș",
+            transitionSpec = { (slideInVertically { it } + fadeIn()) togetherWith (slideOutVertically { -it } + fadeOut()) },
+            label = "ticker",
+        ) { text -> Text(text, color = Lilac, fontSize = 13.sp, maxLines = 1, overflow = TextOverflow.Ellipsis) }
     }
 }
 
@@ -360,45 +473,55 @@ fun levelTitle(level: Int) = when {
     else -> "Legenda Aradului"
 }
 
+fun formatDistance(m: Double): String = if (m < 1000) "${m.roundToInt()} m" else "%.1f km".format(m / 1000)
+
 @Composable
-private fun PlaceCard(place: Place, busy: Boolean, onDetails: () -> Unit, onClose: () -> Unit, onCheckIn: () -> Unit) {
+private fun CarouselCard(place: Place, busy: Boolean, onOpen: () -> Unit, onCheckIn: () -> Unit) {
     val me = Network.session.userId
-    val (status, action) = when (place.mayorId) {
-        null -> "👑 Tron liber" to "Cucerește tronul"
-        me -> "👑 Tu ești Primarul" to "Apără-ți tronul"
-        else -> "👑 Primar: ${place.mayorName}" to "Fură tronul"
-    }
-    GamePanel(
-        Modifier.fillMaxWidth().padding(12.dp),
-        borderColor = if (place.mayorId == null) Gold else categoryColor(place.category),
+    Column(
+        Modifier.fillMaxWidth().clip(RoundedCornerShape(22.dp)).background(Night)
+            .border(1.dp, categoryColor(place.category).copy(alpha = 0.6f), RoundedCornerShape(22.dp))
+            .clickable(onClick = onOpen),
     ) {
-        Column {
+        Box(Modifier.fillMaxWidth().height(118.dp)) {
+            PlacePhoto(place, Modifier.fillMaxSize(), iconSize = 40.dp)
+            Box(Modifier.fillMaxSize().background(Brush.verticalGradient(0.45f to Color.Transparent, 1f to Night)))
+            Row(
+                Modifier.align(Alignment.TopStart).padding(10.dp).clip(RoundedCornerShape(50))
+                    .background(Night.copy(alpha = 0.8f)).padding(horizontal = 8.dp, vertical = 3.dp),
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                Icon(categoryIcon(place.category), null, tint = categoryColor(place.category), modifier = Modifier.size(14.dp))
+                Spacer(Modifier.width(4.dp))
+                Text(place.categoryLabel, color = Color.White, fontSize = 11.sp, fontWeight = FontWeight.Bold)
+            }
+        }
+        Column(Modifier.padding(horizontal = 14.dp, vertical = 10.dp)) {
+            Text(place.name, color = Color.White, fontWeight = FontWeight.Black, fontSize = 17.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
             Row(verticalAlignment = Alignment.CenterVertically) {
-                PlaceImage(place.photoUrl, place.category, place.id, Modifier.size(58.dp).clip(RoundedCornerShape(14.dp)), emojiSize = 28)
-                Spacer(Modifier.width(12.dp))
-                Column(Modifier.weight(1f)) {
-                    Text(place.name, color = Color.White, fontWeight = FontWeight.Black, fontSize = 18.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
-                    Text(
-                        listOfNotNull(place.categoryLabel, place.distanceM?.let(::formatDistance), "★ ${place.rating.roundToInt()}")
-                            .joinToString(" · "),
-                        color = TextMuted, fontSize = 13.sp,
-                    )
-                }
-                Text("✕", color = TextMuted, fontSize = 20.sp, modifier = Modifier.clickable(onClick = onClose).padding(6.dp))
+                Icon(Icons.Rounded.WorkspacePremium, null, tint = if (place.mayorId == null) Gold else TextMuted, modifier = Modifier.size(14.dp))
+                Spacer(Modifier.width(4.dp))
+                Text(
+                    listOfNotNull(
+                        when (place.mayorId) { null -> "Tron liber"; me -> "Tu ești Primarul"; else -> "Primar: ${place.mayorName}" },
+                        place.distanceM?.let(::formatDistance),
+                    ).joinToString(" · "),
+                    color = if (place.mayorId == null) Gold else TextMuted, fontSize = 12.sp, maxLines = 1, overflow = TextOverflow.Ellipsis,
+                )
             }
             Spacer(Modifier.height(10.dp))
-            Pill(
-                status,
-                background = if (place.mayorId == null) Gold else Violet,
-                textColor = if (place.mayorId == null) GoldDark else Color.White,
-            )
-            Spacer(Modifier.height(12.dp))
-            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                Button(onClick = onCheckIn, enabled = !busy, modifier = Modifier.weight(1f).height(50.dp)) {
-                    if (busy) CircularProgressIndicator(Modifier.size(20.dp), strokeWidth = 2.dp, color = GoldDark)
-                    else Text("$action · +XP")
+            Row(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalAlignment = Alignment.CenterVertically) {
+                Button(
+                    onClick = onCheckIn, enabled = !busy, modifier = Modifier.weight(1f).height(42.dp),
+                    contentPadding = PaddingValues(horizontal = 10.dp),
+                ) {
+                    if (busy) CircularProgressIndicator(Modifier.size(18.dp), strokeWidth = 2.dp, color = GoldDark)
+                    else Text(if (place.mayorId == null) "Cucerește tronul" else "Fă check-in", fontSize = 14.sp)
                 }
-                OutlinedButton(onClick = onDetails, modifier = Modifier.height(50.dp)) { Text("Detalii", color = Color.White) }
+                OutlinedButton(onClick = onOpen, modifier = Modifier.height(42.dp), contentPadding = PaddingValues(horizontal = 12.dp)) {
+                    Text("Detalii", color = Color.White, fontSize = 14.sp)
+                    Icon(Icons.Rounded.ChevronRight, null, tint = Color.White, modifier = Modifier.size(18.dp))
+                }
             }
         }
     }
@@ -406,156 +529,169 @@ private fun PlaceCard(place: Place, busy: Boolean, onDetails: () -> Unit, onClos
 
 @OptIn(MapsComposeExperimentalApi::class)
 @Composable
-private fun PlacesMap(vm: MapViewModel, hasPermission: Boolean, showHeat: Boolean) {
+private fun PlacesMap(
+    vm: MapViewModel,
+    camera: CameraPositionState,
+    look: MapLook,
+    hasPermission: Boolean,
+    showHeat: Boolean,
+    highlightedId: Int?,
+    onPlaceTap: (Place) -> Unit,
+) {
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
-    val camera = rememberCameraPositionState { position = CameraPosition.fromLatLngZoom(ARAD, 13.6f) }
-    val style = remember { MapStyleOptions.loadRawResourceStyle(context, R.raw.map_style_night) }
-    val me = Network.session.userId
+    val darkStyle = remember { MapStyleOptions.loadRawResourceStyle(context, R.raw.map_style_night) }
+    val items = remember(vm.places) { vm.places.map(::PlaceItem) }
+    val clusterManager = rememberClusterManager<PlaceItem>()
+    var renderer by remember { mutableStateOf<PhotoClusterRenderer?>(null) }
+
     GoogleMap(
         modifier = Modifier.fillMaxSize(),
         cameraPositionState = camera,
-        contentPadding = PaddingValues(top = 190.dp, bottom = 12.dp),
-        properties = MapProperties(isMyLocationEnabled = hasPermission, mapStyleOptions = style),
-        uiSettings = MapUiSettings(zoomControlsEnabled = false, myLocationButtonEnabled = false, mapToolbarEnabled = false),
-        onMapClick = { vm.selectPlace(null) },
+        contentPadding = PaddingValues(top = 200.dp, bottom = 250.dp),
+        properties = MapProperties(
+            isMyLocationEnabled = hasPermission,
+            mapType = if (look == MapLook.SATELLITE) MapType.HYBRID else MapType.NORMAL,
+            mapStyleOptions = if (look == MapLook.DARK) darkStyle else null,
+        ),
+        uiSettings = MapUiSettings(zoomControlsEnabled = false, myLocationButtonEnabled = false, mapToolbarEnabled = false, compassEnabled = false),
     ) {
-        // Locurile apropiate se grupează într-o bulă (cu emoji-urile categoriilor din ea); la zoom se desfac.
-        // Grupare mai agresivă decât implicit: rază mare și bule chiar și din 2 locuri.
-        val items = remember(vm.places) { vm.places.map(::PlaceItem) }
-        val clusterManager = rememberClusterManager<PlaceItem>()
-        LaunchedEffect(clusterManager) {
-            clusterManager?.algorithm = NonHierarchicalDistanceBasedAlgorithm<PlaceItem>().apply {
-                maxDistanceBetweenClusteredItems = CLUSTER_RADIUS_DP
-            }
-        }
-        val renderer = rememberClusterRenderer(
-            clusterContent = { cluster -> ClusterBubble(cluster.items.map { it.place.category }) },
-            clusterItemContent = { item ->
-                val p = item.place
-                PlaceMarker(categoryEmoji(p.category), categoryColor(p.category), mine = p.mayorId == me, noMayor = p.mayorId == null)
-            },
-            clusterManager = clusterManager,
-        )
-        SideEffect {
-            val manager = clusterManager ?: return@SideEffect
-            (renderer as? DefaultClusterRenderer<PlaceItem>)?.minClusterSize = 2
-            if (renderer != null && manager.renderer != renderer) manager.renderer = renderer
+        // markerele native cu poze (desenate o dată, fără animațiile lente)
+        MapEffect(clusterManager) { map ->
+            val manager = clusterManager ?: return@MapEffect
+            manager.algorithm = NonHierarchicalDistanceBasedAlgorithm<PlaceItem>().apply { maxDistanceBetweenClusteredItems = 90 }
+            val r = PhotoClusterRenderer(context, map, manager, scope)
+            manager.renderer = r
+            renderer = r
             manager.setOnClusterClickListener { cluster ->
-                scope.launch {
-                    camera.animate(CameraUpdateFactory.newLatLngZoom(cluster.position, camera.position.zoom + 2f), 500)
-                }
+                scope.launch { camera.animate(CameraUpdateFactory.newLatLngZoom(cluster.position, camera.position.zoom + 2f), 300) }
                 true
             }
-            manager.setOnClusterItemClickListener { item ->
-                vm.selectPlace(item.place)
-                true // nu deschide fereastra standard Google
-            }
+            manager.setOnClusterItemClickListener { item -> onPlaceTap(item.place); true }
         }
         if (clusterManager != null) Clustering(items = items, clusterManager = clusterManager)
+
+        // sesizările (gropi etc.) - markere roșii separate
+        vm.reports.forEach { r ->
+            key("r${r.id}") {
+                Marker(
+                    state = remember { MarkerState(LatLng(r.lat, r.lng)) },
+                    title = r.categoryLabel,
+                    snippet = listOf(r.description, "semnalat de ${r.userName}").filter { it.isNotBlank() }.joinToString(" · "),
+                    icon = BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED),
+                    alpha = 0.9f,
+                )
+            }
+        }
+
         if (showHeat && vm.heat.isNotEmpty()) {
             key(vm.heatVersion) {
                 val provider = remember {
-                    HeatmapTileProvider.Builder()
-                        .data(vm.heat)
-                        .radius(50)
-                        .gradient(
-                            Gradient(
-                                intArrayOf(0xFF7C5CFF.toInt(), 0xFFFF3D81.toInt(), 0xFFFFD23F.toInt()),
-                                floatArrayOf(0.2f, 0.6f, 1f),
-                            )
-                        )
+                    HeatmapTileProvider.Builder().data(vm.heat).radius(50)
+                        .gradient(Gradient(intArrayOf(0xFF7C5CFF.toInt(), 0xFFFF3D81.toInt(), 0xFFFFD23F.toInt()), floatArrayOf(0.2f, 0.6f, 1f)))
                         .build()
                 }
                 TileOverlay(tileProvider = provider)
             }
         }
     }
+
+    LaunchedEffect(highlightedId, renderer) { renderer?.highlight(highlightedId, items) }
 }
 
-/** Un loc pe hartă, în formatul cerut de gruparea markerelor. */
-private class PlaceItem(val place: Place) : ClusterItem {
-    override fun getPosition() = LatLng(place.lat, place.lng)
-    override fun getTitle() = place.name
-    override fun getSnippet(): String? = null
-    override fun getZIndex(): Float = if (place.mayorId == Network.session.userId) 2f else 1f
-}
-
-/** Cât de departe (în dp pe ecran) se adună locurile într-o bulă. Implicit Google: 100. */
-private const val CLUSTER_RADIUS_DP = 120
-
-/** Marker mic și rotund: emoji pe fundal închis, cu inel în culoarea categoriei; auriu cu coroană unde ești Primar. */
+/** Lista de locuri (alternativa la hartă): carduri mari cu poze, cele mai apropiate primele. */
 @Composable
-private fun PlaceMarker(emoji: String, color: Color, mine: Boolean, noMayor: Boolean) {
-    Box(Modifier.size(36.dp)) {
-        Box(
-            Modifier
-                .align(Alignment.Center)
-                .size(30.dp)
-                .clip(CircleShape)
-                .background(if (mine) Gold else NightDeep)
-                .border(2.5.dp, if (mine) Color.White else color, CircleShape),
-            contentAlignment = Alignment.Center,
-        ) { Text(if (mine) "👑" else emoji, fontSize = 15.sp) }
-        if (noMayor && !mine) {
-            // bulina aurie = „tron liber”
-            Box(
-                Modifier
-                    .align(Alignment.TopEnd)
-                    .size(11.dp)
-                    .clip(CircleShape)
-                    .background(Gold)
-                    .border(2.dp, NightDeep, CircleShape)
-            )
+private fun PlacesFeed(places: List<Place>, onPlace: (Int) -> Unit, topPadding: androidx.compose.ui.unit.Dp) {
+    LazyColumn(
+        contentPadding = PaddingValues(top = topPadding, bottom = 24.dp, start = 16.dp, end = 72.dp),
+        verticalArrangement = Arrangement.spacedBy(12.dp),
+    ) {
+        items(places, key = { it.id }) { p ->
+            Column(Modifier.fillMaxWidth().clip(RoundedCornerShape(20.dp)).background(Panel).clickable { onPlace(p.id) }) {
+                PlacePhoto(p, Modifier.fillMaxWidth().height(150.dp), iconSize = 44.dp)
+                Column(Modifier.padding(14.dp)) {
+                    Text(p.name, color = Color.White, fontWeight = FontWeight.Black, fontSize = 17.sp)
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Icon(categoryIcon(p.category), null, tint = categoryColor(p.category), modifier = Modifier.size(15.dp))
+                        Spacer(Modifier.width(5.dp))
+                        Text(
+                            listOfNotNull(p.categoryLabel, p.distanceM?.let(::formatDistance), "${p.rating.roundToInt()} puncte").joinToString(" · "),
+                            color = TextMuted, fontSize = 13.sp,
+                        )
+                    }
+                }
+            }
         }
     }
 }
 
-/** Bulă pentru mai multe locuri apropiate: numărul + emoji-urile celor mai frecvente categorii. */
-@Composable
-private fun ClusterBubble(categories: List<String>) {
-    val top = categories.groupingBy { it }.eachCount().entries
-        .sortedByDescending { it.value }.take(3).joinToString("") { categoryEmoji(it.key) }
-    Column(
-        Modifier
-            .clip(RoundedCornerShape(50))
-            .background(Violet)
-            .border(2.5.dp, Gold, RoundedCornerShape(50))
-            .padding(horizontal = 12.dp, vertical = 5.dp),
-        horizontalAlignment = Alignment.CenterHorizontally,
-    ) {
-        Text("${categories.size}", color = Color.White, fontWeight = FontWeight.Black, fontSize = 16.sp, lineHeight = 17.sp)
-        Text(top, fontSize = 12.sp, lineHeight = 14.sp)
-    }
-}
+private val REPORT_CATEGORIES = listOf(
+    "groapa" to "Groapă în drum", "trotuar" to "Trotuar stricat", "iluminat" to "Iluminat stricat",
+    "gunoi" to "Gunoi / mizerie", "semnalizare" to "Semn sau semafor", "altele" to "Altceva",
+)
 
-private fun formatDistance(m: Double): String =
-    if (m < 1000) "${m.roundToInt()} m" else "%.1f km".format(m / 1000)
-
-/** Rezervă când nu există cheie Google Maps: locurile ca listă, cele mai apropiate primele. */
+/** Formularul de sesizare: categorie, descriere, poză. Poziția = unde ești acum (lângă problemă). */
 @Composable
-private fun PlacesList(places: List<Place>, onPlace: (Int) -> Unit) {
-    LazyColumn(contentPadding = PaddingValues(top = 200.dp, bottom = 88.dp)) {
-        items(places, key = { it.id }) { p ->
-            Row(
-                Modifier
-                    .fillMaxWidth()
-                    .clickable { onPlace(p.id) }
-                    .padding(horizontal = 16.dp, vertical = 10.dp),
-                verticalAlignment = Alignment.CenterVertically,
-            ) {
-                PlaceImage(p.photoUrl, p.category, p.id, Modifier.size(52.dp).clip(RoundedCornerShape(12.dp)), emojiSize = 26)
-                Spacer(Modifier.width(12.dp))
-                Column(Modifier.weight(1f)) {
-                    Text(p.name, fontWeight = FontWeight.Bold, maxLines = 1)
-                    Text(
-                        listOfNotNull(p.categoryLabel, p.distanceM?.let(::formatDistance)).joinToString(" · "),
-                        style = MaterialTheme.typography.bodySmall, color = TextMuted, maxLines = 1,
-                    )
-                }
-                Text("★ ${p.rating.roundToInt()}", fontWeight = FontWeight.Black, color = Gold)
+private fun ReportForm(busy: Boolean, onSend: (String, String, ByteArray?) -> Unit) {
+    val context = LocalContext.current
+    val scope = rememberCoroutineScope()
+    var category by remember { mutableStateOf("groapa") }
+    var description by remember { mutableStateOf("") }
+    var photoUri by remember { mutableStateOf<Uri?>(null) }
+    var photoTaken by remember { mutableStateOf(false) }
+    val camera = rememberLauncherForActivityResult(ActivityResultContracts.TakePicture()) { ok -> photoTaken = ok }
+
+    Column(Modifier.fillMaxWidth().padding(horizontal = 20.dp).padding(bottom = 28.dp)) {
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Icon(Icons.Rounded.ReportProblem, null, tint = Pink, modifier = Modifier.size(26.dp))
+            Spacer(Modifier.width(10.dp))
+            Text("Semnalează o problemă", color = Color.White, fontSize = 22.sp, fontWeight = FontWeight.Black)
+        }
+        Text("Ajunge pe harta orașului, cu poza și locul exact. +10 XP", color = TextMuted, fontSize = 13.sp)
+        Spacer(Modifier.height(14.dp))
+        LazyRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            items(REPORT_CATEGORIES) { (code, label) ->
+                FilterChip(
+                    selected = category == code, onClick = { category = code }, label = { Text(label) },
+                    colors = FilterChipDefaults.filterChipColors(
+                        containerColor = Panel, labelColor = Color.White, selectedContainerColor = Pink, selectedLabelColor = Color.White,
+                    ),
+                    border = null, shape = RoundedCornerShape(50),
+                )
             }
-            HorizontalDivider(color = Panel)
+        }
+        Spacer(Modifier.height(12.dp))
+        OutlinedTextField(
+            value = description, onValueChange = { if (it.length <= 500) description = it },
+            label = { Text("Descriere (opțional)") }, modifier = Modifier.fillMaxWidth(), minLines = 2,
+        )
+        Spacer(Modifier.height(12.dp))
+        OutlinedButton(
+            onClick = { val u = newPhotoUri(context); photoUri = u; camera.launch(u) },
+            modifier = Modifier.fillMaxWidth().height(48.dp),
+        ) {
+            Icon(Icons.Rounded.CameraAlt, null, tint = Color.White)
+            Spacer(Modifier.width(8.dp))
+            Text(if (photoTaken) "Poză adăugată · refă" else "Adaugă poză", color = Color.White)
+        }
+        Spacer(Modifier.height(12.dp))
+        Button(
+            onClick = {
+                scope.launch {
+                    val bytes = if (photoTaken) photoUri?.let { compressPhoto(context, it) } else null
+                    onSend(category, description.trim(), bytes)
+                }
+            },
+            enabled = !busy,
+            colors = ButtonDefaults.buttonColors(containerColor = Pink, contentColor = Color.White),
+            modifier = Modifier.fillMaxWidth().height(52.dp),
+        ) {
+            if (busy) CircularProgressIndicator(Modifier.size(20.dp), strokeWidth = 2.dp, color = Color.White)
+            else {
+                Icon(Icons.Rounded.Flag, null)
+                Spacer(Modifier.width(8.dp))
+                Text("Trimite sesizarea", fontSize = 16.sp)
+            }
         }
     }
 }

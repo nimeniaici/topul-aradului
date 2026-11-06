@@ -26,6 +26,8 @@ android {
         buildConfigField("String", "GOOGLE_WEB_CLIENT_ID", "\"${localProps.getProperty("GOOGLE_WEB_CLIENT_ID", "").trim()}\"")
         val mapsKey = localProps.getProperty("MAPS_API_KEY", "").trim()
         manifestPlaceholders["MAPS_API_KEY"] = mapsKey
+        // aceeași cheie e folosită și pentru pozele locurilor (Places API New)
+        buildConfigField("String", "MAPS_API_KEY", "\"$mapsKey\"")
         // fără cheie, aplicația arată o listă de locuri în loc de hartă
         buildConfigField("boolean", "HAS_MAPS_KEY", (mapsKey.isNotEmpty() && mapsKey != "pune_cheia_aici").toString())
         buildConfigField(
@@ -64,6 +66,7 @@ dependencies {
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
     implementation(libs.androidx.material.icons.core)
+    implementation(libs.androidx.material.icons.extended)
     implementation(libs.androidx.navigation.compose)
 
     implementation(libs.maps.compose)
@@ -80,6 +83,7 @@ dependencies {
     implementation(libs.androidx.credentials)
     implementation(libs.androidx.credentials.play)
     implementation(libs.googleid)
+    implementation(libs.places)
 
     debugImplementation(libs.androidx.ui.tooling)
 }

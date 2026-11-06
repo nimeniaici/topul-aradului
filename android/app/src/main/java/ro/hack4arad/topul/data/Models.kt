@@ -125,3 +125,22 @@ data class LiveEvent(
     val newMayorId: Int?,
     val newMayorName: String?,
 )
+
+/** Sesizare de la cetățeni (groapă, iluminat...). Poziția e a problemei. */
+data class Report(
+    val id: Int,
+    val category: String,
+    val categoryLabel: String,
+    val description: String,
+    val lat: Double,
+    val lng: Double,
+    val photoUrl: String?,
+    val status: String,
+    val userName: String,
+    val createdAt: String,
+)
+
+data class ReportCreated(val report: Report, val xpGained: Int, val totalXp: Int, val level: Int)
+
+/** O vizită din jurnalul meu (check-in). */
+data class MyCheckin(val id: Int, val placeId: Int, val placeName: String, val photoUrl: String?, val createdAt: String)

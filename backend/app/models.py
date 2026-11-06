@@ -81,6 +81,23 @@ class Vote(Base):
     created_at: Mapped[datetime] = mapped_column(DateTime, default=utcnow)
 
 
+class Report(Base):
+    """Sesizare de la cetățeni: groapă, iluminat stricat, gunoi etc. (poziția = locul problemei)."""
+    __tablename__ = "reports"
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    user_id: Mapped[int] = mapped_column(ForeignKey("users.id"), index=True)
+    category: Mapped[str] = mapped_column(String(20))
+    description: Mapped[str] = mapped_column(Text, default="")
+    lat: Mapped[float] = mapped_column(Float)
+    lng: Mapped[float] = mapped_column(Float)
+    photo_path: Mapped[str | None] = mapped_column(String(300), nullable=True)
+    status: Mapped[str] = mapped_column(String(20), default="nou")
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=utcnow, index=True)
+
+    user: Mapped[User] = relationship()
+
+
 class ResetCode(Base):
     """Cod de 6 cifre trimis pe email pentru resetarea parolei (salvăm doar hash-ul)."""
     __tablename__ = "reset_codes"

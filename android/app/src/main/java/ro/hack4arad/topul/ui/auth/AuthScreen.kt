@@ -1,5 +1,8 @@
 package ro.hack4arad.topul.ui.auth
 
+import ro.hack4arad.topul.R
+import androidx.compose.ui.res.painterResource
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -138,7 +141,7 @@ fun AuthScreen(vm: AuthViewModel = viewModel()) {
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         Spacer(Modifier.height(36.dp))
-        Text("👑", fontSize = 84.sp)
+        Image(painterResource(R.drawable.ic_launcher_foreground), contentDescription = null, modifier = Modifier.size(140.dp))
         Text(
             "TOPUL ARADULUI",
             style = MaterialTheme.typography.headlineMedium,
@@ -147,9 +150,9 @@ fun AuthScreen(vm: AuthViewModel = viewModel()) {
         Text("Cucerește orașul. Devino Primar.", color = Color.White, textAlign = TextAlign.Center)
         Spacer(Modifier.height(16.dp))
         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-            Pill("📍 Check-in", Pink, Color.White)
-            Pill("⚔️ Dueluri", Electric, Color.White)
-            Pill("🏆 Topuri", Mint, MintDark)
+            Pill("Check-in", Pink, Color.White)
+            Pill("Dueluri", Electric, Color.White)
+            Pill("Topuri", Mint, MintDark)
         }
         Spacer(Modifier.height(28.dp))
 
@@ -237,7 +240,7 @@ private fun ResetPasswordDialog(vm: AuthViewModel, initialEmail: String) {
     val step = vm.resetStep ?: return
     AlertDialog(
         onDismissRequest = { vm.resetStep = null },
-        title = { Text(if (step == 1) "🔑 Resetează parola" else "📬 Verifică emailul") },
+        title = { Text(if (step == 1) "Resetează parola" else "Verifică emailul") },
         text = {
             Column {
                 if (step == 1) {

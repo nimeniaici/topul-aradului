@@ -35,6 +35,8 @@ CHECKIN_RADIUS_M = float(os.getenv("CHECKIN_RADIUS_M", "100"))
 CHECKIN_COOLDOWN_MIN = int(os.getenv("CHECKIN_COOLDOWN_MIN", "30"))
 # Pune true DOAR pentru demo (ex. în sală, departe de locuri)
 SKIP_DISTANCE_CHECK = _bool("SKIP_DISTANCE_CHECK", False)
+# Conturi de test care pot face check-in de oriunde (emailuri separate prin virgulă)
+TESTER_EMAILS = {e.strip().lower() for e in os.getenv("TESTER_EMAILS", "").split(",") if e.strip()}
 
 # Primar = cele mai multe check-in-uri într-un loc în ultimele N zile
 MAYOR_WINDOW_DAYS = int(os.getenv("MAYOR_WINDOW_DAYS", "30"))

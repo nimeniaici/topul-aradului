@@ -5,7 +5,7 @@ from sqlalchemy.orm import Session, joinedload
 from .. import config
 from ..db import get_db
 from ..gamification import BADGES, MISSIONS, XP_PER_LEVEL, badge_progress, level, update_mayor
-from ..models import Badge, Checkin, Place, ResetCode, User, Vote
+from ..models import Badge, Checkin, Place, Report, ResetCode, User, Vote
 from ..schemas import AVATAR_COLORS, AVATAR_EMOJIS, MissionOut, ProfileOut, UpdateMeIn
 from ..security import get_current_user
 from ..serializers import badge_out, badge_placeholder, place_out
@@ -68,6 +68,7 @@ def delete_me(user: User = Depends(get_current_user), db: Session = Depends(get_
     """Șterge definitiv contul și toate datele lui (check-in-uri, poze, voturi, insigne)."""
     uid = user.id
     photos = db.scalars(select(Checkin.photo_path).where(Checkin.user_id == uid, Checkin.photo_path.is_not(None))).all()
+    photos += db.scalars(select(Report.photo_path).where(Report.user_id == uid, Report.photo_path.is_not(None))).all()
     visited_ids = set(db.scalars(select(Checkin.place_id).where(Checkin.user_id == uid)))
     mayor_places = db.scalars(select(Place).where(Place.mayor_id == uid)).all()
 
@@ -77,6 +78,7 @@ def delete_me(user: User = Depends(get_current_user), db: Session = Depends(get_
     db.execute(delete(Vote).where(Vote.user_id == uid))
     db.execute(delete(Badge).where(Badge.user_id == uid))
     db.execute(delete(ResetCode).where(ResetCode.user_id == uid))
+    db.execute(delete(Report).where(Report.user_id == uid))
     db.flush()
 
     # recalculăm contoarele și primarii locurilor atinse

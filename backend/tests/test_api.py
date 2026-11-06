@@ -134,3 +134,30 @@ def test_leaderboard_pagination_is_stable(client):
     assert len({p["id"] for p in pages}) == len(pages)
     users = client.get("/leaderboard/users", params={"limit": 2, "offset": 1}).json()
     assert users and users[0]["rank"] == 2
+
+
+def test_maintenance_sync_keeps_users(client, auth, tmp_path, monkeypatch):
+    """Sincronizarea locurilor nu atinge conturile; locurile scoase dispar cu check-in-urile lor."""
+    import json
+    from app import maintenance, seed
+    from app.db import SessionLocal
+    from app.models import Place, User
+    data = json.loads(seed.SEED_FILE.read_text(encoding="utf-8"))
+    victim = data[0]
+    place = next(p for p in client.get("/places").json() if p["name"] == victim["name"])
+    assert client.post("/checkins", data={"place_id": place["id"], "lat": place["lat"], "lng": place["lng"]},
+                       headers=auth).status_code == 201
+    smaller = tmp_path / "seed.json"
+    smaller.write_text(json.dumps(data[1:] + [{**data[1], "name": "Loc nou de test"}], ensure_ascii=False), encoding="utf-8")
+    monkeypatch.setattr(maintenance, "SEED_FILE", smaller)
+    with SessionLocal() as db:
+        users_before = db.query(User).count()
+        result = maintenance.sync_places(db)
+        assert victim["name"] in result["șterse"] and "Loc nou de test" in result["adăugate"]
+        assert db.query(User).count() == users_before
+        assert db.query(Place).filter_by(name=victim["name"]).count() == 0
+    assert client.get("/users/me", headers=auth).status_code == 200
+    # refacem lista originală pentru celelalte teste
+    monkeypatch.setattr(maintenance, "SEED_FILE", seed.SEED_FILE)
+    with SessionLocal() as db:
+        maintenance.sync_places(db)
