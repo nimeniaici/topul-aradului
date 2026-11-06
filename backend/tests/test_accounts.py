@@ -2,7 +2,8 @@
 from app import config, mailer, security
 
 
-def _register(client, email, password="parola123", name="Cont Test"):
+def _register(client, email, password="parola123", name=None):
+    name = name or email.split("@")[0].replace("-", ".")
     r = client.post("/auth/register", json={"name": name, "email": email, "password": password})
     assert r.status_code == 201, r.text
     return {"Authorization": f"Bearer {r.json()['access_token']}"}
@@ -25,7 +26,7 @@ def test_google_not_configured(client, monkeypatch):
 def test_google_creates_then_reuses_account(client, monkeypatch):
     _fake_google(monkeypatch)
     r1 = client.post("/auth/google", json={"id_token": "x" * 30})
-    assert r1.status_code == 200 and r1.json()["user"]["name"] == "Gigel"
+    assert r1.status_code == 200 and r1.json()["user"]["name"] == "gigel"
     r2 = client.post("/auth/google", json={"id_token": "y" * 30})
     assert r2.json()["user"]["id"] == r1.json()["user"]["id"]
     # contul Google nu are parolă: login-ul clasic explică de ce
@@ -40,7 +41,7 @@ def test_google_links_existing_email_account(client, monkeypatch):
     _fake_google(monkeypatch, sub="google-maria", email="maria@gmail.com", given_name="Maria G")
     r = client.post("/auth/google", json={"id_token": "z" * 30})
     me = client.get("/users/me", headers={"Authorization": f"Bearer {r.json()['access_token']}"}).json()
-    assert me["name"] == "Maria" and me["google_linked"] and me["has_password"]
+    assert me["name"] == "maria" and me["google_linked"] and me["has_password"]
 
 
 def test_google_rejects_unverified_email(client, monkeypatch):
@@ -51,14 +52,14 @@ def test_google_rejects_unverified_email(client, monkeypatch):
 # ---------- Profil ----------
 def test_update_profile(client):
     h = _register(client, "edit@test.ro")
-    r = client.patch("/users/me", json={"name": "Nume Nou", "avatar_emoji": "🦊", "avatar_color": "mint"}, headers=h)
+    r = client.patch("/users/me", json={"name": "nume.nou", "avatar_emoji": "🦊", "avatar_color": "mint"}, headers=h)
     assert r.status_code == 200
-    assert (r.json()["name"], r.json()["avatar_emoji"], r.json()["avatar_color"]) == ("Nume Nou", "🦊", "mint")
+    assert (r.json()["name"], r.json()["avatar_emoji"], r.json()["avatar_color"]) == ("nume.nou", "🦊", "mint")
     assert client.patch("/users/me", json={"avatar_emoji": "💩"}, headers=h).status_code == 400
     assert client.patch("/users/me", json={"avatar_color": "rosu"}, headers=h).status_code == 400
-    assert client.patch("/users/me", json={"name": "x"}, headers=h).status_code == 422
+    assert client.patch("/users/me", json={"name": "x"}, headers=h).status_code == 400
     top = client.get("/leaderboard/users", params={"limit": 100}).json()
-    assert any(u["name"] == "Nume Nou" and u["avatar_emoji"] == "🦊" for u in top)
+    assert any(u["name"] == "nume.nou" and u["avatar_emoji"] == "🦊" for u in top)
 
 
 # ---------- Ștergere cont ----------

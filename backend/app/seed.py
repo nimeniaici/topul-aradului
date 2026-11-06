@@ -33,7 +33,7 @@ def seed_demo(db: Session) -> None:
     from .gamification import award_badges, update_mayor
     from .security import hash_password
 
-    names = ["Ana (demo)", "Mihai (demo)", "Ioana (demo)", "Vlad (demo)", "Sara (demo)", "Radu (demo)"]
+    names = ["ana.demo", "mihai.demo", "ioana.demo", "vlad.demo", "sara.demo", "radu.demo"]
     users = []
     for i, n in enumerate(names):
         email = f"demo{i + 1}@topularadului.ro"

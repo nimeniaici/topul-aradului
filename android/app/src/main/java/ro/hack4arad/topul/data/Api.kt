@@ -18,6 +18,9 @@ interface Api {
     @POST("auth/register")
     suspend fun register(@Body body: RegisterIn): TokenOut
 
+    @GET("auth/username-available")
+    suspend fun usernameAvailable(@Query("u") username: String): UsernameCheck
+
     @POST("auth/login")
     suspend fun login(@Body body: LoginIn): TokenOut
 

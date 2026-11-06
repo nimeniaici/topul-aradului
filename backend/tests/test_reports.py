@@ -23,7 +23,7 @@ def test_report_validation(client, auth):
 
 
 def test_tester_can_check_in_from_anywhere(client, monkeypatch):
-    r = client.post("/auth/register", json={"name": "Testerița", "email": "testerita@test.ro", "password": "parola123"})
+    r = client.post("/auth/register", json={"name": "testerita", "email": "testerita@test.ro", "password": "parola123"})
     h = {"Authorization": f"Bearer {r.json()['access_token']}"}
     place = client.get("/places", params={"category": "obiectiv"}).json()[0]
     far = {"place_id": place["id"], "lat": 46.0, "lng": 21.0}

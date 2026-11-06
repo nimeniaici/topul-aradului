@@ -1,10 +1,12 @@
 import secrets
 from datetime import timedelta
 
+from sqlalchemy.exc import IntegrityError
 from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException
 from sqlalchemy import func, select
 from sqlalchemy.orm import Session
 
+from .. import usernames
 from .. import config, mailer
 from ..db import get_db
 from ..gamification import level
@@ -35,10 +37,27 @@ def register(body: RegisterIn, db: Session = Depends(get_db)):
     email = body.email.strip().lower()
     if _by_email(db, email):
         raise HTTPException(409, "Există deja un cont cu acest email.")
-    user = User(name=body.name.strip(), email=email, password_hash=hash_password(body.password))
+    username = usernames.validate_new(db, body.name)
+    user = User(name=username, email=email, password_hash=hash_password(body.password))
     db.add(user)
-    db.commit()
+    try:
+        db.commit()
+    except IntegrityError:  # două înregistrări cu același username în aceeași secundă
+        db.rollback()
+        raise HTTPException(409, "Username-ul sau emailul tocmai a fost luat. Încearcă altul.")
     return token_out(user)
+
+
+@router.get("/username-available")
+def username_available(u: str, db: Session = Depends(get_db)):
+    """Pentru verificarea în timp ce scrii: e liber username-ul?"""
+    name = usernames.normalize(u)
+    if (why := usernames.problem(name)):
+        return {"username": name, "available": False, "reason": why}
+    if usernames.is_taken(db, name):
+        return {"username": name, "available": False, "reason": "E deja luat.",
+                "suggestion": usernames.generate(db, name)}
+    return {"username": name, "available": True, "reason": None}
 
 
 @router.post("/login", response_model=TokenOut)
@@ -66,8 +85,8 @@ def google_login(body: GoogleIn, db: Session = Depends(get_db)):
 
     user = db.scalar(select(User).where(User.google_sub == info["sub"])) or _by_email(db, email)
     if user is None:
-        name = (info.get("given_name") or info.get("name") or email.split("@")[0])[:40]
-        user = User(name=name if len(name) >= 2 else "Arădean", email=email, password_hash="",
+        base = info.get("given_name") or info.get("name") or email.split("@")[0]
+        user = User(name=usernames.generate(db, base), email=email, password_hash="",
                     google_sub=info["sub"])
         db.add(user)
     elif not user.google_sub:

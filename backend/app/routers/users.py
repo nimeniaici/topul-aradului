@@ -2,6 +2,8 @@ from fastapi import APIRouter, Depends, HTTPException, Response
 from sqlalchemy import delete, distinct, func, select
 from sqlalchemy.orm import Session, joinedload
 
+from sqlalchemy.exc import IntegrityError
+from .. import usernames
 from .. import config
 from ..db import get_db
 from ..gamification import BADGES, MISSIONS, XP_PER_LEVEL, badge_progress, level, update_mayor
@@ -49,8 +51,8 @@ def me(user: User = Depends(get_current_user), db: Session = Depends(get_db)):
 
 @router.patch("/me", response_model=ProfileOut)
 def update_me(body: UpdateMeIn, user: User = Depends(get_current_user), db: Session = Depends(get_db)):
-    if body.name is not None:
-        user.name = body.name.strip()
+    if body.name is not None and usernames.normalize(body.name) != user.name:
+        user.name = usernames.validate_new(db, body.name, except_id=user.id)
     if body.avatar_emoji is not None:
         if body.avatar_emoji not in AVATAR_EMOJIS:
             raise HTTPException(400, "Emoji indisponibil pentru avatar.")
@@ -59,7 +61,11 @@ def update_me(body: UpdateMeIn, user: User = Depends(get_current_user), db: Sess
         if body.avatar_color not in AVATAR_COLORS:
             raise HTTPException(400, "Culoare indisponibilă pentru avatar.")
         user.avatar_color = body.avatar_color
-    db.commit()
+    try:
+        db.commit()
+    except IntegrityError:
+        db.rollback()
+        raise HTTPException(409, "Username-ul tocmai a fost luat de altcineva. Încearcă altul.")
     return _profile(db, user)
 
 

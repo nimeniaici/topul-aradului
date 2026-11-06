@@ -6,7 +6,8 @@ from pydantic import BaseModel, Field
 
 # ---------- Auth ----------
 class RegisterIn(BaseModel):
-    name: str = Field(min_length=2, max_length=40)
+    # username-ul unic (câmpul se numește „name” ca să meargă și aplicațiile mai vechi)
+    name: str = Field(min_length=1, max_length=40)
     email: str = Field(pattern=r"^[^@\s]+@[^@\s]+\.[^@\s]+$", max_length=120)
     password: str = Field(min_length=6, max_length=100)
 
@@ -41,7 +42,7 @@ AVATAR_COLORS = ["violet", "pink", "mint", "blue", "gold", "green"]
 
 
 class UpdateMeIn(BaseModel):
-    name: str | None = Field(None, min_length=2, max_length=40)
+    name: str | None = Field(None, min_length=1, max_length=40)
     avatar_emoji: str | None = None
     avatar_color: str | None = None
 

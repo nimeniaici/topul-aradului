@@ -2,7 +2,9 @@ package ro.hack4arad.topul.data
 
 // Câmpurile sunt în camelCase; Gson le traduce automat din snake_case (vezi Network.kt).
 
+/** name = username-ul unic (ex. diana.arad) */
 data class RegisterIn(val name: String, val email: String, val password: String)
+data class UsernameCheck(val username: String, val available: Boolean, val reason: String?, val suggestion: String? = null)
 data class LoginIn(val email: String, val password: String)
 
 data class UserOut(val id: Int, val name: String, val xp: Int, val level: Int, val avatarEmoji: String?, val avatarColor: String?)

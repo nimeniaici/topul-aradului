@@ -7,6 +7,7 @@ from fastapi.staticfiles import StaticFiles
 
 from . import config
 from .db import Base, SessionLocal, engine, ensure_columns, scrub_checkin_gps
+from . import usernames
 from .routers import auth, checkins, crashes, download, duels, leaderboard, live, pages, places, reports, tour3d, users
 from .seed import seed_places
 
@@ -16,6 +17,7 @@ async def lifespan(_app: FastAPI):
     Base.metadata.create_all(engine)
     ensure_columns()
     scrub_checkin_gps()
+    usernames.migrate(engine)
     config.UPLOAD_DIR.mkdir(parents=True, exist_ok=True)
     if config.SEED_ON_STARTUP:
         with SessionLocal() as db:

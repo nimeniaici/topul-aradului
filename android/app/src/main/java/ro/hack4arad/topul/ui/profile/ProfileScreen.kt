@@ -1,5 +1,6 @@
 package ro.hack4arad.topul.ui.profile
 
+import ro.hack4arad.topul.ui.components.UsernameField
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -360,6 +361,7 @@ private fun EditProfileDialog(
     onDismiss: () -> Unit,
 ) {
     var name by remember { mutableStateOf(p.name) }
+    var nameOk by remember { mutableStateOf(true) }
     var emoji by remember { mutableStateOf(p.avatarEmoji) }
     var color by remember { mutableStateOf(p.avatarColor ?: "violet") }
     AlertDialog(
@@ -369,10 +371,7 @@ private fun EditProfileDialog(
             Column(Modifier.verticalScroll(rememberScrollState())) {
                 Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center) { Avatar(name, 72.dp, emoji = emoji, colorKey = color) }
                 Spacer(Modifier.height(12.dp))
-                OutlinedTextField(
-                    value = name, onValueChange = { if (it.length <= 40) name = it },
-                    label = { Text("Nume") }, singleLine = true, modifier = Modifier.fillMaxWidth(),
-                )
+                UsernameField(name, { name = it }, { nameOk = it }, current = p.name)
                 Text("Avatar", color = TextMuted, fontSize = 13.sp, modifier = Modifier.padding(top = 12.dp, bottom = 6.dp))
                 AVATAR_EMOJIS.chunked(6).forEach { row ->
                     Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
@@ -399,7 +398,7 @@ private fun EditProfileDialog(
                 error?.let { Text(it, color = Pink, modifier = Modifier.padding(top = 8.dp)) }
             }
         },
-        confirmButton = { Button(onClick = { onSave(name, emoji, color) }, enabled = !saving && name.trim().length >= 2) { Text("Salvează") } },
+        confirmButton = { Button(onClick = { onSave(name, emoji, color) }, enabled = !saving && nameOk) { Text("Salvează") } },
         dismissButton = { TextButton(onClick = onDismiss) { Text("Renunță", color = TextMuted) } },
     )
 }

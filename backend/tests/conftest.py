@@ -32,6 +32,6 @@ def auth(client):
     global _counter
     _counter += 1
     r = client.post("/auth/register", json={
-        "name": f"Tester {_counter}", "email": f"t{_counter}@test.ro", "password": "parola123"})
+        "name": f"tester{_counter}", "email": f"t{_counter}@test.ro", "password": "parola123"})
     assert r.status_code == 201, r.text
     return {"Authorization": f"Bearer {r.json()['access_token']}"}

@@ -1,5 +1,7 @@
 package ro.hack4arad.topul.ui.auth
 
+import androidx.compose.runtime.remember
+import ro.hack4arad.topul.ui.components.UsernameField
 import ro.hack4arad.topul.R
 import androidx.compose.ui.res.painterResource
 import androidx.compose.foundation.Image
@@ -127,9 +129,10 @@ fun AuthScreen(vm: AuthViewModel = viewModel()) {
     val focus = LocalFocusManager.current
     var register by rememberSaveable { mutableStateOf(true) }
     var name by rememberSaveable { mutableStateOf("") }
+    var usernameOk by remember { mutableStateOf(false) }
     var email by rememberSaveable { mutableStateOf("") }
     var password by rememberSaveable { mutableStateOf("") }
-    val canSubmit = !vm.loading && email.isNotBlank() && password.length >= 6 && (!register || name.trim().length >= 2)
+    val canSubmit = !vm.loading && email.isNotBlank() && password.length >= 6 && (!register || usernameOk)
 
     Column(
         Modifier
@@ -176,13 +179,8 @@ fun AuthScreen(vm: AuthViewModel = viewModel()) {
 
         val next = KeyboardActions(onNext = { focus.moveFocus(FocusDirection.Down) })
         if (register) {
-            OutlinedTextField(
-                value = name, onValueChange = { name = it },
-                label = { Text("Nume") }, singleLine = true,
-                keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next), keyboardActions = next,
-                modifier = Modifier.fillMaxWidth(),
-            )
-            Spacer(Modifier.height(8.dp))
+            UsernameField(name, { name = it }, { usernameOk = it }, keyboardActions = next)
+            Spacer(Modifier.height(4.dp))
         }
         OutlinedTextField(
             value = email, onValueChange = { email = it },

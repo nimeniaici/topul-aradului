@@ -30,7 +30,7 @@ def test_register_login(client):
     assert client.post("/auth/register", json={"name": "Ana", "email": "ana@test.ro", "password": "secret1"}).status_code == 409
     assert client.post("/auth/login", json={"email": "ana@test.ro", "password": "gresit"}).status_code == 401
     r = client.post("/auth/login", json={"email": "ana@test.ro", "password": "secret1"})
-    assert r.status_code == 200 and r.json()["user"]["name"] == "Ana"
+    assert r.status_code == 200 and r.json()["user"]["name"] == "ana"
 
 
 def test_requires_auth(client):
