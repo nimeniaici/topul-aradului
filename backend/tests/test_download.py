@@ -19,6 +19,6 @@ def test_app_page_before_and_after_upload(client, monkeypatch):
     d = client.get("/descarca")
     assert d.status_code == 200
     assert d.headers["content-type"] == "application/vnd.android.package-archive"
-    assert "topul-aradului.apk" in d.headers["content-disposition"]
+    assert "topul-aradului-" in d.headers["content-disposition"] and d.headers["cache-control"] == "no-store"
     assert d.content.startswith(b"PK")
     assert "Descarcă aplicația" in client.get("/app").text

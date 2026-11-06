@@ -46,7 +46,13 @@ def download_apk():
     path = _apk_path()
     if not path.exists():
         raise HTTPException(404, "Aplicația nu e încă disponibilă pentru descărcare.")
-    return FileResponse(path, media_type="application/vnd.android.package-archive", filename=APK_NAME)
+    # nume cu data urcării: telefonul nu mai confundă versiunea nouă cu una descărcată mai demult
+    stamp = datetime.fromtimestamp(path.stat().st_mtime, timezone.utc).strftime("%m%d-%H%M")
+    return FileResponse(
+        path, media_type="application/vnd.android.package-archive",
+        filename=APK_NAME.replace(".apk", f"-{stamp}.apk"),
+        headers={"Cache-Control": "no-store"},
+    )
 
 
 @router.get("/app", response_class=HTMLResponse, include_in_schema=False)
@@ -56,7 +62,7 @@ def app_page():
         st = path.stat()
         size = f"{st.st_size / 1048576:.1f} MB"
         updated = datetime.fromtimestamp(st.st_mtime, timezone.utc).strftime("%d.%m.%Y %H:%M UTC")
-        button = f'<a class="btn" href="/descarca">⬇️ Descarcă aplicația <span>(Android · {size})</span></a>'
+        button = f'<a class="btn" href="/descarca?v={int(st.st_mtime)}">Descarcă aplicația <span>(Android · {size})</span></a>'
         meta = f'<p class="muted">Versiune actualizată: {updated}</p>'
     else:
         button = '<p class="btn off">Aplicația va fi disponibilă în curând</p>'
