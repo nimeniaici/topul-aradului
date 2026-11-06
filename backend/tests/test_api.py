@@ -17,6 +17,13 @@ def test_health_and_seed(client):
     assert {"pizza", "cafenea", "obiectiv"} <= cats
 
 
+def test_public_pages(client):
+    for path, text in [("/despre", "Topul Aradului"), ("/confidentialitate", "Politica de confidențialitate"),
+                       ("/termeni", "Termeni de utilizare")]:
+        r = client.get(path)
+        assert r.status_code == 200 and "text/html" in r.headers["content-type"] and text in r.text
+
+
 def test_register_login(client):
     r = client.post("/auth/register", json={"name": "Ana", "email": "Ana@Test.ro", "password": "secret1"})
     assert r.status_code == 201
