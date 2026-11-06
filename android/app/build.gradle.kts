@@ -19,8 +19,8 @@ android {
         applicationId = "ro.hack4arad.topul"
         minSdk = 26
         targetSdk = 35
-        versionCode = 3
-        versionName = "0.3"
+        versionCode = 4
+        versionName = "0.4"
 
         // Client ID OAuth de tip „Web application” (același ca GOOGLE_CLIENT_IDS pe server)
         buildConfigField("String", "GOOGLE_WEB_CLIENT_ID", "\"${localProps.getProperty("GOOGLE_WEB_CLIENT_ID", "").trim()}\"")
@@ -32,7 +32,7 @@ android {
         buildConfigField("boolean", "HAS_MAPS_KEY", (mapsKey.isNotEmpty() && mapsKey != "pune_cheia_aici").toString())
         buildConfigField(
             "String", "BASE_URL",
-            "\"${localProps.getProperty("BASE_URL", "http://10.0.2.2:8000/")}\""
+            "\"${(project.findProperty("baseUrl") as String?) ?: localProps.getProperty("BASE_URL", "http://10.0.2.2:8000/")}\""
         )
     }
 

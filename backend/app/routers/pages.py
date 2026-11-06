@@ -44,10 +44,10 @@ faci check-in când ești acolo, votezi în dueluri „care e mai bun?” și cu
 <b>Primar</b> al locurilor tale preferate.</p>
 <div class="card">
 <ul>
-<li>📍 Check-in verificat prin GPS (doar când ești lângă loc)</li>
-<li>⚔️ Dueluri între locuri, cu clasament în stil Elo</li>
-<li>🔥 Hartă live cu locurile unde e agitație acum</li>
-<li>🏅 Niveluri, insigne și misiuni</li>
+<li>Check-in verificat prin GPS (doar când ești lângă loc)</li>
+<li>Dueluri între locuri, cu clasament în stil Elo</li>
+<li>Hartă live cu locurile unde e agitație acum</li>
+<li>Niveluri, insigne și misiuni</li>
 </ul>
 </div>
 <p>Datele locurilor provin din <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>
@@ -72,6 +72,7 @@ salvăm doar <i>ce loc</i> ai vizitat și când, nu unde te aflai exact. Nu urm�
 <li><b>Sesizări:</b> dacă semnalezi o problemă (de exemplu o groapă), salvăm poza, descrierea și poziția
 <i>problemei</i>, ca să apară pe hartă și să poată fi rezolvată. Sesizările sunt publice, cu numele tău afișat.</li>
 <li><b>Activitatea în joc:</b> check-in-urile, voturile din dueluri, punctele XP, insignele și avatarul ales.</li>
+<li><b>Rapoarte de erori:</b> dacă aplicația se închide din cauza unei erori, trimitem descrierea tehnică a erorii, modelul telefonului și versiunea aplicației, fără date despre tine, ca s-o putem repara.</li>
 </ul>
 
 <h2>Ce e public</h2>
