@@ -1,0 +1,5 @@
+# Fișierele text rămân cu LF (serverul Railway e Linux); scripturile Windows cu CRLF.
+* text=auto eol=lf
+*.bat text eol=crlf
+*.jar binary
+*.png binary

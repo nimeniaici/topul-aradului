@@ -1,0 +1,17 @@
+fastapi==0.162.0
+uvicorn[standard]==0.54.0
+SQLAlchemy==2.1.8
+PyJWT==2.15.1
+python-multipart==0.0.33
+python-dotenv==1.2.4
+
+# login cu Google (verificarea ID token-ului)
+google-auth==2.62.1
+requests==2.34.2
+
+# PostgreSQL (online, pe Railway/Render)
+psycopg[binary]==3.3.8
+
+# teste
+httpx==0.28.1
+pytest==9.2.0

@@ -1,0 +1,10 @@
+# Copiază acest fișier ca local.properties (Android Studio adaugă singur sdk.dir).
+
+# Cheia Google Maps (Google Cloud Console -> Maps SDK for Android)
+MAPS_API_KEY=pune_cheia_aici
+
+# Adresa backend-ului:
+#  - emulator Android:         http://10.0.2.2:8000/
+#  - telefon real, același Wi-Fi: http://IP_LAPTOP:8000/   (ex. http://192.168.1.23:8000/)
+#  - online (Railway/Render):   https://numele-tau.up.railway.app/
+BASE_URL=http://10.0.2.2:8000/

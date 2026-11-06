@@ -1,0 +1,668 @@
+[
+ {
+  "name": "Pizzeria Milano",
+  "category": "pizza",
+  "description": "Bucătărie: italian.",
+  "address": "Bulevardul Revoluției 83, Arad",
+  "lat": 46.173301,
+  "lng": 21.317331,
+  "verified": true
+ },
+ {
+  "name": "MONDOPIZZA",
+  "category": "pizza",
+  "description": "Bucătărie: pizza.",
+  "address": "Strada Cloșca 12, Arad",
+  "lat": 46.178296,
+  "lng": 21.317269,
+  "verified": true
+ },
+ {
+  "name": "Pizzeria Don",
+  "category": "pizza",
+  "description": "Pizzerie din Arad.",
+  "address": "Strada Nicolae Bălcescu, Arad",
+  "lat": 46.170438,
+  "lng": 21.317154,
+  "verified": true
+ },
+ {
+  "name": "Pizza Drive",
+  "category": "pizza",
+  "description": "Pizzerie din Arad.",
+  "address": "Arad",
+  "lat": 46.170315,
+  "lng": 21.313248,
+  "verified": true
+ },
+ {
+  "name": "Pizza Ruby",
+  "category": "pizza",
+  "description": "Bucătărie: pizza.",
+  "address": "Strada Ecaterina Teodoroiu 3, Arad",
+  "lat": 46.170741,
+  "lng": 21.309565,
+  "verified": true
+ },
+ {
+  "name": "Venezzia Pizza Express",
+  "category": "pizza",
+  "description": "Pizzerie din Arad.",
+  "address": "Strada Dimitrie Bolintineanu 12, Arad",
+  "lat": 46.180938,
+  "lng": 21.326339,
+  "verified": true
+ },
+ {
+  "name": "KHARMA",
+  "category": "burger",
+  "description": "Bucătărie: steak, burgeri, italian, pui, pește & fructe de mare.",
+  "address": "Strada 9 Mai 83, Arad",
+  "lat": 46.173312,
+  "lng": 21.317159,
+  "verified": true
+ },
+ {
+  "name": "Eat like a man",
+  "category": "burger",
+  "description": "Bucătărie: burgeri, salate.",
+  "address": "Calea Romanilor 35-37, Arad",
+  "lat": 46.162628,
+  "lng": 21.32338,
+  "verified": true
+ },
+ {
+  "name": "La Casa de Burger",
+  "category": "burger",
+  "description": "Bucătărie: burgeri.",
+  "address": "Arad",
+  "lat": 46.200798,
+  "lng": 21.288062,
+  "verified": true
+ },
+ {
+  "name": "Foodie The Van",
+  "category": "burger",
+  "description": "Bucătărie: burgeri, salate.",
+  "address": "Arad",
+  "lat": 46.179662,
+  "lng": 21.324637,
+  "verified": true
+ },
+ {
+  "name": "La Raul",
+  "category": "burger",
+  "description": "Bucătărie: burgeri, pizza.",
+  "address": "Calea Iuliu Maniu Nr.1-3, Arad",
+  "lat": 46.182748,
+  "lng": 21.324849,
+  "verified": true
+ },
+ {
+  "name": "McDonald's",
+  "category": "burger",
+  "description": "Bucătărie: burgeri.",
+  "address": "Arad",
+  "lat": 46.175366,
+  "lng": 21.317706,
+  "verified": true
+ },
+ {
+  "name": "Euphoria Biergarten Arad",
+  "category": "restaurant",
+  "description": "Bucătărie: german, pizza, local, burgeri, italian.",
+  "address": "Strada 1 Decembrie 1918, Arad",
+  "lat": 46.173326,
+  "lng": 21.318217,
+  "verified": true
+ },
+ {
+  "name": "Mantua",
+  "category": "restaurant",
+  "description": "Restaurant din Arad.",
+  "address": "Arad",
+  "lat": 46.173309,
+  "lng": 21.318003,
+  "verified": true
+ },
+ {
+  "name": "Cine Citta",
+  "category": "restaurant",
+  "description": "Restaurant din Arad.",
+  "address": "Arad",
+  "lat": 46.173306,
+  "lng": 21.317534,
+  "verified": true
+ },
+ {
+  "name": "Ema Del Mar",
+  "category": "restaurant",
+  "description": "Bucătărie: pește & fructe de mare.",
+  "address": "Strada Episcopiei 9, Arad",
+  "lat": 46.175399,
+  "lng": 21.314968,
+  "verified": true
+ },
+ {
+  "name": "La Bottega",
+  "category": "restaurant",
+  "description": "Restaurant din Arad.",
+  "address": "Arad",
+  "lat": 46.17678,
+  "lng": 21.322953,
+  "verified": true
+ },
+ {
+  "name": "Restaurant Picasso",
+  "category": "restaurant",
+  "description": "Restaurant din Arad.",
+  "address": "Arad",
+  "lat": 46.170471,
+  "lng": 21.318562,
+  "verified": true
+ },
+ {
+  "name": "Vegan Time",
+  "category": "restaurant",
+  "description": "Restaurant din Arad.",
+  "address": "Strada Nicolae Bălcescu, Arad",
+  "lat": 46.170443,
+  "lng": 21.317976,
+  "verified": true
+ },
+ {
+  "name": "Restaurant Coandi",
+  "category": "restaurant",
+  "description": "Restaurant din Arad.",
+  "address": "Strada Nicolae Bălcescu, Arad",
+  "lat": 46.170395,
+  "lng": 21.317446,
+  "verified": true
+ },
+ {
+  "name": "Taverna Libaneză",
+  "category": "restaurant",
+  "description": "Restaurant din Arad.",
+  "address": "Strada Mihai Eminescu 28, Arad",
+  "lat": 46.172156,
+  "lng": 21.311279,
+  "verified": true
+ },
+ {
+  "name": "Casa Bulzan",
+  "category": "restaurant",
+  "description": "Bucătărie: local.",
+  "address": "Strada Mucius Scaevola 2-6, Arad",
+  "lat": 46.166832,
+  "lng": 21.319612,
+  "verified": true
+ },
+ {
+  "name": "Restaurant Transilvania",
+  "category": "restaurant",
+  "description": "Restaurant din Arad.",
+  "address": "Strada Nicolae Bălcescu Transilvania, Arad",
+  "lat": 46.170206,
+  "lng": 21.316788,
+  "verified": true
+ },
+ {
+  "name": "Asia Wok",
+  "category": "restaurant",
+  "description": "Restaurant din Arad.",
+  "address": "Arad",
+  "lat": 46.168131,
+  "lng": 21.316306,
+  "verified": true
+ },
+ {
+  "name": "Snooze Coffee",
+  "category": "cafenea",
+  "description": "Cafenea din Arad.",
+  "address": "Arad",
+  "lat": 46.173733,
+  "lng": 21.316455,
+  "verified": true
+ },
+ {
+  "name": "Corso",
+  "category": "cafenea",
+  "description": "Cafenea din Arad.",
+  "address": "Strada Cloșca 1, Arad",
+  "lat": 46.177641,
+  "lng": 21.318856,
+  "verified": true
+ },
+ {
+  "name": "Makor Specialty Coffee",
+  "category": "cafenea",
+  "description": "Bucătărie: cafea.",
+  "address": "Bulevardul Revoluției, Arad",
+  "lat": 46.170984,
+  "lng": 21.315213,
+  "verified": true
+ },
+ {
+  "name": "5 to go",
+  "category": "cafenea",
+  "description": "Bucătărie: cafea.",
+  "address": "Arad",
+  "lat": 46.17057,
+  "lng": 21.316627,
+  "verified": true
+ },
+ {
+  "name": "Boeme Cafe",
+  "category": "cafenea",
+  "description": "Cafenea din Arad.",
+  "address": "Strada Episcopiei 19-21, Arad",
+  "lat": 46.17477,
+  "lng": 21.312537,
+  "verified": true
+ },
+ {
+  "name": "Le Petit café",
+  "category": "cafenea",
+  "description": "Cafenea din Arad.",
+  "address": "Strada Mihai Eminescu 26, Arad",
+  "lat": 46.172217,
+  "lng": 21.31185,
+  "verified": true
+ },
+ {
+  "name": "Kaffeine",
+  "category": "cafenea",
+  "description": "Cafenea din Arad.",
+  "address": "Strada Ștefan Cicio Pop 12-14, Arad",
+  "lat": 46.172143,
+  "lng": 21.311526,
+  "verified": true
+ },
+ {
+  "name": "Just Blvck Coffee",
+  "category": "cafenea",
+  "description": "Cafenea din Arad.",
+  "address": "Bulevardul Revoluției 29, Arad",
+  "lat": 46.181773,
+  "lng": 21.323217,
+  "verified": true
+ },
+ {
+  "name": "Cofetăria Libelula",
+  "category": "desert",
+  "description": "Bucătărie: prăjituri.",
+  "address": "Arad",
+  "lat": 46.178546,
+  "lng": 21.320937,
+  "verified": true
+ },
+ {
+  "name": "Gelateria Coandi",
+  "category": "desert",
+  "description": "Dulciuri și prăjituri.",
+  "address": "Strada Nicolae Bălcescu Gelateria Coandi, Arad",
+  "lat": 46.170252,
+  "lng": 21.317348,
+  "verified": true
+ },
+ {
+  "name": "Boema Delice",
+  "category": "desert",
+  "description": "Dulciuri și prăjituri.",
+  "address": "Strada Vincențiu Babeș 2, Arad",
+  "lat": 46.177815,
+  "lng": 21.3142,
+  "verified": true
+ },
+ {
+  "name": "Caprice",
+  "category": "desert",
+  "description": "Dulciuri și prăjituri.",
+  "address": "Bulevardul Revoluției, Arad",
+  "lat": 46.186978,
+  "lng": 21.325398,
+  "verified": true
+ },
+ {
+  "name": "Delizioso",
+  "category": "desert",
+  "description": "Dulciuri și prăjituri.",
+  "address": "Arad",
+  "lat": 46.172186,
+  "lng": 21.316475,
+  "verified": true
+ },
+ {
+  "name": "Semico Gourmet Pastry",
+  "category": "desert",
+  "description": "Dulciuri și prăjituri.",
+  "address": "Arad",
+  "lat": 46.17612,
+  "lng": 21.319086,
+  "verified": true
+ },
+ {
+  "name": "Restaurant Belvedere",
+  "category": "terasa",
+  "description": "Bucătărie: pizza, local, pui.",
+  "address": "Malul Muresului, Arad",
+  "lat": 46.175098,
+  "lng": 21.321709,
+  "verified": true
+ },
+ {
+  "name": "Ratio Beach",
+  "category": "terasa",
+  "description": "Local cu terasă.",
+  "address": "Arad",
+  "lat": 46.174277,
+  "lng": 21.32368,
+  "verified": true
+ },
+ {
+  "name": "La Ponton",
+  "category": "terasa",
+  "description": "Local cu terasă.",
+  "address": "Arad",
+  "lat": 46.169627,
+  "lng": 21.322375,
+  "verified": true
+ },
+ {
+  "name": "Falezza",
+  "category": "terasa",
+  "description": "Local cu terasă.",
+  "address": "Aleea Răsăritului Bl. 23, Arad",
+  "lat": 46.179682,
+  "lng": 21.332692,
+  "verified": true
+ },
+ {
+  "name": "Jad Café",
+  "category": "bar",
+  "description": "Bar / pub din Arad.",
+  "address": "Arad",
+  "lat": 46.175275,
+  "lng": 21.317584,
+  "verified": true
+ },
+ {
+  "name": "Sky",
+  "category": "bar",
+  "description": "Bar / pub din Arad.",
+  "address": "Arad",
+  "lat": 46.173746,
+  "lng": 21.316411,
+  "verified": true
+ },
+ {
+  "name": "Luci Bar",
+  "category": "bar",
+  "description": "Bar / pub din Arad.",
+  "address": "Arad",
+  "lat": 46.1763,
+  "lng": 21.319187,
+  "verified": true
+ },
+ {
+  "name": "One More Beer",
+  "category": "bar",
+  "description": "Bar / pub din Arad.",
+  "address": "Strada Ștefan Cicio Pop 12, Arad",
+  "lat": 46.172342,
+  "lng": 21.31165,
+  "verified": true
+ },
+ {
+  "name": "Art Cafe",
+  "category": "bar",
+  "description": "Bar / pub din Arad.",
+  "address": "Arad",
+  "lat": 46.169377,
+  "lng": 21.316276,
+  "verified": true
+ },
+ {
+  "name": "Wings",
+  "category": "bar",
+  "description": "Bar / pub din Arad.",
+  "address": "Piața Avram Iancu, Arad",
+  "lat": 46.169423,
+  "lng": 21.316552,
+  "verified": true
+ },
+ {
+  "name": "Palatul Cultural",
+  "category": "obiectiv",
+  "description": "Complexul Muzeal și Filarmonica de Stat, lângă Mureș.",
+  "address": "Arad",
+  "lat": 46.174171,
+  "lng": 21.320699,
+  "verified": true
+ },
+ {
+  "name": "Teatrul Clasic „Ioan Slavici”",
+  "category": "obiectiv",
+  "description": "Teatrul din centrul Aradului.",
+  "address": "Arad",
+  "lat": 46.17112,
+  "lng": 21.315794,
+  "verified": true
+ },
+ {
+  "name": "Statuia Libertății",
+  "category": "obiectiv",
+  "description": "Monumentul dedicat celor 13 generali martiri de la 1849.",
+  "address": "Arad",
+  "lat": 46.170871,
+  "lng": 21.309178,
+  "verified": true
+ },
+ {
+  "name": "Cetatea Aradului",
+  "category": "obiectiv",
+  "description": "Cetate în stil Vauban din secolul al XVIII-lea.",
+  "address": "Arad",
+  "lat": 46.170887,
+  "lng": 21.332493,
+  "verified": true
+ },
+ {
+  "name": "Catedrala „Sfânta Treime”",
+  "category": "obiectiv",
+  "description": "Catedrala ortodoxă din Piața Caius Iacob.",
+  "address": "Piața Academician Caius Iacob 1, Arad",
+  "lat": 46.183562,
+  "lng": 21.32471,
+  "verified": true
+ },
+ {
+  "name": "Arcul de Triumf",
+  "category": "obiectiv",
+  "description": "Lângă Parcul Reconcilierii.",
+  "address": "Arad",
+  "lat": 46.170851,
+  "lng": 21.308403,
+  "verified": true
+ },
+ {
+  "name": "Palatul Neumann",
+  "category": "obiectiv",
+  "description": "Palat istoric din centru.",
+  "address": "Arad",
+  "lat": 46.175444,
+  "lng": 21.317178,
+  "verified": true
+ },
+ {
+  "name": "Casa cu lacăt",
+  "category": "obiectiv",
+  "description": "Clădire istorică cu legenda lacătului.",
+  "address": "Strada Tribunul Dobra 7, Arad",
+  "lat": 46.168678,
+  "lng": 21.318226,
+  "verified": true
+ },
+ {
+  "name": "Palatul Băncii Naționale",
+  "category": "obiectiv",
+  "description": "Clădire istorică pe Bulevardul Revoluției.",
+  "address": "Bulevardul Revoluției 72, Arad",
+  "lat": 46.176385,
+  "lng": 21.317964,
+  "verified": true
+ },
+ {
+  "name": "Muzeul de Istoria Calculatoarelor",
+  "category": "obiectiv",
+  "description": "Pentru pasionații de tehnologie.",
+  "address": "Strada Horia 3, Arad",
+  "lat": 46.176187,
+  "lng": 21.316066,
+  "verified": true
+ },
+ {
+  "name": "Turnul de apă",
+  "category": "obiectiv",
+  "description": "Turn de apă transformat în muzeu.",
+  "address": "Arad",
+  "lat": 46.169661,
+  "lng": 21.308028,
+  "verified": true
+ },
+ {
+  "name": "Teatrul de Marionete",
+  "category": "obiectiv",
+  "description": "Spectacole pentru copii.",
+  "address": "Strada Episcopiei 15, Arad",
+  "lat": 46.175016,
+  "lng": 21.313942,
+  "verified": true
+ },
+ {
+  "name": "Parcul Europa",
+  "category": "natura",
+  "description": "Parc pe malul Mureșului.",
+  "address": "Arad",
+  "lat": 46.178438,
+  "lng": 21.331454,
+  "verified": true
+ },
+ {
+  "name": "Ștrandul Neptun",
+  "category": "natura",
+  "description": "Ștrand și zonă de agrement.",
+  "address": "Arad",
+  "lat": 46.173919,
+  "lng": 21.326744,
+  "verified": true
+ },
+ {
+  "name": "Parcul Pădurice",
+  "category": "natura",
+  "description": "Parc cu mulți copaci, aproape de centru.",
+  "address": "Arad",
+  "lat": 46.18431,
+  "lng": 21.322803,
+  "verified": true
+ },
+ {
+  "name": "Parcul Mihai Eminescu",
+  "category": "natura",
+  "description": "Parc pe malul Mureșului, lângă centru.",
+  "address": "Arad",
+  "lat": 46.175651,
+  "lng": 21.321002,
+  "verified": true
+ },
+ {
+  "name": "Parcul Copiilor",
+  "category": "natura",
+  "description": "Loc de joacă și plimbare.",
+  "address": "Arad",
+  "lat": 46.172999,
+  "lng": 21.320731,
+  "verified": true
+ },
+ {
+  "name": "Parcul Reconcilierii",
+  "category": "natura",
+  "description": "Parcul cu Statuia Libertății.",
+  "address": "Arad",
+  "lat": 46.170875,
+  "lng": 21.308731,
+  "verified": true
+ },
+ {
+  "name": "Parcul Alfa",
+  "category": "natura",
+  "description": "Parc de cartier.",
+  "address": "Arad",
+  "lat": 46.160756,
+  "lng": 21.27903,
+  "verified": true
+ },
+ {
+  "name": "Hack4Arad @ Complex M (UAV)",
+  "category": "eveniment",
+  "description": "Locul hackathonului Hack4Arad 2026! Fă check-in aici.",
+  "address": "Str. Elena Drăgoi nr. 2, Arad",
+  "lat": 46.17665,
+  "lng": 21.3436,
+  "verified": true
+ },
+ {
+  "name": "Palatul Administrativ (Primăria)",
+  "category": "obiectiv",
+  "description": "Clădirea Primăriei, simbol al Bulevardului Revoluției.",
+  "address": "Bulevardul Revoluției 75, Arad",
+  "lat": 46.17537,
+  "lng": 21.3193,
+  "verified": true
+ },
+ {
+  "name": "Cetatea Șoimoș",
+  "category": "obiectiv",
+  "description": "Ruinele cetății de lângă Lipova, cu vedere spre Mureș.",
+  "address": "Lipova, jud. Arad",
+  "lat": 46.10877,
+  "lng": 21.72299,
+  "verified": true
+ },
+ {
+  "name": "Cetatea Ineului",
+  "category": "obiectiv",
+  "description": "Cetate și muzeu în orașul Ineu.",
+  "address": "Strada Ioan Slavici, Ineu, jud. Arad",
+  "lat": 46.42825,
+  "lng": 21.84123,
+  "verified": true
+ },
+ {
+  "name": "Mănăstirea Hodoș-Bodrog",
+  "category": "obiectiv",
+  "description": "Una dintre cele mai vechi mănăstiri din România.",
+  "address": "jud. Arad",
+  "lat": 46.13365,
+  "lng": 21.18374,
+  "verified": true
+ },
+ {
+  "name": "Stațiunea Moneasa",
+  "category": "natura",
+  "description": "Stațiune balneară în Munții Codru-Moma.",
+  "address": "Moneasa, jud. Arad",
+  "lat": 46.46111,
+  "lng": 22.25674,
+  "verified": true
+ },
+ {
+  "name": "Podgoria Miniș-Măderat",
+  "category": "producator",
+  "description": "Podgoria cu tradiție a județului: vinuri locale.",
+  "address": "Miniș, jud. Arad",
+  "lat": 46.13502,
+  "lng": 21.60452,
+  "verified": true
+ }
+]

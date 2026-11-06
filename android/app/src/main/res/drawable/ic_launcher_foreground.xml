@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Coroana „Topul Aradului” (zona sigură a iconiței adaptive e cercul central de 66dp) -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+    <!-- corpul coroanei -->
+    <path
+        android:fillColor="#FFFFD23F"
+        android:pathData="M31,68 L29,42 L42,53 L54,33 L66,53 L79,42 L77,68 Z" />
+    <!-- baza -->
+    <path
+        android:fillColor="#FFFFD23F"
+        android:pathData="M31,71 L77,71 L77,78 Q77,79 76,79 L32,79 Q31,79 31,78 Z" />
+    <!-- pietre -->
+    <path
+        android:fillColor="#FFFF3D81"
+        android:pathData="M54,52 m-4,0 a4,4 0 1,0 8,0 a4,4 0 1,0 -8,0" />
+    <path
+        android:fillColor="#FF2EE6A6"
+        android:pathData="M41,61 m-3,0 a3,3 0 1,0 6,0 a3,3 0 1,0 -6,0" />
+    <path
+        android:fillColor="#FF4D7CFF"
+        android:pathData="M67,61 m-3,0 a3,3 0 1,0 6,0 a3,3 0 1,0 -6,0" />
+    <!-- vârfuri -->
+    <path
+        android:fillColor="#FFFFD23F"
+        android:pathData="M29,40 m-3,0 a3,3 0 1,0 6,0 a3,3 0 1,0 -6,0 M54,31 m-3.5,0 a3.5,3.5 0 1,0 7,0 a3.5,3.5 0 1,0 -7,0 M79,40 m-3,0 a3,3 0 1,0 6,0 a3,3 0 1,0 -6,0" />
+</vector>
