@@ -542,7 +542,6 @@ private fun PlacesMap(
     val scope = rememberCoroutineScope()
     val darkStyle = remember { MapStyleOptions.loadRawResourceStyle(context, R.raw.map_style_night) }
     val items = remember(vm.places) { vm.places.map(::PlaceItem) }
-    val clusterManager = rememberClusterManager<PlaceItem>()
     var renderer by remember { mutableStateOf<PhotoClusterRenderer?>(null) }
 
     GoogleMap(
@@ -556,6 +555,8 @@ private fun PlacesMap(
         ),
         uiSettings = MapUiSettings(zoomControlsEnabled = false, myLocationButtonEnabled = false, mapToolbarEnabled = false, compassEnabled = false),
     ) {
+        // trebuie creat ÎNĂUNTRUL hărții (are nevoie de obiectul GoogleMap)
+        val clusterManager = rememberClusterManager<PlaceItem>()
         // markerele native cu poze (desenate o dată, fără animațiile lente)
         MapEffect(clusterManager) { map ->
             val manager = clusterManager ?: return@MapEffect

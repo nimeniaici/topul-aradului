@@ -2,6 +2,7 @@ package ro.hack4arad.topul.data
 
 import android.content.Context
 import android.content.SharedPreferences
+import android.util.Log
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.libraries.places.api.Places
 import com.google.android.libraries.places.api.model.CircularBounds
@@ -32,7 +33,7 @@ object PlacePhotos {
     val enabled: Boolean get() = client != null
 
     fun init(context: Context) {
-        prefs = context.getSharedPreferences("place_photos", Context.MODE_PRIVATE)
+        prefs = context.getSharedPreferences("place_photos_v2", Context.MODE_PRIVATE)
         if (BuildConfig.MAPS_API_KEY.isBlank()) return
         runCatching {
             if (!Places.isInitialized()) Places.initializeWithNewPlacesApiEnabled(context.applicationContext, BuildConfig.MAPS_API_KEY)
@@ -51,7 +52,11 @@ object PlacePhotos {
         val places = client ?: return null
         return locks.getOrPut(id) { Mutex() }.withLock {
             memory[id]?.let { return@withLock it.takeIf { it != NONE } }
-            val found = runCatching { fetch(places, name, lat, lng) }.getOrNull()
+            // o eroare (fără net, cheie refuzată) NU se ține minte; doar „Google chiar n-are poză”
+            val found = try { fetch(places, name, lat, lng) } catch (e: Exception) {
+                Log.w("PlacePhotos", "Poza pentru '$name' a eșuat: ${e.message}")
+                return@withLock null
+            }
             val value = found ?: NONE
             memory[id] = value
             prefs.edit().putString("u$id", value).putLong("t$id", System.currentTimeMillis()).apply()
