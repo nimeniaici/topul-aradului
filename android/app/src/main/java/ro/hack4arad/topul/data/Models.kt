@@ -59,6 +59,7 @@ data class PlaceDetail(
     val verified: Boolean,
     val recentPhotos: List<Photo>,
     val rankInCategory: Int,
+    val splatMb: Double?,
 )
 
 data class Badge(val code: String, val title: String, val description: String, val earnedAt: String) {

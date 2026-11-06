@@ -67,10 +67,14 @@ interface Api {
     suspend fun vote(@Body body: VoteIn): VoteOut
 
     @GET("leaderboard/places")
-    suspend fun topPlaces(@Query("category") category: String? = null, @Query("limit") limit: Int = 30): List<Place>
+    suspend fun topPlaces(
+        @Query("category") category: String? = null,
+        @Query("limit") limit: Int = 20,
+        @Query("offset") offset: Int = 0,
+    ): List<Place>
 
     @GET("leaderboard/users")
-    suspend fun topUsers(@Query("limit") limit: Int = 30): List<UserRank>
+    suspend fun topUsers(@Query("limit") limit: Int = 20, @Query("offset") offset: Int = 0): List<UserRank>
 
     @GET("users/me")
     suspend fun me(): Profile

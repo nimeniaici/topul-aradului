@@ -30,7 +30,8 @@ def test_upload_view_and_delete_splat(client, monkeypatch):
     url = r.json()["splat_url"]
     assert url.startswith("/uploads/splats/") and url.endswith(".splat")
     assert client.get(url).status_code == 200
-    assert client.get(f"/places/{p['id']}").json()["splat_url"] == url
+    detail = client.get(f"/places/{p['id']}").json()
+    assert detail["splat_url"] == url and detail["splat_mb"] is not None
 
     page = client.get(f"/tur3d/{p['id']}")
     assert page.status_code == 200 and "TUR 3D" in page.text and url in page.text

@@ -98,6 +98,7 @@ class PhotoOut(BaseModel):
 class PlaceDetailOut(PlaceOut):
     recent_photos: list[PhotoOut]
     rank_in_category: int
+    splat_mb: float | None = None  # cât se descarcă la „Explorează în 3D” (afișat pe buton)
 
 
 # ---------- Check-in ----------

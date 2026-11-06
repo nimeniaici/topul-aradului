@@ -122,3 +122,15 @@ def test_live_websocket_receives_checkin(client, auth):
         assert _checkin(client, auth, place).status_code == 201
         msg = ws.receive_json()
         assert msg["type"] == "checkin" and msg["place_id"] == place["id"]
+
+
+def test_leaderboard_pagination_is_stable(client):
+    """Lazy loading în clasament: paginile succesive nu se suprapun și acoperă toate locurile."""
+    all_places = client.get("/leaderboard/places", params={"limit": 100}).json()
+    pages = []
+    for offset in range(0, len(all_places), 20):
+        pages += client.get("/leaderboard/places", params={"limit": 20, "offset": offset}).json()
+    assert [p["id"] for p in pages] == [p["id"] for p in all_places]
+    assert len({p["id"] for p in pages}) == len(pages)
+    users = client.get("/leaderboard/users", params={"limit": 2, "offset": 1}).json()
+    assert users and users[0]["rank"] == 2

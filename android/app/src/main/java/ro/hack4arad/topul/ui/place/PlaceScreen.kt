@@ -82,6 +82,17 @@ import ro.hack4arad.topul.util.hasLocationPermission
 import ro.hack4arad.topul.util.newPhotoUri
 import ro.hack4arad.topul.util.userMessage
 import kotlin.math.roundToInt
+import android.content.Context
+import android.net.ConnectivityManager
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.TextButton
+import androidx.compose.runtime.remember
+
+private fun formatMb(mb: Double) = if (mb < 1) "<1 MB" else "${mb.roundToInt()} MB"
+
+/** true pe date mobile (sau orice rețea „cu contor”), unde descărcările mari costă. */
+private fun isOnMeteredNetwork(context: Context): Boolean =
+    (context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager).isActiveNetworkMetered
 
 class PlaceViewModel(handle: SavedStateHandle) : ViewModel() {
     private val placeId: Int = checkNotNull(handle["id"])
@@ -124,6 +135,7 @@ fun PlaceScreen(onBack: () -> Unit, onTour3D: (Int) -> Unit = {}, vm: PlaceViewM
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
     var photoUri by rememberSaveable { mutableStateOf<Uri?>(null) }
+    var confirm3D by remember { mutableStateOf(false) }
 
     fun doCheckIn(photo: Uri?) {
         if (!hasLocationPermission(context)) {
@@ -202,11 +214,17 @@ fun PlaceScreen(onBack: () -> Unit, onTour3D: (Int) -> Unit = {}, vm: PlaceViewM
                     }
 
                     if (place.splatUrl != null) {
+                        // Scena 3D se descarcă abia acum (lazy loading); pe date mobile cerem confirmare.
                         Button(
-                            onClick = { onTour3D(place.id) },
+                            onClick = { if (isOnMeteredNetwork(context)) confirm3D = true else onTour3D(place.id) },
                             colors = ButtonDefaults.buttonColors(containerColor = Electric, contentColor = Color.White),
                             modifier = Modifier.fillMaxWidth().padding(top = 16.dp).height(56.dp),
-                        ) { Text("🧊 Explorează în 3D", fontSize = 17.sp) }
+                        ) {
+                            Text(
+                                "🧊 Explorează în 3D" + (place.splatMb?.let { " · ${formatMb(it)}" } ?: ""),
+                                fontSize = 17.sp,
+                            )
+                        }
                     }
 
                     vm.actionError?.let {
@@ -269,6 +287,23 @@ fun PlaceScreen(onBack: () -> Unit, onTour3D: (Int) -> Unit = {}, vm: PlaceViewM
             colors = IconButtonDefaults.iconButtonColors(containerColor = Night.copy(alpha = 0.7f), contentColor = Color.White),
             modifier = Modifier.padding(12.dp).clip(CircleShape),
         ) { Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Înapoi") }
+
+        val p3d = vm.place
+        if (confirm3D && p3d != null) {
+            AlertDialog(
+                onDismissRequest = { confirm3D = false },
+                title = { Text("🧊 Tur 3D pe date mobile") },
+                text = {
+                    Text(
+                        "Ești pe date mobile. Scena 3D are " +
+                            (p3d.splatMb?.let { formatMb(it) } ?: "câțiva zeci de MB") +
+                            ". O descarci acum?",
+                    )
+                },
+                confirmButton = { Button(onClick = { confirm3D = false; onTour3D(p3d.id) }) { Text("Descarcă") } },
+                dismissButton = { TextButton(onClick = { confirm3D = false }) { Text("Mai târziu", color = TextMuted) } },
+            )
+        }
 
         vm.result?.let { r ->
             CheckinCelebration(r, place?.name ?: "", onDismiss = { vm.result = null })

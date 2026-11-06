@@ -41,6 +41,28 @@ def _place(db: Session, place_id: int) -> Place:
     return place
 
 
+_size_cache: dict[str, float | None] = {}
+
+
+def splat_size_mb(url: str | None) -> float | None:
+    """Dimensiunea scenei 3D în MB (fișier local sau cerere HEAD pentru adrese externe; rezultatul se ține minte)."""
+    if not url:
+        return None
+    prefix = f"/uploads/{_SPLAT_DIR}/"
+    if url.startswith(prefix):
+        path = config.UPLOAD_DIR / _SPLAT_DIR / url[len(prefix):]
+        return round(path.stat().st_size / 1048576, 1) if path.exists() else None
+    if url not in _size_cache:
+        try:
+            import requests
+            r = requests.head(url, allow_redirects=True, timeout=4)
+            size = int(r.headers.get("content-length", "0"))
+            _size_cache[url] = round(size / 1048576, 1) if size else None
+        except Exception:
+            _size_cache[url] = None
+    return _size_cache[url]
+
+
 def _delete_local(place: Place) -> None:
     prefix = f"/uploads/{_SPLAT_DIR}/"
     if place.splat_url and place.splat_url.startswith(prefix):

@@ -8,6 +8,7 @@ from ..geo import distance_m
 from ..models import Checkin, Place
 from ..schemas import CategoryOut, PhotoOut, PlaceDetailOut, PlaceOut
 from ..serializers import photo_url, place_out
+from .tour3d import splat_size_mb
 
 router = APIRouter(prefix="/places", tags=["places"])
 
@@ -64,4 +65,5 @@ def place_detail(place_id: int, db: Session = Depends(get_db)):
         recent_photos=[PhotoOut(photo_url=photo_url(c.photo_path), user_name=c.user.name,
                                 created_at=c.created_at) for c in photos],
         rank_in_category=better + 1,
+        splat_mb=splat_size_mb(place.splat_url),
     )

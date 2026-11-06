@@ -59,6 +59,13 @@ import ro.hack4arad.topul.ui.theme.PanelHigh
 import ro.hack4arad.topul.ui.theme.TextMuted
 import ro.hack4arad.topul.util.userMessage
 import kotlin.math.roundToInt
+import androidx.compose.foundation.lazy.LazyListState
+import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.snapshotFlow
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.flow.distinctUntilChanged
 
 class LeaderboardViewModel : ViewModel() {
     var categories by mutableStateOf<List<Category>>(emptyList())
@@ -71,6 +78,12 @@ class LeaderboardViewModel : ViewModel() {
         private set
     var error by mutableStateOf<String?>(null)
         private set
+    /** se încarcă următoarea pagină (lazy loading la derulare) */
+    var loadingMore by mutableStateOf(false)
+        private set
+    private var placesEnd = false
+    private var usersEnd = false
+    private var refreshJob: Job? = null
 
     init {
         viewModelScope.launch { runCatching { categories = Network.api.duelCategories() } }
@@ -82,13 +95,60 @@ class LeaderboardViewModel : ViewModel() {
         refresh()
     }
 
+    /** Prima pagină (20 de rezultate); restul se cer abia când derulezi spre final. */
     fun refresh() {
-        viewModelScope.launch {
+        refreshJob?.cancel()
+        refreshJob = viewModelScope.launch {
             runCatching {
-                places = Network.api.topPlaces(category)
-                users = Network.api.topUsers()
+                val p = Network.api.topPlaces(category, PAGE, 0)
+                val u = Network.api.topUsers(PAGE, 0)
+                places = p
+                users = u
+                placesEnd = p.size < PAGE
+                usersEnd = u.size < PAGE
             }.onSuccess { error = null }.onFailure { error = it.userMessage() }
         }
+    }
+
+    fun loadMorePlaces() {
+        if (loadingMore || placesEnd || places.isEmpty()) return
+        loadingMore = true
+        viewModelScope.launch {
+            runCatching { Network.api.topPlaces(category, PAGE, places.size) }
+                .onSuccess { page -> places = (places + page).distinctBy { it.id }; placesEnd = page.size < PAGE }
+            loadingMore = false
+        }
+    }
+
+    fun loadMoreUsers() {
+        if (loadingMore || usersEnd || users.isEmpty()) return
+        loadingMore = true
+        viewModelScope.launch {
+            runCatching { Network.api.topUsers(PAGE, users.size) }
+                .onSuccess { page -> users = (users + page).distinctBy { it.id }; usersEnd = page.size < PAGE }
+            loadingMore = false
+        }
+    }
+
+    private companion object { const val PAGE = 20 }
+}
+
+/** Cere pagina următoare când ultimele rânduri devin vizibile. */
+@Composable
+private fun LoadMoreWhenNearEnd(state: LazyListState, onLoadMore: () -> Unit) {
+    LaunchedEffect(state) {
+        snapshotFlow {
+            val last = state.layoutInfo.visibleItemsInfo.lastOrNull()?.index ?: 0
+            last >= state.layoutInfo.totalItemsCount - 4
+        }.distinctUntilChanged().collect { nearEnd -> if (nearEnd) onLoadMore() }
+    }
+}
+
+@Composable
+private fun LoadingMoreRow(visible: Boolean) {
+    if (!visible) return
+    Box(Modifier.fillMaxWidth().padding(16.dp), contentAlignment = Alignment.Center) {
+        CircularProgressIndicator(Modifier.size(24.dp), color = Gold, strokeWidth = 2.dp)
     }
 }
 
@@ -122,7 +182,9 @@ fun LeaderboardScreen(onPlace: (Int) -> Unit, vm: LeaderboardViewModel = viewMod
                     PlaceImage(p.photoUrl, p.category, p.id, Modifier.size(56.dp).clip(CircleShape), emojiSize = 26)
                 }) { onPlace(p.id) }
             }
-            LazyColumn(contentPadding = PaddingValues(bottom = 16.dp)) {
+            val listState = rememberLazyListState()
+            LoadMoreWhenNearEnd(listState, vm::loadMorePlaces)
+            LazyColumn(state = listState, contentPadding = PaddingValues(bottom = 16.dp)) {
                 item { Podium(podium) }
                 items(vm.places.drop(3), key = { it.id }) { p ->
                     RankRow(rank = vm.places.indexOf(p) + 1, onClick = { onPlace(p.id) }, score = "★ ${p.rating.roundToInt()}",
@@ -130,19 +192,23 @@ fun LeaderboardScreen(onPlace: (Int) -> Unit, vm: LeaderboardViewModel = viewMod
                         PlaceImage(p.photoUrl, p.category, p.id, Modifier.size(44.dp).clip(RoundedCornerShape(12.dp)), emojiSize = 22)
                     }
                 }
+                item { LoadingMoreRow(vm.loadingMore) }
             }
         } else {
             val me = Network.session.userId
             val podium = vm.users.take(3).map { u ->
                 PodiumEntry(u.name, "Nivel ${u.level}", "${u.xp} XP", { Avatar(u.name, 56.dp, ring = if (u.id == me) Gold else Panel, emoji = u.avatarEmoji, colorKey = u.avatarColor) }) {}
             }
-            LazyColumn(contentPadding = PaddingValues(top = 12.dp, bottom = 16.dp)) {
+            val listState = rememberLazyListState()
+            LoadMoreWhenNearEnd(listState, vm::loadMoreUsers)
+            LazyColumn(state = listState, contentPadding = PaddingValues(top = 12.dp, bottom = 16.dp)) {
                 item { Podium(podium) }
                 items(vm.users.drop(3), key = { it.id }) { u ->
                     RankRow(rank = u.rank, onClick = {}, score = "${u.xp} XP",
                         title = u.name + if (u.id == me) " (tu)" else "", subtitle = "Nivel ${u.level}",
                         highlight = u.id == me) { Avatar(u.name, 44.dp, ring = if (u.id == me) Gold else Panel, emoji = u.avatarEmoji, colorKey = u.avatarColor) }
                 }
+                item { LoadingMoreRow(vm.loadingMore) }
             }
         }
     }
