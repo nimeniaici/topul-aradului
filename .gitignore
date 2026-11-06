@@ -19,3 +19,7 @@ android/.kotlin/
 captures/
 
 .DS_Store
+
+# Secrete locale (SMTP etc.)
+backend/.env.*
+!backend/.env.example
