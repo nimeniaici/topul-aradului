@@ -68,7 +68,7 @@ Dacă intri cu Google, primim de la Google numele, emailul și un identificator 
 <li><b>Locația, doar la check-in, și nu o păstrăm:</b> când apeși „Check-in”, aplicația trimite poziția GPS
 din acel moment, iar serverul o folosește <b>doar</b> ca să verifice că ești la cel mult 100 m de loc. Apoi o aruncă:
 salvăm doar <i>ce loc</i> ai vizitat și când, nu unde te aflai exact. Nu urmărim locația în fundal.</li>
-<li><b>Poze:</b> doar dacă alegi să faci check-in cu poză. Pozele sunt vizibile celorlalți utilizatori pe pagina locului.</li>
+<li><b>Poze:</b> doar dacă alegi să faci check-in cu poză (vizibile pe pagina locului) sau să-ți pui poză de profil (vizibilă lângă username-ul tău). Poza de profil o poți șterge oricând din Profil.</li>
 <li><b>Sesizări:</b> dacă semnalezi o problemă (de exemplu o groapă), salvăm poza, descrierea și poziția
 <i>problemei</i>, ca să apară pe hartă și să poată fi rezolvată. Sesizările sunt publice, cu numele tău afișat.</li>
 <li><b>Activitatea în joc:</b> check-in-urile, voturile din dueluri, punctele XP, insignele și avatarul ales.</li>

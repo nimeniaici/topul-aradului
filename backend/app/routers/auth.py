@@ -12,6 +12,7 @@ from ..db import get_db
 from ..gamification import level
 from ..models import ResetCode, User, utcnow
 from ..schemas import ForgotIn, GoogleIn, LoginIn, MessageOut, RegisterIn, ResetIn, TokenOut, UserOut
+from ..serializers import photo_url
 from ..security import create_token, hash_code, hash_password, verify_google_token, verify_password
 
 router = APIRouter(prefix="/auth", tags=["auth"])
@@ -24,7 +25,8 @@ def token_out(user: User) -> TokenOut:
     return TokenOut(
         access_token=create_token(user.id),
         user=UserOut(id=user.id, name=user.name, xp=user.xp, level=level(user.xp),
-                     avatar_emoji=user.avatar_emoji, avatar_color=user.avatar_color),
+                     avatar_emoji=user.avatar_emoji, avatar_color=user.avatar_color,
+                     avatar_url=photo_url(user.avatar_path)),
     )
 
 

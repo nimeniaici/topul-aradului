@@ -104,4 +104,11 @@ interface Api {
 
     @DELETE("users/me")
     suspend fun deleteMe(): Response<Unit>
+
+    @Multipart
+    @POST("users/me/avatar")
+    suspend fun uploadAvatar(@Part photo: MultipartBody.Part): Profile
+
+    @DELETE("users/me/avatar")
+    suspend fun deleteAvatar(): Profile
 }

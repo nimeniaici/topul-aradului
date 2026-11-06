@@ -17,7 +17,7 @@ def ensure_columns() -> None:
     insp = inspect(engine)
     tables = set(insp.get_table_names())
     new_cols = {
-        "users": {"google_sub": "VARCHAR(64)", "avatar_emoji": "VARCHAR(16)", "avatar_color": "VARCHAR(16)"},
+        "users": {"google_sub": "VARCHAR(64)", "avatar_emoji": "VARCHAR(16)", "avatar_color": "VARCHAR(16)", "avatar_path": "VARCHAR(80)"},
         "places": {"splat_url": "VARCHAR(300)"},
     }
     with engine.begin() as conn:

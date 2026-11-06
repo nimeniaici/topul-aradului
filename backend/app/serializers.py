@@ -27,6 +27,7 @@ def place_out(p: Place, distance: float | None = None) -> PlaceOut:
         checkin_count=p.checkin_count,
         mayor_id=p.mayor_id,
         mayor_name=p.mayor.name if p.mayor else None,
+        mayor_avatar_url=photo_url(p.mayor.avatar_path) if p.mayor else None,
         verified=p.verified,
         distance_m=round(distance, 1) if distance is not None else None,
     )

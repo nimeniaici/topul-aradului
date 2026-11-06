@@ -45,6 +45,7 @@ class UpdateMeIn(BaseModel):
     name: str | None = Field(None, min_length=1, max_length=40)
     avatar_emoji: str | None = None
     avatar_color: str | None = None
+    avatar_url: str | None = None
 
 
 class UserOut(BaseModel):
@@ -54,6 +55,7 @@ class UserOut(BaseModel):
     level: int
     avatar_emoji: str | None = None
     avatar_color: str | None = None
+    avatar_url: str | None = None
 
 
 class TokenOut(BaseModel):
@@ -86,6 +88,7 @@ class PlaceOut(BaseModel):
     checkin_count: int
     mayor_id: int | None
     mayor_name: str | None
+    mayor_avatar_url: str | None = None
     verified: bool
     distance_m: float | None = None
 
@@ -165,6 +168,7 @@ class UserRankOut(BaseModel):
     rank: int
     avatar_emoji: str | None = None
     avatar_color: str | None = None
+    avatar_url: str | None = None
 
 
 class MissionOut(BaseModel):
@@ -181,6 +185,7 @@ class ProfileOut(BaseModel):
     email: str
     avatar_emoji: str | None
     avatar_color: str | None
+    avatar_url: str | None = None
     has_password: bool
     google_linked: bool
     xp: int

@@ -1,5 +1,13 @@
 package ro.hack4arad.topul.ui.profile
 
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.activity.result.PickVisualMediaRequest
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.activity.compose.rememberLauncherForActivityResult
+import ro.hack4arad.topul.util.compressPhoto
+import okhttp3.RequestBody.Companion.toRequestBody
+import okhttp3.MediaType.Companion.toMediaType
+import okhttp3.MultipartBody
 import ro.hack4arad.topul.ui.components.UsernameField
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -144,6 +152,25 @@ class ProfileViewModel : ViewModel() {
         }
     }
 
+    /** Poza de profil: o micșorăm la 512 px pe telefon, apoi o urcăm. null = ștergem poza. */
+    fun setAvatar(context: android.content.Context, uri: android.net.Uri?) {
+        viewModelScope.launch {
+            saving = true
+            actionError = null
+            runCatching {
+                if (uri == null) Network.api.deleteAvatar()
+                else {
+                    val bytes = compressPhoto(context, uri, maxSize = 512) ?: error("Nu am putut citi poza.")
+                    val part = MultipartBody.Part.createFormData(
+                        "photo", "avatar.jpg", bytes.toRequestBody("image/jpeg".toMediaType()),
+                    )
+                    Network.api.uploadAvatar(part)
+                }
+            }.onSuccess { profile = it }.onFailure { actionError = it.userMessage() }
+            saving = false
+        }
+    }
+
     fun deleteAccount() {
         viewModelScope.launch {
             saving = true
@@ -184,6 +211,7 @@ private fun relativeTime(iso: String): String = runCatching {
 
 @Composable
 fun ProfileScreen(onPlace: (Int) -> Unit, vm: ProfileViewModel = viewModel()) {
+    val context = LocalContext.current
     LaunchedEffect(Unit) { vm.load() } // reîncarcă la fiecare intrare pe tab
     var editing by remember { mutableStateOf(false) }
     var deleting by remember { mutableStateOf(false) }
@@ -194,7 +222,7 @@ fun ProfileScreen(onPlace: (Int) -> Unit, vm: ProfileViewModel = viewModel()) {
         else -> Column(Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(16.dp)) {
             // ---- antet
             Row(verticalAlignment = Alignment.CenterVertically) {
-                Avatar(p.name, 64.dp, emoji = p.avatarEmoji, colorKey = p.avatarColor)
+                Avatar(p.name, 64.dp, emoji = p.avatarEmoji, colorKey = p.avatarColor, photoUrl = p.avatarUrl)
                 Spacer(Modifier.width(14.dp))
                 Column(Modifier.weight(1f)) {
                     Text(p.name, color = Color.White, fontSize = 24.sp, fontWeight = FontWeight.Black, maxLines = 1, overflow = TextOverflow.Ellipsis)
@@ -302,6 +330,7 @@ fun ProfileScreen(onPlace: (Int) -> Unit, vm: ProfileViewModel = viewModel()) {
         EditProfileDialog(
             prof, saving = vm.saving, error = vm.actionError,
             onSave = { n, e, c -> vm.update(n, e, c) { editing = false } },
+            onPhoto = { uri -> vm.setAvatar(context, uri) },
             onDismiss = { editing = false; vm.actionError = null },
         )
     }
@@ -358,8 +387,12 @@ private fun EditProfileDialog(
     saving: Boolean,
     error: String?,
     onSave: (String, String?, String?) -> Unit,
+    onPhoto: (android.net.Uri?) -> Unit,
     onDismiss: () -> Unit,
 ) {
+    val pickPhoto = rememberLauncherForActivityResult(ActivityResultContracts.PickVisualMedia()) { uri ->
+        if (uri != null) onPhoto(uri)
+    }
     var name by remember { mutableStateOf(p.name) }
     var nameOk by remember { mutableStateOf(true) }
     var emoji by remember { mutableStateOf(p.avatarEmoji) }
@@ -369,10 +402,27 @@ private fun EditProfileDialog(
         title = { Text("Profilul tău") },
         text = {
             Column(Modifier.verticalScroll(rememberScrollState())) {
-                Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center) { Avatar(name, 72.dp, emoji = emoji, colorKey = color) }
-                Spacer(Modifier.height(12.dp))
+                Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center) {
+                    Box {
+                        Avatar(name, 96.dp, emoji = emoji, colorKey = color, photoUrl = p.avatarUrl)
+                        if (saving) CircularProgressIndicator(color = Gold, modifier = Modifier.align(Alignment.Center).size(36.dp))
+                    }
+                }
+                Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center) {
+                    TextButton(
+                        onClick = { pickPhoto.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)) },
+                        enabled = !saving,
+                    ) {
+                        Icon(Icons.Rounded.PhotoCamera, null, tint = Gold)
+                        Text(if (p.avatarUrl == null) "  Pune o poză" else "  Schimbă poza", color = Gold)
+                    }
+                    if (p.avatarUrl != null) TextButton(onClick = { onPhoto(null) }, enabled = !saving) {
+                        Text("Șterge poza", color = TextMuted)
+                    }
+                }
+                Spacer(Modifier.height(4.dp))
                 UsernameField(name, { name = it }, { nameOk = it }, current = p.name)
-                Text("Avatar", color = TextMuted, fontSize = 13.sp, modifier = Modifier.padding(top = 12.dp, bottom = 6.dp))
+                Text(if (p.avatarUrl == null) "Sau alege un avatar" else "Avatar (dacă ștergi poza)", color = TextMuted, fontSize = 13.sp, modifier = Modifier.padding(top = 12.dp, bottom = 6.dp))
                 AVATAR_EMOJIS.chunked(6).forEach { row ->
                     Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
                         row.forEach { e ->

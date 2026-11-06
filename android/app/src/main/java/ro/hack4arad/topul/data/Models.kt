@@ -7,7 +7,7 @@ data class RegisterIn(val name: String, val email: String, val password: String)
 data class UsernameCheck(val username: String, val available: Boolean, val reason: String?, val suggestion: String? = null)
 data class LoginIn(val email: String, val password: String)
 
-data class UserOut(val id: Int, val name: String, val xp: Int, val level: Int, val avatarEmoji: String?, val avatarColor: String?)
+data class UserOut(val id: Int, val name: String, val xp: Int, val level: Int, val avatarEmoji: String?, val avatarColor: String?, val avatarUrl: String? = null)
 data class GoogleIn(val idToken: String)
 data class ForgotIn(val email: String)
 data class ResetIn(val email: String, val code: String, val newPassword: String)
@@ -88,7 +88,7 @@ data class VoteOut(val winner: Place, val loser: Place, val xpGained: Int, val n
 
 data class UserRank(
     val id: Int, val name: String, val xp: Int, val level: Int, val rank: Int,
-    val avatarEmoji: String?, val avatarColor: String?,
+    val avatarEmoji: String?, val avatarColor: String?, val avatarUrl: String? = null,
 )
 
 data class Profile(
@@ -97,6 +97,7 @@ data class Profile(
     val email: String,
     val avatarEmoji: String?,
     val avatarColor: String?,
+    val avatarUrl: String? = null,
     val hasPassword: Boolean,
     val googleLinked: Boolean,
     val xp: Int,

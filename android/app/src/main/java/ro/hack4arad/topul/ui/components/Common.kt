@@ -249,6 +249,7 @@ fun Avatar(
     ring: Color = Gold,
     emoji: String? = null,
     colorKey: String? = null,
+    photoUrl: String? = null,
 ) {
     val initials = name.split(" ").filter { it.isNotBlank() && it.first().isLetter() }
         .take(2).joinToString("") { it.first().uppercase() }.ifEmpty { "?" }
@@ -262,7 +263,9 @@ fun Avatar(
             .fillMaxSize(),
         contentAlignment = Alignment.Center,
     ) {
-        if (emoji != null) Text(emoji, fontSize = (size.value / 2.2).sp)
+        val photo = Network.fullUrl(photoUrl)
+        if (photo != null) AsyncImage(photo, contentDescription = null, contentScale = ContentScale.Crop, modifier = Modifier.fillMaxSize())
+        else if (emoji != null) Text(emoji, fontSize = (size.value / 2.2).sp)
         else Text(initials, color = Color.White, fontWeight = FontWeight.Black, fontSize = (size.value / 2.6).sp)
     }
 }

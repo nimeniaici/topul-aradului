@@ -23,6 +23,8 @@ class User(Base):
     google_sub: Mapped[str | None] = mapped_column(String(64), nullable=True, index=True)
     avatar_emoji: Mapped[str | None] = mapped_column(String(16), nullable=True)
     avatar_color: Mapped[str | None] = mapped_column(String(16), nullable=True)
+    # poza de profil (fișier în UPLOAD_DIR); dacă lipsește, se folosește avatarul cu emoji/culoare
+    avatar_path: Mapped[str | None] = mapped_column(String(80), nullable=True)
     xp: Mapped[int] = mapped_column(Integer, default=0)
     created_at: Mapped[datetime] = mapped_column(DateTime, default=utcnow)
 

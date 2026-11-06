@@ -216,7 +216,7 @@ fun LeaderboardScreen(onPlace: (Int) -> Unit, vm: LeaderboardViewModel = viewMod
                         rank = u.rank, trend = memory.trend(u.id, u.rank), onClick = {},
                         title = u.name + if (u.id == me) " (tu)" else "", subtitle = "Nivel ${u.level}",
                         score = "${u.xp} XP", highlight = u.id == me,
-                    ) { Avatar(u.name, 48.dp, ring = if (u.id == me) Gold else Panel, emoji = u.avatarEmoji, colorKey = u.avatarColor) }
+                    ) { Avatar(u.name, 48.dp, ring = if (u.id == me) Gold else Panel, emoji = u.avatarEmoji, colorKey = u.avatarColor, photoUrl = u.avatarUrl) }
                 }
                 item { LoadingMoreRow(vm.loadingMore) }
             }
@@ -264,7 +264,7 @@ private fun ChampionUser(u: UserRank, isMe: Boolean) {
             .padding(16.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        Avatar(u.name, 72.dp, emoji = u.avatarEmoji, colorKey = u.avatarColor)
+        Avatar(u.name, 72.dp, emoji = u.avatarEmoji, colorKey = u.avatarColor, photoUrl = u.avatarUrl)
         Spacer(Modifier.width(14.dp))
         Column(Modifier.weight(1f)) {
             Row(verticalAlignment = Alignment.CenterVertically) {

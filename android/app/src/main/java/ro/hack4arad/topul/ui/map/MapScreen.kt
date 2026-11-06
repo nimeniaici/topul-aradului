@@ -1,5 +1,16 @@
 package ro.hack4arad.topul.ui.map
 
+import ro.hack4arad.topul.ui.theme.Track
+import androidx.compose.material3.ExtendedFloatingActionButton
+import androidx.compose.material.icons.rounded.Close
+import androidx.compose.material.icons.rounded.Search
+import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.graphics.SolidColor
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.text.BasicTextField
 import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -314,14 +325,17 @@ fun MapScreen(onPlace: (Int) -> Unit, vm: MapViewModel = viewModel()) {
     var listMode by rememberSaveable { mutableStateOf(false) }
     var showHeat by rememberSaveable { mutableStateOf(false) }
     var reporting by remember { mutableStateOf(false) }
+    var query by rememberSaveable { mutableStateOf("") }
+    val shown = remember(vm.places, query) { searchPlaces(vm.places, query) }
     val camera = rememberCameraPositionState { position = CameraPosition.fromLatLngZoom(ARAD, 13.6f) }
-    val pager = rememberPagerState(pageCount = { vm.places.size })
-    val carouselPlace = vm.places.getOrNull(pager.currentPage)
+    val pager = rememberPagerState(pageCount = { shown.size })
+    val carouselPlace = shown.getOrNull(pager.currentPage)
 
     // Tragi caruselul -> harta zboară (scurt, ferm) la locul respectiv
-    LaunchedEffect(pager, vm.places) {
+    LaunchedEffect(pager, shown) {
+        if (pager.currentPage >= shown.size && shown.isNotEmpty()) pager.scrollToPage(0)
         snapshotFlow { pager.settledPage }.distinctUntilChanged().collect { page ->
-            val p = vm.places.getOrNull(page) ?: return@collect
+            val p = shown.getOrNull(page) ?: return@collect
             if (!listMode && pager.pageCount > 0) {
                 camera.animate(CameraUpdateFactory.newLatLngZoom(LatLng(p.lat, p.lng), maxOf(camera.position.zoom, 15.5f)), 350)
             }
@@ -330,12 +344,12 @@ fun MapScreen(onPlace: (Int) -> Unit, vm: MapViewModel = viewModel()) {
 
     Box(Modifier.fillMaxSize()) {
         if (listMode || !BuildConfig.HAS_MAPS_KEY) {
-            PlacesFeed(vm.places, onPlace, topPadding = 200.dp)
+            PlacesFeed(shown, onPlace, topPadding = 270.dp)
         } else {
             PlacesMap(
-                vm = vm, camera = camera, look = look, hasPermission = hasPermission, showHeat = showHeat,
+                vm = vm, places = shown, camera = camera, look = look, hasPermission = hasPermission, showHeat = showHeat,
                 highlightedId = carouselPlace?.id,
-                onPlaceTap = { p -> vm.places.indexOfFirst { it.id == p.id }.takeIf { it >= 0 }?.let { scope.launch { pager.animateScrollToPage(it) } } },
+                onPlaceTap = { p -> shown.indexOfFirst { it.id == p.id }.takeIf { it >= 0 }?.let { scope.launch { pager.animateScrollToPage(it) } } },
             )
         }
 
@@ -343,6 +357,11 @@ fun MapScreen(onPlace: (Int) -> Unit, vm: MapViewModel = viewModel()) {
         Column(Modifier.fillMaxWidth().padding(top = 8.dp)) {
             vm.profile?.let { PlayerHud(it, Modifier.padding(horizontal = 12.dp)) }
             LiveTicker(vm.ticker.firstOrNull(), Modifier.padding(horizontal = 12.dp, vertical = 8.dp))
+            SearchBar(query, { query = it }, Modifier.padding(start = 12.dp, end = 12.dp, bottom = 8.dp))
+            if (query.isNotBlank() && shown.isEmpty()) {
+                Text("Niciun loc nu se potrivește cu „$query”", color = Lilac, fontSize = 13.sp,
+                    modifier = Modifier.padding(horizontal = 20.dp, vertical = 4.dp))
+            }
             CategoryChips(vm.categories, vm.selectedCategory, vm::selectCategory)
             vm.message?.let {
                 Text(
@@ -355,7 +374,7 @@ fun MapScreen(onPlace: (Int) -> Unit, vm: MapViewModel = viewModel()) {
 
         // ---- dreapta: unelte hartă
         Column(
-            Modifier.align(Alignment.CenterEnd).padding(end = 12.dp, top = 120.dp),
+            Modifier.align(Alignment.TopEnd).padding(end = 12.dp, top = 290.dp),
             verticalArrangement = Arrangement.spacedBy(10.dp),
         ) {
             MapTool(if (listMode) Icons.Rounded.Map else Icons.Rounded.ViewAgenda, if (listMode) "Hartă" else "Listă") { listMode = !listMode }
@@ -369,11 +388,20 @@ fun MapScreen(onPlace: (Int) -> Unit, vm: MapViewModel = viewModel()) {
                     vm.myLocation?.let { scope.launch { camera.animate(CameraUpdateFactory.newLatLngZoom(it, 16f), 350) } }
                 }
             }
-            MapTool(Icons.Rounded.ReportProblem, "Semnalează", tint = Pink) { reporting = true }
         }
 
+        // ---- buton mare, mereu vizibil: semnalează o groapă / problemă
+        ExtendedFloatingActionButton(
+            onClick = { reporting = true },
+            icon = { Icon(Icons.Rounded.ReportProblem, null) },
+            text = { Text("Semnalează o groapă", fontWeight = FontWeight.Black) },
+            containerColor = Pink, contentColor = Color.White,
+            modifier = Modifier.align(Alignment.BottomStart)
+                .padding(start = 16.dp, bottom = if (!listMode && shown.isNotEmpty()) 290.dp else 16.dp),
+        )
+
         // ---- jos: carusel cu poze (tragi și harta te urmează)
-        if (!listMode && vm.places.isNotEmpty()) {
+        if (!listMode && shown.isNotEmpty()) {
             HorizontalPager(
                 state = pager,
                 pageSize = PageSize.Fixed(300.dp),
@@ -381,7 +409,7 @@ fun MapScreen(onPlace: (Int) -> Unit, vm: MapViewModel = viewModel()) {
                 pageSpacing = 12.dp,
                 modifier = Modifier.align(Alignment.BottomCenter).padding(bottom = 12.dp),
             ) { page ->
-                val p = vm.places[page]
+                val p = shown[page]
                 CarouselCard(
                     p, busy = vm.busy,
                     onOpen = { onPlace(p.id) },
@@ -431,7 +459,7 @@ private fun PlayerHud(p: Profile, modifier: Modifier = Modifier) {
             .padding(horizontal = 12.dp, vertical = 10.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        Avatar(p.name, 38.dp, emoji = p.avatarEmoji, colorKey = p.avatarColor)
+        Avatar(p.name, 38.dp, emoji = p.avatarEmoji, colorKey = p.avatarColor, photoUrl = p.avatarUrl)
         Spacer(Modifier.width(10.dp))
         Column(Modifier.weight(1f)) {
             Row(verticalAlignment = Alignment.CenterVertically) {
@@ -531,6 +559,7 @@ private fun CarouselCard(place: Place, busy: Boolean, onOpen: () -> Unit, onChec
 @Composable
 private fun PlacesMap(
     vm: MapViewModel,
+    places: List<Place>,
     camera: CameraPositionState,
     look: MapLook,
     hasPermission: Boolean,
@@ -541,7 +570,7 @@ private fun PlacesMap(
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
     val darkStyle = remember { MapStyleOptions.loadRawResourceStyle(context, R.raw.map_style_night) }
-    val items = remember(vm.places) { vm.places.map(::PlaceItem) }
+    val items = remember(places) { places.map(::PlaceItem) }
     var renderer by remember { mutableStateOf<PhotoClusterRenderer?>(null) }
 
     GoogleMap(
@@ -693,6 +722,55 @@ private fun ReportForm(busy: Boolean, onSend: (String, String, ByteArray?) -> Un
                 Spacer(Modifier.width(8.dp))
                 Text("Trimite sesizarea", fontSize = 16.sp)
             }
+        }
+    }
+}
+
+
+/** Caută după nume, categorie sau adresă, fără să conteze diacriticele („cafenea” găsește „Cafenele”). */
+internal fun searchPlaces(places: List<Place>, query: String): List<Place> {
+    val q = plain(query)
+    if (q.isBlank()) return places
+    val words = q.split(" ").filter { it.isNotBlank() }
+    return places.filter { p ->
+        val hay = plain("${p.name} ${p.categoryLabel} ${p.address}")
+        // „pizza” găsește și „pizzeria”, „cafenea” și „cafenele” (ignorăm ultima literă la cuvinte lungi)
+        words.all { w -> w in hay || (w.length >= 5 && w.dropLast(1) in hay) }
+    }.sortedByDescending { plain(it.name).startsWith(q) }
+}
+
+private fun plain(text: String): String =
+    java.text.Normalizer.normalize(text.lowercase(), java.text.Normalizer.Form.NFD)
+        .replace(Regex("\\p{Mn}+"), "")
+        .trim()
+
+@Composable
+private fun SearchBar(query: String, onChange: (String) -> Unit, modifier: Modifier = Modifier) {
+    val focus = LocalFocusManager.current
+    Row(
+        modifier.fillMaxWidth().height(48.dp).clip(RoundedCornerShape(24.dp))
+            .background(Panel.copy(alpha = 0.96f)).border(1.dp, Track, RoundedCornerShape(24.dp))
+            .padding(horizontal = 14.dp),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Icon(Icons.Rounded.Search, null, tint = Lilac, modifier = Modifier.size(22.dp))
+        Spacer(Modifier.width(10.dp))
+        Box(Modifier.weight(1f)) {
+            if (query.isEmpty()) Text("Caută un loc, ex. pizza, cafenea, KFC", color = TextMuted, fontSize = 15.sp, maxLines = 1)
+            BasicTextField(
+                value = query, onValueChange = onChange, singleLine = true,
+                textStyle = TextStyle(color = Color.White, fontSize = 15.sp),
+                cursorBrush = SolidColor(Gold),
+                keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search),
+                keyboardActions = KeyboardActions(onSearch = { focus.clearFocus() }),
+                modifier = Modifier.fillMaxWidth(),
+            )
+        }
+        if (query.isNotEmpty()) {
+            Icon(
+                Icons.Rounded.Close, "Șterge căutarea", tint = Lilac,
+                modifier = Modifier.size(22.dp).clip(CircleShape).clickable { onChange(""); focus.clearFocus() },
+            )
         }
     }
 }

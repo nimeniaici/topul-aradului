@@ -3,6 +3,9 @@ from sqlalchemy import delete, distinct, func, select
 from sqlalchemy.orm import Session, joinedload
 
 from sqlalchemy.exc import IntegrityError
+import uuid
+from fastapi import File, UploadFile
+from ..serializers import photo_url
 from .. import usernames
 from .. import config
 from ..db import get_db
@@ -28,6 +31,7 @@ def _profile(db: Session, user: User) -> ProfileOut:
         email=user.email,
         avatar_emoji=user.avatar_emoji,
         avatar_color=user.avatar_color,
+        avatar_url=photo_url(user.avatar_path),
         has_password=bool(user.password_hash),
         google_linked=bool(user.google_sub),
         xp=user.xp,
@@ -69,11 +73,45 @@ def update_me(body: UpdateMeIn, user: User = Depends(get_current_user), db: Sess
     return _profile(db, user)
 
 
+_AVATAR_MAX = 2 * 1024 * 1024
+_IMAGE_MAGIC = {bytes([0xFF, 0xD8, 0xFF]): ".jpg", bytes([0x89]) + b"PNG": ".png", b"RIFF": ".webp"}
+
+
+@router.post("/me/avatar", response_model=ProfileOut)
+async def upload_avatar(photo: UploadFile = File(...), user: User = Depends(get_current_user),
+                        db: Session = Depends(get_db)):
+    """Poza de profil (aplicația o micșorează înainte, la ~512 px). Înlocuiește poza veche."""
+    data = await photo.read(_AVATAR_MAX + 1)
+    if len(data) > _AVATAR_MAX:
+        raise HTTPException(413, "Poza e prea mare (max 2 MB).")
+    ext = next((e for magic, e in _IMAGE_MAGIC.items() if data.startswith(magic)), None)
+    if ext is None or (ext == ".webp" and data[8:12] != b"WEBP"):
+        raise HTTPException(400, "Fișierul trebuie să fie o poză JPG, PNG sau WebP.")
+    name = f"av_{uuid.uuid4().hex}{ext}"
+    config.UPLOAD_DIR.mkdir(parents=True, exist_ok=True)
+    (config.UPLOAD_DIR / name).write_bytes(data)
+    old, user.avatar_path = user.avatar_path, name
+    db.commit()
+    if old:
+        (config.UPLOAD_DIR / old).unlink(missing_ok=True)
+    return _profile(db, user)
+
+
+@router.delete("/me/avatar", response_model=ProfileOut)
+def delete_avatar(user: User = Depends(get_current_user), db: Session = Depends(get_db)):
+    old, user.avatar_path = user.avatar_path, None
+    db.commit()
+    if old:
+        (config.UPLOAD_DIR / old).unlink(missing_ok=True)
+    return _profile(db, user)
+
+
 @router.delete("/me", status_code=204)
 def delete_me(user: User = Depends(get_current_user), db: Session = Depends(get_db)):
     """Șterge definitiv contul și toate datele lui (check-in-uri, poze, voturi, insigne)."""
     uid = user.id
     photos = db.scalars(select(Checkin.photo_path).where(Checkin.user_id == uid, Checkin.photo_path.is_not(None))).all()
+    photos += [user.avatar_path] if user.avatar_path else []
     photos += db.scalars(select(Report.photo_path).where(Report.user_id == uid, Report.photo_path.is_not(None))).all()
     visited_ids = set(db.scalars(select(Checkin.place_id).where(Checkin.user_id == uid)))
     mayor_places = db.scalars(select(Place).where(Place.mayor_id == uid)).all()
