@@ -126,12 +126,12 @@ async function load() {
 function render() {
   tabs.innerHTML = TABS.map(([k, l]) => `<button class="${k === filter ? 'on' : ''}" onclick="filter='${k}';render()">${l}</button>`).join('');
   // urgențele nepreluate (furtună, inundație, canal deschis, semafor) apar primele
-  const rank = (r) => (r.urgent && r.status === 'nou') ? 0 : r.status === 'nou' ? 1 : r.status === 'in_lucru' ? 2 : 3;
+  const rank = (r) => (r.emergency && r.status !== 'rezolvat' && r.status !== 'respins') ? -1 : (r.urgent && r.status === 'nou') ? 0 : r.status === 'nou' ? 1 : r.status === 'in_lucru' ? 2 : 3;
   const shown = reports.filter(r => !filter || r.status === filter).sort((a, b) => rank(a) - rank(b));
   list.innerHTML = shown.length ? shown.map(r => `
     <div class="item ${r.id === selected ? 'sel' : ''}" onclick="select(${r.id})">
       <div class="thumb" style="${r.photo_url ? `background-image:url('${esc(r.photo_url)}')` : ''}">${r.photo_url ? '' : 'fără poză'}</div>
-      <div><h3>${r.urgent ? '<span class="pill s-nou">URGENT</span> ' : ''}${esc(r.category_label)}</h3>
+      <div><h3>${r.emergency ? '<span class="pill s-nou" style="background:#b00020;color:#fff">ALERTĂ MAJORĂ</span> ' : r.urgent ? '<span class="pill s-nou">URGENT</span> ' : ''}${esc(r.category_label)}</h3>
         <p>${esc(r.description || 'Fără descriere')}</p>
         <p><span class="pill s-${r.status}">${LABELS[r.status]}</span> · @${esc(r.user_name)} · ${when(r.created_at)}</p></div>
     </div>`).join('') : '<p style="padding:16px;color:var(--muted)">Nicio sesizare aici.</p>';

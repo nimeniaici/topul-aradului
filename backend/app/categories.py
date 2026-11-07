@@ -9,9 +9,13 @@ CATEGORIES: dict[str, str] = {
     "terasa": "Terase",
     "bar": "Baruri",
     "obiectiv": "Obiective",
+    "biserica": "Biserici și catedrale",
     "manastire": "Mănăstiri",
     "natura": "Natură",
     "mall": "Centre comerciale",
+    "supermarket": "Supermarketuri",
+    "benzinarie": "Benzinării",
+    "cazare": "Hoteluri și pensiuni",
     "eveniment": "Evenimente",
 }
 

@@ -208,3 +208,34 @@ def delete_user_social(db: Session, uid: int) -> None:
     """Folosit la ștergerea contului."""
     db.execute(delete(Friendship).where(or_(Friendship.requester_id == uid, Friendship.addressee_id == uid)))
     db.execute(delete(SharedLocation).where(SharedLocation.user_id == uid))
+
+
+@router.get("/users/{other_id}/public")
+def public_profile(other_id: int, me: User = Depends(get_current_user), db: Session = Depends(get_db)):
+    """Profilul public al unui arădean (din clasament): doar date de joc, fără email sau poziție."""
+    from ..models import Badge, Checkin
+    from ..serializers import badge_out
+    other = db.get(User, other_id)
+    if not other or is_blocked(db, me.id, other_id):
+        raise HTTPException(404, "Utilizatorul nu există.")
+    rank = (db.scalar(select(func.count()).select_from(User).where(
+        or_(User.xp > other.xp, and_(User.xp == other.xp, User.id < other.id)))) or 0) + 1
+    checkins = db.scalar(select(func.count()).select_from(Checkin).where(Checkin.user_id == other_id)) or 0
+    visited = db.scalar(select(func.count(func.distinct(Checkin.place_id))).where(Checkin.user_id == other_id)) or 0
+    badges = db.scalars(select(Badge).where(Badge.user_id == other_id).order_by(Badge.earned_at)).all()
+    places = db.scalars(select(Place).where(Place.mayor_id == other_id).order_by(Place.name)).all()
+    f = _pair(db, me.id, other_id)
+    if other_id == me.id:
+        status = "me"
+    elif not f:
+        status = "none"
+    elif f.status == "accepted":
+        status = "friends"
+    elif f.status == "pending":
+        status = "outgoing" if f.requester_id == me.id else "incoming"
+    else:
+        status = "blocked"
+    return {**_user_card(db, other), "rank": rank, "checkins": checkins, "places_visited": visited,
+            "badges": [badge_out(b).model_dump(mode="json") for b in badges],
+            "conquered": [{"id": p.id, "name": p.name, "category": p.category, "lat": p.lat, "lng": p.lng} for p in places],
+            "friendship": status, "member_since": other.created_at.isoformat() if getattr(other, "created_at", None) else None}

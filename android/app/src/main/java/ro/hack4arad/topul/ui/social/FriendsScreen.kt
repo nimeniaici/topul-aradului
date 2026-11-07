@@ -1,5 +1,6 @@
 package ro.hack4arad.topul.ui.social
 
+import ro.hack4arad.topul.ui.theme.OnInk
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -96,7 +97,7 @@ fun FriendsScreen(onBack: () -> Unit, onChat: (Int) -> Unit, onPlace: (Int) -> U
             IconButton(onClick = onBack) { Icon(Icons.AutoMirrored.Rounded.ArrowBack, tr("Înapoi", "Back", "Vissza"), tint = Ink) }
             Text(tr("Prieteni", "Friends", "Barátok"), color = Ink, fontSize = 24.sp, fontWeight = FontWeight.Black)
         }
-        toast?.let { Text(it, color = Color.White, modifier = Modifier.padding(horizontal = 16.dp).fillMaxWidth().clip(RoundedCornerShape(14.dp)).background(Ink).padding(12.dp)) }
+        toast?.let { Text(it, color = OnInk, modifier = Modifier.padding(horizontal = 16.dp).fillMaxWidth().clip(RoundedCornerShape(14.dp)).background(Ink).padding(12.dp)) }
 
         // poziția pe hartă: oprită implicit
         val d = data

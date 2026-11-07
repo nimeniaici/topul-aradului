@@ -1,5 +1,11 @@
 package ro.hack4arad.topul.ui.reports
 
+import androidx.compose.material.icons.rounded.Landslide
+import androidx.compose.material.icons.rounded.ElectricBolt
+import androidx.compose.material.icons.rounded.Domain
+import androidx.compose.material.icons.rounded.Apartment
+import androidx.compose.material.icons.rounded.LocalFireDepartment
+import androidx.compose.material.icons.rounded.Flood
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Block
 import androidx.compose.material.icons.rounded.Construction
@@ -34,7 +40,18 @@ val REPORT_KINDS = listOf(
     ReportKind("altele", "Altceva", Icons.Rounded.HelpOutline),
 )
 
-fun reportKind(code: String): ReportKind = REPORT_KINDS.firstOrNull { it.code == code } ?: REPORT_KINDS.last()
+/** Alertele majore (din „Alerte urgente”): pericol pentru vieți, prioritate maximă la Primărie. */
+val EMERGENCY_KINDS = listOf(
+    ReportKind("inundatie_majora", "Inundație majoră / Mureșul", Icons.Rounded.Flood, urgent = true),
+    ReportKind("gaze", "Scurgere de gaze", Icons.Rounded.Warning, urgent = true),
+    ReportKind("explozie", "Explozie / incendiu", Icons.Rounded.LocalFireDepartment, urgent = true),
+    ReportKind("cutremur", "Cutremur – clădire avariată", Icons.Rounded.Apartment, urgent = true),
+    ReportKind("prabusire", "Clădire / structură prăbușită", Icons.Rounded.Domain, urgent = true),
+    ReportKind("cablu", "Cablu electric căzut", Icons.Rounded.ElectricBolt, urgent = true),
+    ReportKind("alunecare", "Surpare de teren / drum", Icons.Rounded.Landslide, urgent = true),
+)
+
+fun reportKind(code: String): ReportKind = (REPORT_KINDS + EMERGENCY_KINDS).firstOrNull { it.code == code } ?: REPORT_KINDS.last()
 
 /** Culoarea statusului: roșu = nouă, portocaliu = în lucru, verde = rezolvată, gri = respinsă. */
 fun statusColor(status: String): Color = when (status) {

@@ -1,5 +1,6 @@
 package ro.hack4arad.topul.ui.transit
 
+import ro.hack4arad.topul.ui.theme.OnInk
 import android.content.Intent
 import android.graphics.Bitmap
 import android.net.Uri
@@ -113,6 +114,7 @@ fun TransitScreen(onBack: () -> Unit) {
     var showTicket by remember { mutableStateOf<Ticket?>(null) }
     var error by remember { mutableStateOf<String?>(null) }
     var vehicles by remember { mutableStateOf<List<ro.hack4arad.topul.data.Vehicle>>(emptyList()) }
+    var timetable by remember { mutableStateOf<ro.hack4arad.topul.data.Timetable?>(null) }
     var mode by remember { mutableStateOf<String?>(null) }   // null = toate, "tram", "bus"
     val shownLines = remember(lines, mode) { lines.filter { mode == null || it.mode == mode } }
     LaunchedEffect(Unit) {
@@ -134,6 +136,8 @@ fun TransitScreen(onBack: () -> Unit) {
     LaunchedEffect(selectedStop) {
         val id = selectedStop ?: return@LaunchedEffect
         // reîmprospătăm minutele cât stai pe ecran
+        timetable = null
+        runCatching { Network.api.timetable(id) }.onSuccess { timetable = it }
         while (true) {
             runCatching { Network.api.nextTrams(id) }.onSuccess { next = it }
             kotlinx.coroutines.delay(30_000)
@@ -151,7 +155,7 @@ fun TransitScreen(onBack: () -> Unit) {
             }
         }
         toast?.let {
-            Text(it, color = Color.White, modifier = Modifier.padding(horizontal = 16.dp).fillMaxWidth()
+            Text(it, color = OnInk, modifier = Modifier.padding(horizontal = 16.dp).fillMaxWidth()
                 .clip(RoundedCornerShape(14.dp)).background(Ink).padding(12.dp))
         }
         error?.let { Text(it, color = Pink, modifier = Modifier.padding(16.dp)) }
@@ -205,7 +209,7 @@ fun TransitScreen(onBack: () -> Unit) {
         Row(Modifier.padding(start = 16.dp, top = 10.dp), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
             listOf(null to tr("Toate", "All", "Mind"), "tram" to tr("Tramvai", "Tram", "Villamos"), "bus" to tr("Autobuz", "Bus", "Busz")).forEach { (code, label) ->
                 val on = mode == code
-                Text(label, color = if (on) Color.White else Ink, fontWeight = FontWeight.Bold, fontSize = 13.sp,
+                Text(label, color = if (on) OnInk else Ink, fontWeight = FontWeight.Bold, fontSize = 13.sp,
                     modifier = Modifier.clip(RoundedCornerShape(50)).background(if (on) Ink else Panel).border(1.dp, Track, RoundedCornerShape(50))
                         .clickable { mode = code; highlight = null }.padding(horizontal = 14.dp, vertical = 7.dp))
             }
@@ -220,7 +224,7 @@ fun TransitScreen(onBack: () -> Unit) {
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
                     Text(l.ref, color = if (on) Color.White else lineColor(l.color), fontWeight = FontWeight.Black)
-                    Text("  ${l.to}", color = if (on) Color.White else Ink, fontSize = 12.sp, maxLines = 1)
+                    Text("  ${l.to}", color = if (on) OnInk else Ink, fontSize = 12.sp, maxLines = 1)
                 }
             }
         }
@@ -231,7 +235,7 @@ fun TransitScreen(onBack: () -> Unit) {
             stops.forEach { s ->
                 val on = selectedStop == s.id
                 Text(
-                    s.name + (s.distanceM?.let { " · ${it} m" } ?: ""), color = if (on) Color.White else Ink, fontSize = 13.sp, fontWeight = FontWeight.Bold,
+                    s.name + (s.distanceM?.let { " · ${it} m" } ?: ""), color = if (on) OnInk else Ink, fontSize = 13.sp, fontWeight = FontWeight.Bold,
                     modifier = Modifier.clip(RoundedCornerShape(50)).background(if (on) Ink else Panel).border(1.dp, Track, RoundedCornerShape(50))
                         .clickable { selectedStop = s.id }.padding(horizontal = 12.dp, vertical = 8.dp),
                 )
@@ -275,6 +279,59 @@ fun TransitScreen(onBack: () -> Unit) {
                 Text(" " + tr("Orarul CTP, cu întârzierile în timp real unde scrie „live”. Date: CTP Arad / Telelink.",
                     "CTP timetable with real-time delays where marked live. Data: CTP Arad / Telelink.", "CTP menetrend, élő késésekkel."), color = TextMuted, fontSize = 11.sp)
             }
+        }
+
+        // ---- check-in în stație (pentru recompensa „transport gratuit”)
+        Row(Modifier.padding(horizontal = 16.dp, vertical = 10.dp).fillMaxWidth().clip(RoundedCornerShape(16.dp)).background(Gold)
+            .clickable {
+                val id = selectedStop ?: return@clickable
+                scope.launch {
+                    val fix = if (hasLocationPermission(context)) runCatching { currentFix(context) }.getOrNull() else null
+                    if (fix == null) { toast = tr("Pornește locația ca să dai check-in în stație.", "Turn on location to check in.", "Kapcsold be a helyet."); return@launch }
+                    runCatching { Network.api.stopCheckin(ro.hack4arad.topul.data.StopCheckinIn(id, fix.lat, fix.lng, fix.isMock)) }
+                        .onSuccess { toast = it.detail }.onFailure { toast = it.userMessage() }
+                }
+            }.padding(14.dp), verticalAlignment = Alignment.CenterVertically) {
+            Icon(Icons.Rounded.Tram, null, tint = ro.hack4arad.topul.ui.theme.GoldDark)
+            Column(Modifier.padding(start = 10.dp)) {
+                Text(tr("Sunt în stație · check-in", "I'm at the stop · check in", "A megállóban vagyok"), color = ro.hack4arad.topul.ui.theme.GoldDark, fontWeight = FontWeight.Black)
+                Text(tr("+3 XP · 50 de stații = o săptămână de transport gratuit (demo)", "+3 XP · 50 stops = a free week (demo)", "+3 XP"),
+                    color = ro.hack4arad.topul.ui.theme.GoldDark.copy(alpha = 0.8f), fontSize = 12.sp)
+            }
+        }
+
+        // ---- orarul complet al stației (azi)
+        Section(tr("Orarul stației", "Stop timetable", "Megálló menetrend") + (timetable?.let { " · " + it.stop.name + " · " + it.date } ?: ""))
+        Card {
+            val tt = timetable
+            when {
+                tt == null -> Text(tr("Se încarcă orarul…", "Loading timetable…", "Betöltés…"), color = TextMuted)
+                tt.lines.isEmpty() -> Text(if (tt.available) tr("Nicio plecare azi din stația asta.", "No more departures today.", "Ma nincs több indulás.")
+                    else tr("Orarul nu e disponibil acum.", "Timetable unavailable right now.", "Nem elérhető."), color = TextMuted)
+                else -> tt.lines.forEach { l ->
+                    Row(Modifier.padding(top = 8.dp), verticalAlignment = Alignment.CenterVertically) {
+                        Box(Modifier.size(30.dp).clip(RoundedCornerShape(8.dp)).background(lineColor(l.color)), contentAlignment = Alignment.Center) {
+                            Text(l.line, color = Color.White, fontWeight = FontWeight.Black, fontSize = 12.sp, maxLines = 1)
+                        }
+                        Text("  " + tr("spre ", "to ", "") + l.towards, color = Ink, fontWeight = FontWeight.Bold, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                    }
+                    // toate orele rămase azi, ca într-un orar de stație
+                    Row(Modifier.horizontalScroll(rememberScrollState()).padding(top = 6.dp, bottom = 4.dp), horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+                        l.times.forEach { t ->
+                            val late = t.delayMin > 1
+                            Column(Modifier.clip(RoundedCornerShape(10.dp)).background(Track).padding(horizontal = 8.dp, vertical = 5.dp),
+                                horizontalAlignment = Alignment.CenterHorizontally) {
+                                Text(t.time, color = Ink, fontWeight = FontWeight.Black, fontSize = 14.sp)
+                                if (t.tomorrow) Text(tr("mâine", "tomorrow", "holnap"), color = TextMuted, fontSize = 10.sp, fontWeight = FontWeight.Bold)
+                                else if (late) Text("→ " + t.expected, color = Pink, fontSize = 10.sp, fontWeight = FontWeight.Bold)
+                                else if (t.live) Text("● live", color = Color(0xFF2E7D32), fontSize = 10.sp, fontWeight = FontWeight.Bold)
+                            }
+                        }
+                    }
+                }
+            }
+            Text(tr("Ora din orarul CTP; cu roșu, ora estimată când vehiculul întârzie.", "CTP timetable; red = expected time when late.", "CTP menetrend."),
+                color = TextMuted, fontSize = 11.sp, modifier = Modifier.padding(top = 6.dp))
         }
 
         // ---- semnalări live

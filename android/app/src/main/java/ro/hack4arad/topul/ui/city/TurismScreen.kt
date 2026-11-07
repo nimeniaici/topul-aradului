@@ -1,5 +1,6 @@
 package ro.hack4arad.topul.ui.city
 
+import ro.hack4arad.topul.ui.theme.OnInk
 import android.content.Intent
 import android.net.Uri
 import androidx.compose.foundation.background
@@ -195,7 +196,7 @@ fun TurismScreen(onBack: () -> Unit) {
 
 @Composable
 private fun Chip(label: String, on: Boolean, small: Boolean = false, onClick: () -> Unit) {
-    Text(label, color = if (on) Color.White else Ink, fontWeight = FontWeight.Bold, fontSize = if (small) 12.sp else 14.sp, maxLines = 1,
+    Text(label, color = if (on) OnInk else Ink, fontWeight = FontWeight.Bold, fontSize = if (small) 12.sp else 14.sp, maxLines = 1,
         modifier = Modifier.clip(RoundedCornerShape(50)).background(if (on) Ink else Panel).border(1.dp, Track, RoundedCornerShape(50))
             .clickable(onClick = onClick).padding(horizontal = if (small) 10.dp else 14.dp, vertical = if (small) 6.dp else 8.dp))
 }

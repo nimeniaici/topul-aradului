@@ -1,5 +1,7 @@
 package ro.hack4arad.topul.ui.map
 
+import androidx.compose.material.icons.rounded.Call
+import ro.hack4arad.topul.ui.theme.OnInk
 import androidx.compose.material.icons.rounded.Landscape
 import androidx.compose.material.icons.rounded.Group
 import androidx.compose.material.icons.rounded.Tram
@@ -390,6 +392,7 @@ fun MapScreen(onPlace: (Int) -> Unit, onOpenReports: () -> Unit = {}, vm: MapVie
     }
     LaunchedEffect(showTurism) { if (showTurism) vm.loadTurism() }
     var reporting by remember { mutableStateOf(false) }
+    var emergencyForm by remember { mutableStateOf(false) }
     var query by rememberSaveable { mutableStateOf("") }
     val shown = remember(vm.places, query) { searchPlaces(vm.places, query) }
     val camera = rememberCameraPositionState { position = CameraPosition.fromLatLngZoom(ARAD, 13.6f) }
@@ -412,7 +415,7 @@ fun MapScreen(onPlace: (Int) -> Unit, onOpenReports: () -> Unit = {}, vm: MapVie
         HomeActions.takeMap()?.let { req ->
             if (req.list) listMode = true
             req.category?.let { if (vm.selectedCategory != it) vm.selectCategory(it) }
-            if (req.report) reporting = true
+            if (req.report) { emergencyForm = req.emergency; reporting = true }
         }
     }
     var menuOpen by remember { mutableStateOf(false) }
@@ -529,7 +532,7 @@ fun MapScreen(onPlace: (Int) -> Unit, onOpenReports: () -> Unit = {}, vm: MapVie
                     else vm.myLocation?.let { scope.launch { camera.animate(CameraUpdateFactory.newLatLngZoom(it, 16f), 350) } }
                 },
                 onCategory = { vm.selectCategory(it) },
-                onReport = { menuOpen = false; reporting = true },
+                onReport = { menuOpen = false; emergencyForm = false; reporting = true },
                 onMyReports = { menuOpen = false; onOpenReports() },
             )
         }
@@ -541,7 +544,7 @@ fun MapScreen(onPlace: (Int) -> Unit, onOpenReports: () -> Unit = {}, vm: MapVie
             sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true),
             containerColor = Night,
         ) {
-            ReportForm(busy = vm.busy) { category, description, photo ->
+            ReportForm(busy = vm.busy, emergency = emergencyForm) { category, description, photo ->
                 scope.launch {
                     val fix = if (hasLocationPermission(context)) currentFix(context) else null
                     if (fix == null && !hasLocationPermission(context)) permissionLauncher.launch(LOCATION_PERMISSIONS)
@@ -752,7 +755,7 @@ private fun CarouselCard(place: Place, busy: Boolean, onOpen: () -> Unit, onChec
                     contentPadding = PaddingValues(horizontal = 10.dp),
                 ) {
                     if (busy) CircularProgressIndicator(Modifier.size(18.dp), strokeWidth = 2.dp, color = GoldDark)
-                    else Text(if (place.mayorId == null) "Cucerește tronul" else "Fă check-in", fontSize = 14.sp)
+                    else Text(if (place.mayorId == null) "Cucerește tronul" else "Fă check-in", fontSize = 13.sp, maxLines = 1, softWrap = false, overflow = TextOverflow.Ellipsis)
                 }
                 OutlinedButton(onClick = onOpen, modifier = Modifier.height(42.dp), contentPadding = PaddingValues(horizontal = 12.dp)) {
                     Text("Detalii", color = Ink, fontSize = 14.sp)
@@ -792,6 +795,8 @@ private fun PlacesMap(
     val darkStyle = remember { MapStyleOptions.loadRawResourceStyle(context, R.raw.map_style_night) }
     val items = remember(places) { places.map(::PlaceItem) }
     var renderer by remember { mutableStateOf<PhotoClusterRenderer?>(null) }
+    // listenerul clusterelor e setat o singură dată -> citim mereu ultima versiune a callback-ului (altfel vede lista goală de la pornire)
+    val currentOnPlaceTap by androidx.compose.runtime.rememberUpdatedState(onPlaceTap)
 
     GoogleMap(
         modifier = Modifier.fillMaxSize(),
@@ -801,7 +806,7 @@ private fun PlacesMap(
         properties = MapProperties(
             isMyLocationEnabled = hasPermission,
             mapType = if (look == MapLook.SATELLITE) MapType.HYBRID else MapType.NORMAL,
-            mapStyleOptions = if (look == MapLook.DARK) darkStyle else null,
+            mapStyleOptions = if (look == MapLook.DARK || (ro.hack4arad.topul.ui.theme.ThemeState.dark && look == MapLook.LIGHT)) darkStyle else null,
         ),
         uiSettings = MapUiSettings(zoomControlsEnabled = false, myLocationButtonEnabled = false, mapToolbarEnabled = false, compassEnabled = false),
     ) {
@@ -818,7 +823,7 @@ private fun PlacesMap(
                 scope.launch { camera.animate(CameraUpdateFactory.newLatLngZoom(cluster.position, camera.position.zoom + 2f), 300) }
                 true
             }
-            manager.setOnClusterItemClickListener { item -> onPlaceTap(item.place); true }
+            manager.setOnClusterItemClickListener { item -> currentOnPlaceTap(item.place); true }
         }
         if (clusterManager != null) Clustering(items = items, clusterManager = clusterManager)
 
@@ -931,10 +936,11 @@ private fun PlacesFeed(places: List<Place>, onPlace: (Int) -> Unit, topPadding: 
 
 /** Formularul de sesizare: categorie, descriere, poză. Poziția = unde ești acum (lângă problemă). */
 @Composable
-private fun ReportForm(busy: Boolean, onSend: (String, String, ByteArray?) -> Unit) {
+private fun ReportForm(busy: Boolean, emergency: Boolean = false, onSend: (String, String, ByteArray?) -> Unit) {
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
-    var category by remember { mutableStateOf("groapa") }
+    val kinds = if (emergency) ro.hack4arad.topul.ui.reports.EMERGENCY_KINDS else REPORT_KINDS
+    var category by remember { mutableStateOf(kinds.first().code) }
     var description by remember { mutableStateOf("") }
     var photoUri by remember { mutableStateOf<Uri?>(null) }
     var photoTaken by remember { mutableStateOf(false) }
@@ -944,12 +950,27 @@ private fun ReportForm(busy: Boolean, onSend: (String, String, ByteArray?) -> Un
         Row(verticalAlignment = Alignment.CenterVertically) {
             Icon(Icons.Rounded.ReportProblem, null, tint = Pink, modifier = Modifier.size(26.dp))
             Spacer(Modifier.width(10.dp))
-            Text("Semnalează o problemă", color = Ink, fontSize = 22.sp, fontWeight = FontWeight.Black)
+            Text(if (emergency) "Alertă urgentă" else "Semnalează o problemă", color = Ink, fontSize = 22.sp, fontWeight = FontWeight.Black)
         }
-        Text("Ajunge direct la Primăria Aradului, cu poza și locul exact. +10 XP, iar +20 XP când e rezolvată.", color = TextMuted, fontSize = 13.sp)
+        if (emergency) {
+            // întâi 112: aplicația nu înlocuiește serviciul de urgență
+            Row(
+                Modifier.padding(top = 8.dp).fillMaxWidth().clip(RoundedCornerShape(14.dp)).background(Color(0xFFB00020))
+                    .clickable { context.startActivity(android.content.Intent(android.content.Intent.ACTION_DIAL, android.net.Uri.parse("tel:112"))) }
+                    .padding(12.dp),
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                Icon(Icons.Rounded.Call, null, tint = Color.White)
+                Text("  Pericol pentru oameni? Sună acum la 112", color = Color.White, fontWeight = FontWeight.Black)
+            }
+            Text("Doar pentru situații extrem de grave. Alerta ajunge prima în lista Primăriei, cu prioritate maximă, și e anunțată live în oraș.",
+                color = TextMuted, fontSize = 13.sp, modifier = Modifier.padding(top = 8.dp))
+        } else {
+            Text("Ajunge direct la Primăria Aradului, cu poza și locul exact. +10 XP, iar +20 XP când e rezolvată.", color = TextMuted, fontSize = 13.sp)
+        }
         Spacer(Modifier.height(14.dp))
         // grilă cu toate tipurile de alerte (cele urgente au un semn roșu)
-        REPORT_KINDS.chunked(3).forEach { row ->
+        kinds.chunked(3).forEach { row ->
             Row(Modifier.fillMaxWidth().padding(bottom = 8.dp), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 row.forEach { k ->
                     val on = category == k.code
@@ -960,13 +981,13 @@ private fun ReportForm(busy: Boolean, onSend: (String, String, ByteArray?) -> Un
                     ) {
                         Icon(k.icon, null, tint = if (on) Color.White else if (k.urgent) Pink else Lilac, modifier = Modifier.size(26.dp))
                         Spacer(Modifier.height(4.dp))
-                        Text(k.label, color = if (on) Color.White else Ink, fontSize = 11.sp, fontWeight = FontWeight.Bold,
+                        Text(k.label, color = if (on) OnInk else Ink, fontSize = 11.sp, fontWeight = FontWeight.Bold,
                             textAlign = TextAlign.Center, maxLines = 2, lineHeight = 13.sp)
                     }
                 }
             }
         }
-        if (reportKind(category).urgent) {
+        if (!emergency && reportKind(category).urgent) {
             Text(
                 "Dacă cineva e în pericol chiar acum, sună la 112. Sesizarea ajunge la Primărie, nu la salvare.",
                 color = Gold, fontSize = 12.sp,
@@ -1003,7 +1024,7 @@ private fun ReportForm(busy: Boolean, onSend: (String, String, ByteArray?) -> Un
             else {
                 Icon(Icons.Rounded.Flag, null)
                 Spacer(Modifier.width(8.dp))
-                Text("Trimite sesizarea", fontSize = 16.sp)
+                Text(if (emergency) "Trimite alerta" else "Trimite sesizarea", fontSize = 16.sp)
             }
         }
     }

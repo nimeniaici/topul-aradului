@@ -11,7 +11,7 @@ from .. import usernames
 from .. import config
 from ..db import get_db
 from ..gamification import BADGES, MISSIONS, XP_PER_LEVEL, badge_progress, level, update_mayor
-from ..models import Badge, ChatMember, ChatMessage, ChatRoom, Checkin, Feedback, Place, Report, ResetCode, TransitReport, TransitTicket, User, Vote
+from ..models import Badge, ChatMember, ChatMessage, ChatRoom, Checkin, Feedback, Place, Report, ResetCode, RewardVoucher, TransitCheckin, TransitReport, TransitTicket, User, Vote
 from ..schemas import AVATAR_COLORS, AVATAR_EMOJIS, MissionOut, ProfileOut, UpdateMeIn
 from .friends import delete_user_social
 from ..security import get_current_user, hash_password, verify_password
@@ -155,6 +155,8 @@ def delete_me(user: User = Depends(get_current_user), db: Session = Depends(get_
     db.execute(delete(Feedback).where(Feedback.user_id == uid))
     db.execute(delete(TransitReport).where(TransitReport.user_id == uid))
     db.execute(delete(TransitTicket).where(TransitTicket.user_id == uid))
+    db.execute(delete(TransitCheckin).where(TransitCheckin.user_id == uid))
+    db.execute(delete(RewardVoucher).where(RewardVoucher.user_id == uid))
     db.execute(delete(ChatMessage).where(ChatMessage.user_id == uid))
     db.execute(delete(ChatMember).where(ChatMember.user_id == uid))
     db.execute(update(ChatRoom).where(ChatRoom.owner_id == uid).values(owner_id=None))

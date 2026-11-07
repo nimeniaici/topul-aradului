@@ -234,3 +234,28 @@ class ChatMessage(Base):
     created_at: Mapped[datetime] = mapped_column(DateTime, default=utcnow, index=True)
 
     user: Mapped[User] = relationship()
+
+
+# ---------------- recompense ----------------
+class TransitCheckin(Base):
+    """Check-in într-o stație CTP (pentru recompensele de transport)."""
+    __tablename__ = "transit_checkins"
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    user_id: Mapped[int] = mapped_column(ForeignKey("users.id"), index=True)
+    stop_id: Mapped[str] = mapped_column(String(20))
+    stop_name: Mapped[str] = mapped_column(String(80))
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=utcnow, index=True)
+
+
+class RewardVoucher(Base):
+    """Voucher DEMONSTRATIV deblocat dintr-o recompensă (transport gratuit, reducere la un local)."""
+    __tablename__ = "reward_vouchers"
+    __table_args__ = (UniqueConstraint("user_id", "reward", "place_id"),)
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    user_id: Mapped[int] = mapped_column(ForeignKey("users.id"), index=True)
+    reward: Mapped[str] = mapped_column(String(30))
+    place_id: Mapped[int | None] = mapped_column(ForeignKey("places.id"), nullable=True)
+    code: Mapped[str] = mapped_column(String(20))
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=utcnow)

@@ -278,6 +278,9 @@ fun ProfileScreen(onPlace: (Int) -> Unit, vm: ProfileViewModel = viewModel()) {
                 }
             }
 
+            // ---- recompense (transport gratuit, reduceri la localuri) – demo
+            RewardsSection()
+
             // ---- misiuni
             if (p.missions.isNotEmpty()) {
                 SectionTitle("Misiuni")

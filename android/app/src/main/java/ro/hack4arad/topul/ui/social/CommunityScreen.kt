@@ -1,5 +1,6 @@
 package ro.hack4arad.topul.ui.social
 
+import ro.hack4arad.topul.ui.theme.OnInk
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -100,7 +101,7 @@ fun CommunityScreen(onBack: () -> Unit, onRoom: (Int, String) -> Unit) {
             IconButton(onClick = onBack) { Icon(Icons.AutoMirrored.Rounded.ArrowBack, tr("Înapoi", "Back", "Vissza"), tint = Ink) }
             Text(tr("Comunitate", "Community", "Közösség"), color = Ink, fontSize = 24.sp, fontWeight = FontWeight.Black)
         }
-        toast?.let { Text(it, color = Color.White, modifier = Modifier.padding(horizontal = 16.dp).fillMaxWidth().clip(RoundedCornerShape(14.dp)).background(Ink).padding(12.dp)) }
+        toast?.let { Text(it, color = OnInk, modifier = Modifier.padding(horizontal = 16.dp).fillMaxWidth().clip(RoundedCornerShape(14.dp)).background(Ink).padding(12.dp)) }
 
         // evenimentele care urmează (din comunitatea generală)
         if (events.isNotEmpty()) {
@@ -166,7 +167,7 @@ fun CommunityScreen(onBack: () -> Unit, onRoom: (Int, String) -> Unit) {
                             Row(Modifier.padding(bottom = 6.dp), horizontalArrangement = Arrangement.spacedBy(6.dp)) {
                                 row.forEach { t ->
                                     val on = t.code == tag
-                                    Text(t.label, color = if (on) Color.White else Ink, fontSize = 12.sp, fontWeight = FontWeight.Bold,
+                                    Text(t.label, color = if (on) OnInk else Ink, fontSize = 12.sp, fontWeight = FontWeight.Bold,
                                         modifier = Modifier.clip(RoundedCornerShape(50)).background(if (on) Ink else Track).clickable { tag = t.code }
                                             .padding(horizontal = 10.dp, vertical = 6.dp))
                                 }

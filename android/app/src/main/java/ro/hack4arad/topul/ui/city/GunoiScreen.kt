@@ -1,5 +1,6 @@
 package ro.hack4arad.topul.ui.city
 
+import ro.hack4arad.topul.ui.theme.OnInk
 import android.content.Context
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -119,8 +120,8 @@ fun GunoiScreen(onBack: () -> Unit) {
         }
         if (s != null) {
             Column(Modifier.padding(16.dp).fillMaxWidth().clip(RoundedCornerShape(20.dp)).background(Ink).padding(16.dp)) {
-                Text(s.place.street, color = Color.White, fontWeight = FontWeight.Black, fontSize = 20.sp)
-                Text(tr("Cartier ", "District ", "Negyed ") + s.place.cartier, color = Color.White.copy(alpha = 0.75f), fontSize = 13.sp)
+                Text(s.place.street, color = OnInk, fontWeight = FontWeight.Black, fontSize = 20.sp)
+                Text(tr("Cartier ", "District ", "Negyed ") + s.place.cartier, color = OnInk.copy(alpha = 0.75f), fontSize = 13.sp)
                 s.fractions.firstOrNull()?.let { f ->
                     Spacer(Modifier.size(10.dp))
                     Text(tr("Următoarea ridicare: ", "Next pickup: ", "Következő: ") + f.label.lowercase() + ", " + f.nextLabel,

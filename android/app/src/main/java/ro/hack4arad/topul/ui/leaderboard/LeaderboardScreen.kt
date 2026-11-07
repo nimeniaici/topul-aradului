@@ -162,7 +162,7 @@ private class RankMemory(context: Context, scope: String) {
 }
 
 @Composable
-fun LeaderboardScreen(onPlace: (Int) -> Unit, vm: LeaderboardViewModel = viewModel()) {
+fun LeaderboardScreen(onPlace: (Int) -> Unit, onUser: (Int) -> Unit = {}, vm: LeaderboardViewModel = viewModel()) {
     var tab by rememberSaveable { mutableIntStateOf(0) }
     val context = LocalContext.current
     Column(Modifier.fillMaxSize()) {
@@ -213,10 +213,10 @@ fun LeaderboardScreen(onPlace: (Int) -> Unit, vm: LeaderboardViewModel = viewMod
             val listState = rememberLazyListState()
             LoadMoreWhenNearEnd(listState, vm::loadMoreUsers)
             LazyColumn(state = listState, contentPadding = PaddingValues(start = 12.dp, end = 12.dp, top = 12.dp, bottom = 16.dp)) {
-                vm.users.firstOrNull()?.let { champ -> item(key = "champ") { ChampionUser(champ, champ.id == me) } }
+                vm.users.firstOrNull()?.let { champ -> item(key = "champ") { ChampionUser(champ, champ.id == me) { onUser(champ.id) } } }
                 itemsIndexed(vm.users.drop(1), key = { _, u -> u.id }) { _, u ->
                     RankRow(
-                        rank = u.rank, trend = memory.trend(u.id, u.rank), onClick = {},
+                        rank = u.rank, trend = memory.trend(u.id, u.rank), onClick = { onUser(u.id) },
                         title = u.name + if (u.id == me) " (tu)" else "", subtitle = "Nivel ${u.level}",
                         score = "${u.xp} XP", highlight = u.id == me,
                     ) { Avatar(u.name, 48.dp, ring = if (u.id == me) Gold else Panel, emoji = u.avatarEmoji, colorKey = u.avatarColor, photoUrl = u.avatarUrl) }
@@ -260,11 +260,11 @@ private fun ChampionPlace(p: Place, mixed: Boolean, onClick: () -> Unit) {
 }
 
 @Composable
-private fun ChampionUser(u: UserRank, isMe: Boolean) {
+private fun ChampionUser(u: UserRank, isMe: Boolean, onClick: () -> Unit = {}) {
     Row(
         Modifier.fillMaxWidth().padding(bottom = 10.dp).clip(RoundedCornerShape(24.dp))
             .background(Brush.linearGradient(listOf(Violet, NightDeep))).border(2.dp, Gold, RoundedCornerShape(24.dp))
-            .padding(16.dp),
+            .clickable(onClick = onClick).padding(16.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Avatar(u.name, 72.dp, emoji = u.avatarEmoji, colorKey = u.avatarColor, photoUrl = u.avatarUrl)

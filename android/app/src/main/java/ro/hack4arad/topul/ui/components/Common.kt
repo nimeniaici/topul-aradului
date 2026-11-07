@@ -46,6 +46,9 @@ import androidx.compose.material.icons.rounded.AccountBalance
 import androidx.compose.material.icons.rounded.Cake
 import androidx.compose.material.icons.rounded.Celebration
 import androidx.compose.material.icons.rounded.Church
+import androidx.compose.material.icons.rounded.Hotel
+import androidx.compose.material.icons.rounded.LocalGasStation
+import androidx.compose.material.icons.rounded.ShoppingCart
 import androidx.compose.material.icons.rounded.CloudOff
 import androidx.compose.material.icons.rounded.Deck
 import androidx.compose.material.icons.rounded.Icecream
@@ -88,6 +91,10 @@ fun categoryIcon(code: String): ImageVector = when (code) {
     "bar" -> Icons.Rounded.SportsBar
     "obiectiv" -> Icons.Rounded.AccountBalance
     "manastire" -> Icons.Rounded.Church
+    "biserica" -> Icons.Rounded.Church
+    "supermarket" -> Icons.Rounded.ShoppingCart
+    "benzinarie" -> Icons.Rounded.LocalGasStation
+    "cazare" -> Icons.Rounded.Hotel
     "natura" -> Icons.Rounded.Park
     "mall" -> Icons.Rounded.LocalMall
     "eveniment" -> Icons.Rounded.Celebration
@@ -97,7 +104,9 @@ fun categoryIcon(code: String): ImageVector = when (code) {
 /** Culoarea neon a fiecărei categorii (markere, carduri, chenare). */
 fun categoryColor(code: String): Color = when (code) {
     // toate categoriile folosesc nuanțe din aceeași familie (paleta aleasă), ca să fie armonios
-    "fastfood", "bar", "manastire" -> Violet
+    "fastfood", "bar", "manastire", "biserica" -> Violet
+    "supermarket", "benzinarie" -> Mint
+    "cazare" -> Electric
     "restaurant", "terasa", "mall" -> Electric
     "cafenea", "cofetarie", "gelaterie" -> Leaf
     "obiectiv", "natura", "eveniment" -> NightDeep
@@ -295,7 +304,7 @@ fun SectionTitle(text: String, modifier: Modifier = Modifier) {
 @Composable
 fun AppLogo(size: Dp, modifier: Modifier = Modifier) {
     androidx.compose.foundation.Image(
-        painter = androidx.compose.ui.res.painterResource(ro.hack4arad.topul.ui.theme.ThemeState.palette.logo),
+        painter = androidx.compose.ui.res.painterResource(ro.hack4arad.topul.ui.theme.ThemeState.active.logo),
         contentDescription = "CityConnect Arad",
         modifier = modifier.size(size).clip(RoundedCornerShape(size * 0.24f)),
     )

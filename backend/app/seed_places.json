@@ -559,8 +559,8 @@
   },
   {
     "name": "Catedrala „Sfânta Treime”",
-    "category": "obiectiv",
-    "description": "Catedrala ortodoxă din Piața Caius Iacob.",
+    "category": "biserica",
+    "description": "Catedrala Arhiepiscopală „Sfânta Treime”, cea mai mare biserică ortodoxă din Arad, în Piața Caius Iacob.",
     "address": "Piața Academician Caius Iacob 1, Arad",
     "lat": 46.183562,
     "lng": 21.32471,
@@ -852,6 +852,1914 @@
     "address": "Bulevardul Nicolae Titulescu 3, Arad",
     "lat": 46.169877,
     "lng": 21.346029,
+    "verified": true
+  },
+  {
+    "name": "Biserica Lutherană",
+    "category": "biserica",
+    "description": "Monument istoric, de cult protestant; biserica a fost ridicată în anul 1906 în stil neogotic, după planurile arhitectului Szántay Lájos; în Arad este cunoscută sub…",
+    "address": "Bulevardul Revoluției 61, Arad",
+    "lat": 46.177426,
+    "lng": 21.319939,
+    "verified": true
+  },
+  {
+    "name": "Biserica Sârbească „Sfântul Petru și Pavel”",
+    "category": "biserica",
+    "description": "Ctitorul acestui lăcaş de cult ortodox, a fost căpitanul Jovan Popović Tekelija pentru familiile grănicerilor sârbi stabiliţi aici; biserica a fost refăcută în 1790 în…",
+    "address": "Piața Sârbească, nr. 1, Arad",
+    "lat": 46.166813,
+    "lng": 21.311753,
+    "verified": true
+  },
+  {
+    "name": "Catedrală „Sfântul Ioan Botezătorul”",
+    "category": "biserica",
+    "description": "Catedrala „Nașterea Sf. Ioan Botezătorul” este un monument de arhitectură barocă din municipiul Arad care a fost construit între anii 1862-1865 sub conducerea…",
+    "address": "Arad",
+    "lat": 46.170454,
+    "lng": 21.311775,
+    "verified": true
+  },
+  {
+    "name": "Mănăstirea Bodrogu Nou",
+    "category": "manastire",
+    "description": "Ansamblul mănăstiresc cuprinde: biserica cu hramul “Intrarea în Biserică a Maicii Domnului” – ridicată la începutul sec.",
+    "address": "Zădăreni, jud. Arad",
+    "lat": 46.134463,
+    "lng": 21.197353,
+    "verified": true
+  },
+  {
+    "name": "Situl Mănăstirii Bizere",
+    "category": "manastire",
+    "description": "Situl arheologic Frumuşeni Mănăstirea Bizere, se află în lunca Mureşului, pe malul stâng al Mureşului, în locul numit “Fântâna turcului”; în anul 1183 a fost atestată…",
+    "address": "Frumușeni, jud. Arad",
+    "lat": 46.10234,
+    "lng": 21.47309,
+    "verified": true
+  },
+  {
+    "name": "Hotel Phoenix",
+    "category": "cazare",
+    "description": "Hotelul Phoenix este situat pe principala arteră care face legătura cu centrul orașului, în imediata apropiere a zonei industriale vest Arad , la 3 km de autostrada și…",
+    "address": "Calea Aurel Vlaicu nr. 267, Arad",
+    "lat": 46.200982,
+    "lng": 21.283043,
+    "verified": true
+  },
+  {
+    "name": "Hotel Continental",
+    "category": "cazare",
+    "description": "Hotelul este situat în centrul orașului, pe bulevardul principal, în imediata apropiere a centrului comercial și cultural al Aradului.",
+    "address": "Bulevardul Revoluției, nr. 79, Arad",
+    "lat": 46.174039,
+    "lng": 21.318298,
+    "verified": true
+  },
+  {
+    "name": "Hotel Parc (Moneasa)",
+    "category": "cazare",
+    "description": "Hotelul Parc este amplasat în centrul stațiunii Moneasa, într-o oaza de verdeață străbătută de apele pârâului Băilor, o mândrie a stațiunii din punct de vedere al…",
+    "address": "Moneasa",
+    "lat": 46.459464,
+    "lng": 22.251698,
+    "verified": true
+  },
+  {
+    "name": "Motel Maria Magdalena (Lipova)",
+    "category": "cazare",
+    "description": "Motelul Ana Maria Magdalena a fost construit in anul 2008 si este situat pe DN7, km 513 in localitatea Radna, Lipova, Jud. Arad.",
+    "address": "Str. Morilor, Nr.257, Lipova",
+    "lat": 46.094067,
+    "lng": 21.686299,
+    "verified": true
+  },
+  {
+    "name": "Hotel Leon & Spa",
+    "category": "cazare",
+    "description": "Hotel Leon & Spa este cel mai nou hotel din Arad. Deschis în anul 2014, el se află la doar câteva minute de centrul orașului.",
+    "address": "B-dul Nicolae Titulescu Nr. 5, Arad",
+    "lat": 46.169146,
+    "lng": 21.345978,
+    "verified": true
+  },
+  {
+    "name": "Hotel Best Western Central",
+    "category": "cazare",
+    "description": "Hoteluri în Arad.",
+    "address": "Strada Horia, Nr. 8, Arad",
+    "lat": 46.177059,
+    "lng": 21.317225,
+    "verified": true
+  },
+  {
+    "name": "Pensiunea Konak (Ghioroc)",
+    "category": "cazare",
+    "description": "Pensiuni în Ghioroc.",
+    "address": "Ghioroc",
+    "lat": 46.15359,
+    "lng": 21.585835,
+    "verified": true
+  },
+  {
+    "name": "Hotel XE-MAR",
+    "category": "cazare",
+    "description": "Hotel-Restaurant XE-MAR si-a deschis portile pentru clientii sai incepand cu data de 1 octombrie 2006, intr-o cladire noua.",
+    "address": "Piața Eroilor, nr. 1, Arad",
+    "lat": 46.158349,
+    "lng": 21.321935,
+    "verified": true
+  },
+  {
+    "name": "Hotel Stejarii (Ineu)",
+    "category": "cazare",
+    "description": "Hotel Stejarii dispune de 35 de locuri în 16 camere și 120 de locuri în restaurant. De asemenea acesta dispune de o piscină, tv și internet.",
+    "address": "Strada Lacului, nr. 3, Ineu",
+    "lat": 46.411155,
+    "lng": 21.822812,
+    "verified": true
+  },
+  {
+    "name": "Hotel Central (Ineu)",
+    "category": "cazare",
+    "description": "Hotelul Central Ineu localizat in centrul orasului, la 2 minute de Primarie, la 1 minut de orice banca din oras, va ofera locul ideal pentru a innopta in orasul nostru!",
+    "address": "Strada Republicii, nr. 21-23, Ineu",
+    "lat": 46.426273,
+    "lng": 21.838089,
+    "verified": true
+  },
+  {
+    "name": "Hanul „Moara cu Noroc” (Ineu)",
+    "category": "cazare",
+    "description": "Hotelul se află la 1 km înainte de intrarea în orașul Ineu. Toate camerele de la Moara cu Noroc au balcon, televizor LCD cu canale prin satelit şi frigider.",
+    "address": "soseaua Arad-Ineu, DJ792 KM 35, Ineu, Ineu",
+    "lat": 46.403165,
+    "lng": 21.819078,
+    "verified": true
+  },
+  {
+    "name": "La Amadeus&Monica (Miniș)",
+    "category": "cazare",
+    "description": "Pensiuni în Miniș.",
+    "address": "Sat Miniș, nr. 37, Miniș, Miniș",
+    "lat": 46.129389,
+    "lng": 21.601571,
+    "verified": true
+  },
+  {
+    "name": "Pensiunea Turistică „La Foresteria” (Galșa)",
+    "category": "cazare",
+    "description": "Pensiuni în Galșa.",
+    "address": "Strada Carierei, nr. 831, Galșa",
+    "lat": 46.283028,
+    "lng": 21.664628,
+    "verified": true
+  },
+  {
+    "name": "Pensiunea Turistică „Mara” (Lipova)",
+    "category": "cazare",
+    "description": "Pensiuni în Lipova.",
+    "address": "Lipova",
+    "lat": 46.105256,
+    "lng": 21.652321,
+    "verified": true
+  },
+  {
+    "name": "Pensiunea Komodo (Pecica)",
+    "category": "cazare",
+    "description": "Pensiuni în Pecica.",
+    "address": "Strada 1, nr. 134, Pecica",
+    "lat": 46.1712,
+    "lng": 21.061938,
+    "verified": true
+  },
+  {
+    "name": "Pensiunea Onyx (Sebiș)",
+    "category": "cazare",
+    "description": "Sală Evenimente, capacitate de 350 locuri, meniuri alese în funcţie de cerinţele fiecăruia. Ideal pentru Evenimente Speciale: Nunţi, botezuri, zile de naștere!!",
+    "address": "str Republicii, nr 81, Sebiș",
+    "lat": 46.380506,
+    "lng": 22.135801,
+    "verified": true
+  },
+  {
+    "name": "Han Bârsa",
+    "category": "cazare",
+    "description": "A fost construit în anul 1863 pe Canalul Morilor, fiind cea mai veche moara de apă din această zonă!",
+    "address": "Bârsa, nr. 79A, Bârsa",
+    "lat": 46.37605,
+    "lng": 22.079028,
+    "verified": true
+  },
+  {
+    "name": "Taverna Pecicană",
+    "category": "cazare",
+    "description": "Taverna Pecicană este un brand în arta culinară românească și a ospitalității, etalând o bucătărie tradițională de hotar cu influențe maghiare în condimentare și…",
+    "address": "Str. 501, nr. 1, Pecica",
+    "lat": 46.171735,
+    "lng": 21.091463,
+    "verified": true
+  },
+  {
+    "name": "Pensiunea Casa Verde (Vladimirescu)",
+    "category": "cazare",
+    "description": "Pensiuni în Vladimirescu.",
+    "address": "Vladimirescu",
+    "lat": 46.156485,
+    "lng": 21.427098,
+    "verified": true
+  },
+  {
+    "name": "Casa Bata",
+    "category": "cazare",
+    "description": "Pensiune vânătorească și resort spa, ideal pentru a pentru o relaxare în mijlocul naturii!",
+    "address": "sat Țela, nr.12, Bata",
+    "lat": 45.997637,
+    "lng": 22.046091,
+    "verified": true
+  },
+  {
+    "name": "Maria Rustic Resort (Cuied)",
+    "category": "cazare",
+    "description": "Maria-Rustic-Resort este un complex turistic așezat într-un cadru natural de excepție, o oază de liniște și frumos, un loc superb de recreere sau petrecerea unui sfârșit…",
+    "address": "Cuied Lac, comuna Buteni, Cuied",
+    "lat": 46.312715,
+    "lng": 22.043612,
+    "verified": true
+  },
+  {
+    "name": "Hanul Moților (Hălmagiu)",
+    "category": "cazare",
+    "description": "Hanul Moților se află chiar în centrul Hălmagiului la doar 50m de DN76.",
+    "address": "Strada Avram Iancu, nr. 25, Hălmagiu",
+    "lat": 46.260151,
+    "lng": 22.57867,
+    "verified": true
+  },
+  {
+    "name": "Wine Princess (Păuliș)",
+    "category": "cazare",
+    "description": "Pensiuni în Păuliș.",
+    "address": "Păuliş, nr. 583, Păuliș",
+    "lat": 46.120977,
+    "lng": 21.598715,
+    "verified": true
+  },
+  {
+    "name": "Hotel Coandi",
+    "category": "cazare",
+    "description": "Hoteluri în Arad.",
+    "address": "Calea Romanilor 47, Arad",
+    "lat": 46.161322,
+    "lng": 21.323212,
+    "verified": true
+  },
+  {
+    "name": "Vila Queen",
+    "category": "cazare",
+    "description": "Hoteluri în Arad.",
+    "address": "Str. C-tin Brancusi, nr. 20-22, Arad",
+    "lat": 46.191495,
+    "lng": 21.298868,
+    "verified": true
+  },
+  {
+    "name": "Hotel Crișana",
+    "category": "cazare",
+    "description": "Hoteluri în Arad.",
+    "address": "Strada Petru Rareș nr. 24, Arad",
+    "lat": 46.192056,
+    "lng": 21.331129,
+    "verified": true
+  },
+  {
+    "name": "Apfel Haus (Horia)",
+    "category": "cazare",
+    "description": "Pensiuni în Horia.",
+    "address": "Sat Horia, DJ 709, Km 5 500m, Horia",
+    "lat": 46.199145,
+    "lng": 21.428579,
+    "verified": true
+  },
+  {
+    "name": "XO Residence",
+    "category": "cazare",
+    "description": "Pensiuni în Arad.",
+    "address": "Strada Dr. Ion Rațiu,nr. 13, Arad",
+    "lat": 46.180067,
+    "lng": 21.306003,
+    "verified": true
+  },
+  {
+    "name": "Pensiunea Oxana (Lipova)",
+    "category": "cazare",
+    "description": "Pensiuni în Lipova.",
+    "address": "str. Detasamentul Paulis nr. 33,, Lipova",
+    "lat": 46.093739,
+    "lng": 21.682641,
+    "verified": true
+  },
+  {
+    "name": "SEP Hotel",
+    "category": "cazare",
+    "description": "Hoteluri în Arad.",
+    "address": "Str. Stefan Tenetchi Nr.37, Arad",
+    "lat": 46.207628,
+    "lng": 21.267464,
+    "verified": true
+  },
+  {
+    "name": "Pensiunea Radena",
+    "category": "cazare",
+    "description": "Situată la marginea Aradului, chiar lângă drumul dinspre Deva, Pensiunea Radena oferă parcare privată păzită gratuită în curte, bucătărie comună pentru oaspeți și camere…",
+    "address": "Str. Cerbului, nr.2, Arad",
+    "lat": 46.179948,
+    "lng": 21.35175,
+    "verified": true
+  },
+  {
+    "name": "Pensiunea Belanco",
+    "category": "cazare",
+    "description": "Pensiuni în Arad.",
+    "address": "Strada Cocorilor, nr. 36, Arad",
+    "lat": 46.187094,
+    "lng": 21.30214,
+    "verified": true
+  },
+  {
+    "name": "Pensiunea Alexander",
+    "category": "cazare",
+    "description": "Pensiuni în Arad.",
+    "address": "Calea Radnei, Nr. 175, Arad",
+    "lat": 46.177215,
+    "lng": 21.358681,
+    "verified": true
+  },
+  {
+    "name": "Hotel Ana",
+    "category": "cazare",
+    "description": "Hotelul are o capacitate de cazare de 15 camere duble, regim single si un apartament.",
+    "address": "Calea Radnei, Nr. 133, Arad",
+    "lat": 46.178968,
+    "lng": 21.351085,
+    "verified": true
+  },
+  {
+    "name": "Pensiunea Panorama",
+    "category": "cazare",
+    "description": "Pensiuni în Arad.",
+    "address": "Strada Digului, nr. 1A, Arad",
+    "lat": 46.189129,
+    "lng": 21.312783,
+    "verified": true
+  },
+  {
+    "name": "Pensiunea Arada",
+    "category": "cazare",
+    "description": "Pensiuni în Arad.",
+    "address": "Calea Radnei, nr. 227, Arad",
+    "lat": 46.176056,
+    "lng": 21.364088,
+    "verified": true
+  },
+  {
+    "name": "Pensiunea Bella",
+    "category": "cazare",
+    "description": "Pensiuni în Arad.",
+    "address": "Calea Radnei, nr. 201, Arad",
+    "lat": 46.176472,
+    "lng": 21.362168,
+    "verified": true
+  },
+  {
+    "name": "Pensiunea Sergiu&Geanina",
+    "category": "cazare",
+    "description": "Pensiuni în Arad.",
+    "address": "Strada Cerbului, nr. 22-24, Arad",
+    "lat": 46.180394,
+    "lng": 21.351879,
+    "verified": true
+  },
+  {
+    "name": "Pensiunea Etap",
+    "category": "cazare",
+    "description": "Pensiuni în Arad.",
+    "address": "Strada Tribunul Corcheș, nr. 1-4, Arad",
+    "lat": 46.213308,
+    "lng": 21.287892,
+    "verified": true
+  },
+  {
+    "name": "Pensiunea Diskkret",
+    "category": "cazare",
+    "description": "Pensiuni în Arad.",
+    "address": "Strada Voievod Moga, nr. 10, Arad",
+    "lat": 46.186292,
+    "lng": 21.339176,
+    "verified": true
+  },
+  {
+    "name": "Hotel „Hanul de la Răscruce”",
+    "category": "cazare",
+    "description": "Hoteluri în Arad.",
+    "address": "DN 7, FN 310047, Arad",
+    "lat": 46.205081,
+    "lng": 21.190431,
+    "verified": true
+  },
+  {
+    "name": "Pensiunea Star",
+    "category": "cazare",
+    "description": "Pensiuni în Arad.",
+    "address": "Strada Făt-Frumos, nr. 14, Arad",
+    "lat": 46.202111,
+    "lng": 21.293149,
+    "verified": true
+  },
+  {
+    "name": "Pensiunea XE-MAR",
+    "category": "cazare",
+    "description": "Pensiuni în Arad.",
+    "address": "Calea Timisorii, nr.13, Arad",
+    "lat": 46.156566,
+    "lng": 21.322117,
+    "verified": true
+  },
+  {
+    "name": "Hotel Darosy",
+    "category": "cazare",
+    "description": "Hotel Darosy este un hotel de 3 stele, având o recepție cu program non-stop. Micul dejun nu este inclus în preț și se oferă doar la cerere.",
+    "address": "Calea Victoriei, nr. 2c, Arad",
+    "lat": 46.183766,
+    "lng": 21.309704,
+    "verified": true
+  },
+  {
+    "name": "Hotel Miky",
+    "category": "cazare",
+    "description": "Hoteluri în Arad.",
+    "address": "Calea Radnei, nr. 231, Arad",
+    "lat": 46.175922,
+    "lng": 21.364839,
+    "verified": true
+  },
+  {
+    "name": "Hotel Iris",
+    "category": "cazare",
+    "description": "Hoteluri în Arad.",
+    "address": "Strada Căpitan Ignat, nr. 1, Arad",
+    "lat": 46.17142,
+    "lng": 21.303943,
+    "verified": true
+  },
+  {
+    "name": "Pensiunea Nimbus",
+    "category": "cazare",
+    "description": "Pensiuni în Arad.",
+    "address": "Strada Iustin Marșieu, nr. 12, Arad",
+    "lat": 46.181672,
+    "lng": 21.315852,
+    "verified": true
+  },
+  {
+    "name": "Hotel Lotus",
+    "category": "cazare",
+    "description": "Hotel Lotus este locația perfectă dacă doriți liniște și comfort, se află în zona Intim (aproape de Spitalul Județean) fiind deasemenea aproape de spații comerciale…",
+    "address": "Nicolae Stefu Nr. 8, Arad",
+    "lat": 46.184754,
+    "lng": 21.312815,
+    "verified": true
+  },
+  {
+    "name": "Agro Village Resort (Labașinț)",
+    "category": "cazare",
+    "description": "AGROVILLAGE RESORT se află la 1 oră și 20 de minute distanță de municipiul Arad și 30 de minute distanță cu mașina de Timișoara și aeroportul său internațional.",
+    "address": "Labașinț",
+    "lat": 45.961559,
+    "lng": 21.792052,
+    "verified": true
+  },
+  {
+    "name": "Hotel-Restaurant „Cabana Deltei” (Șagu)",
+    "category": "cazare",
+    "description": "Hotel-Restaurant Cabana Deltei se găsește pe DN69, la intrarea în localitatea Șagu, pe stânga, pe sensul de mers Arad-Timișoara.",
+    "address": "Loc. Șagu Nr.933, Șagu",
+    "lat": 46.066873,
+    "lng": 21.284259,
+    "verified": true
+  },
+  {
+    "name": "Pensiunea Lunca",
+    "category": "cazare",
+    "description": "Pensiuni în Arad.",
+    "address": "Pădurea Ceala, Zona 3 Insule, Arad",
+    "lat": 46.14868,
+    "lng": 21.249826,
+    "verified": true
+  },
+  {
+    "name": "Wine Road Glamping (Cuvin)",
+    "category": "cazare",
+    "description": "La poalele dealului, într-o oază de liniște, oferă servicii de cazare în corturi de lux pentru vacanțe și perioade de scurtă durată, activități recreative (ciubăr) și…",
+    "address": "Com. Ghioroc, Sat Cuvin, Nr. 544, Jud. Arad, Cuvin",
+    "lat": 46.179486,
+    "lng": 21.602396,
+    "verified": true
+  },
+  {
+    "name": "Tabăra Căsoaia",
+    "category": "cazare",
+    "description": "La poalele dealului, într-o oază de liniște, oferim servicii de cazare în corturi de lux pentru vacanțe și perioade de scurtă durată, activități recreative (ciubăr) și…",
+    "address": "Moneasa, 317220, Căsoaia",
+    "lat": 46.216714,
+    "lng": 21.760481,
+    "verified": true
+  },
+  {
+    "name": "Moby Dick - Camping Park (Ghioroc)",
+    "category": "cazare",
+    "description": "Servicii: -access zilnic la plajă fără cazare - 25 ron per pers -campare cu cortul propriu - 25 ron per camera de cort și 25 ron per persoana per noapte -campare cu…",
+    "address": "Aleea Plajei, Ghioroc, Ghioroc",
+    "lat": 46.145911,
+    "lng": 21.581264,
+    "verified": true
+  },
+  {
+    "name": "Aniroc Signature Hotel",
+    "category": "cazare",
+    "description": "Un hotel unicat, în inima oraşului Arad, care îmbină flerul contemporan cu stilul industrial.",
+    "address": "Str. Vasile Goldiș nr.5, Arad",
+    "lat": 46.17081,
+    "lng": 21.313397,
+    "verified": true
+  },
+  {
+    "name": "Casa Maximus (Moneasa)",
+    "category": "cazare",
+    "description": "Casa Maximus este locul ideal pentru familii cu copii, pentru cei ce tânjesc după liniște dar și pentru cei dornici de distracție într-un cadru natural deosebit.",
+    "address": "Strada Liliacului, nr. 14, Moneasa, Moneasa",
+    "lat": 46.446185,
+    "lng": 22.245073,
+    "verified": true
+  },
+  {
+    "name": "Pensiunea „Lacul liniștit” (Moneasa)",
+    "category": "cazare",
+    "description": "Această pensiune pune la dispozitia oaspeților: recepție, terasă acoperită și terasă în aer liber, grătar, debarcader cu bărcuțe și hidrobiciclete, spațiu pentru…",
+    "address": "Insula Lac FN, 317220 Moneasa,, Moneasa",
+    "lat": 46.463004,
+    "lng": 22.265635,
+    "verified": true
+  },
+  {
+    "name": "Casa „Flori de Nuc” (Moneasa)",
+    "category": "cazare",
+    "description": "Casa Flori de Nuc se află în Stațiunea Moneasa vizavi de tabăra de copii. Este situată lângă pădure, un loc liniștit și frumos cu aer proaspăt de munte.",
+    "address": "nr 148, Moneasa, 317220, Moneasa",
+    "lat": 46.465036,
+    "lng": 22.271289,
+    "verified": true
+  },
+  {
+    "name": "Camping Nela Tur (Corbești)",
+    "category": "cazare",
+    "description": "Camping în Corbești.",
+    "address": "Corbesti, Nr.27, Corbești",
+    "lat": 46.073675,
+    "lng": 22.390051,
+    "verified": true
+  },
+  {
+    "name": "Vok Luxury Home/City Loft",
+    "category": "cazare",
+    "description": "VOK Luxury Home/City Loft este un apartament unde oaspetii se pot relaxa, odihni si a-si gasi linistea interioara.",
+    "address": "STR. VASILE ALECSANDRI NR.3, AP.4, ARAD, Arad",
+    "lat": 46.174035,
+    "lng": 21.316045,
+    "verified": true
+  },
+  {
+    "name": "Vok Luxury Home/Tropical Living",
+    "category": "cazare",
+    "description": "VOK Luxury Home/Tropical Living este un apartament intr-un design modern cu accente tropicale si o atmosfera eleganta, unde oaspetii se pot relaxa, odihni si a-si gasi…",
+    "address": "Bulevardul Revoluției,nr. 101, Ap.16, Arad",
+    "lat": 46.171011,
+    "lng": 21.316774,
+    "verified": true
+  },
+  {
+    "name": "Dor-Tin",
+    "category": "cazare",
+    "description": "Pensiunea DorTin este o locatie nouă cu dotări moderne, situată în cartierul Grădiște, din mun. Arad, pe Str. Moricz Zsigmond, nr.50.",
+    "address": "Strada Zsigmond Moricz 52, Arad",
+    "lat": 46.195264,
+    "lng": 21.336708,
+    "verified": true
+  },
+  {
+    "name": "Căsuțele Vânătorului (Moneasa)",
+    "category": "cazare",
+    "description": "Unitatea de cazare este deschisă din luna mai pana în septembrie și dispune pentru cazare de 4 căsute de lemn tip butoi, clasificate tip camping si oferă urmatoarele…",
+    "address": "317220 Moneasa, Moneasa",
+    "lat": 46.466957,
+    "lng": 22.275495,
+    "verified": true
+  },
+  {
+    "name": "Cabana Casa Luca (Moneasa)",
+    "category": "cazare",
+    "description": "Bine ați venit la Cabana Casa Luca – locul unde confortul, natura și momentele frumoase se întâlnesc.",
+    "address": "Strada Valea Rănușei, nr. 31, Moneasa",
+    "lat": 46.436104,
+    "lng": 22.265109,
+    "verified": true
+  },
+  {
+    "name": "Hotel Monica",
+    "category": "cazare",
+    "description": "Hotel în Arad, zona Visinului.",
+    "address": "Arad",
+    "lat": 46.184422,
+    "lng": 21.335627,
+    "verified": true
+  },
+  {
+    "name": "Hostel Raluca",
+    "category": "cazare",
+    "description": "Hostel în Arad, zona Vama Micalaca.",
+    "address": "Arad",
+    "lat": 46.174765,
+    "lng": 21.365551,
+    "verified": true
+  },
+  {
+    "name": "Hotel Beauty",
+    "category": "cazare",
+    "description": "Hotel în Arad, zona Infanteriei.",
+    "address": "Arad",
+    "lat": 46.164338,
+    "lng": 21.335983,
+    "verified": true
+  },
+  {
+    "name": "Hostel Fortress",
+    "category": "cazare",
+    "description": "Hostel în Arad, zona Raza de Soare.",
+    "address": "Arad",
+    "lat": 46.160092,
+    "lng": 21.330262,
+    "verified": true
+  },
+  {
+    "name": "Hostel Roua",
+    "category": "cazare",
+    "description": "Hostel în Arad, zona Vama Micalaca.",
+    "address": "Arad",
+    "lat": 46.176711,
+    "lng": 21.368005,
+    "verified": true
+  },
+  {
+    "name": "Hotel Cristian",
+    "category": "cazare",
+    "description": "Hotel în Arad, zona Caraimanul.",
+    "address": "Arad",
+    "lat": 46.150304,
+    "lng": 21.323504,
+    "verified": true
+  },
+  {
+    "name": "Hostel Ella",
+    "category": "cazare",
+    "description": "Hostel în Arad, zona Izvor.",
+    "address": "Arad",
+    "lat": 46.212346,
+    "lng": 21.283037,
+    "verified": true
+  },
+  {
+    "name": "Pensiunea Monica",
+    "category": "cazare",
+    "description": "Hostel în Arad, zona L.N.I..",
+    "address": "Arad",
+    "lat": 46.183218,
+    "lng": 21.330547,
+    "verified": true
+  },
+  {
+    "name": "Hotel Paradis",
+    "category": "cazare",
+    "description": "Hotel în Arad, zona Autoservice.",
+    "address": "Arad",
+    "lat": 46.144324,
+    "lng": 21.317922,
+    "verified": true
+  },
+  {
+    "name": "Hostel Pascha",
+    "category": "cazare",
+    "description": "Hostel în Arad, zona Autoservice.",
+    "address": "Arad",
+    "lat": 46.147536,
+    "lng": 21.319242,
+    "verified": true
+  },
+  {
+    "name": "Hotel West",
+    "category": "cazare",
+    "description": "Hotel în Arad, zona Gorunului.",
+    "address": "Arad",
+    "lat": 46.19616,
+    "lng": 21.335431,
+    "verified": true
+  },
+  {
+    "name": "Pensiune SAN",
+    "category": "cazare",
+    "description": "Hostel în Arad, zona RAR.",
+    "address": "Strada General Doda Nr.39 Pensiune SAN, Arad",
+    "lat": 46.203305,
+    "lng": 21.278149,
+    "verified": true
+  },
+  {
+    "name": "Pensiunea Olimp",
+    "category": "cazare",
+    "description": "Motel în Arad, zona Gradinita.",
+    "address": "Strada Vrancei 36 B, Arad",
+    "lat": 46.172582,
+    "lng": 21.357572,
+    "verified": true
+  },
+  {
+    "name": "Motel West",
+    "category": "cazare",
+    "description": "Motel în Arad, zona Vladimirescu Moara.",
+    "address": "Strada Progresului 119, Arad",
+    "lat": 46.161776,
+    "lng": 21.410728,
+    "verified": true
+  },
+  {
+    "name": "Hotel Frunzei garsoniere",
+    "category": "cazare",
+    "description": "Hotel în Arad, zona Flacara.",
+    "address": "Arad",
+    "lat": 46.141084,
+    "lng": 21.336445,
+    "verified": true
+  },
+  {
+    "name": "Hotel Casute strand",
+    "category": "cazare",
+    "description": "Hotel în Arad, zona Uzina Electrica.",
+    "address": "Arad",
+    "lat": 46.176171,
+    "lng": 21.329262,
+    "verified": true
+  },
+  {
+    "name": "Hotel Blocuri",
+    "category": "cazare",
+    "description": "Hotel în Arad, zona Andrei Saguna.",
+    "address": "Arad",
+    "lat": 46.16519,
+    "lng": 21.30344,
+    "verified": true
+  },
+  {
+    "name": "Pensiune Miorița",
+    "category": "cazare",
+    "description": "Pensiune în Arad, zona Miorita.",
+    "address": "Calea Radnei 17, Arad",
+    "lat": 46.179474,
+    "lng": 21.349464,
+    "verified": true
+  },
+  {
+    "name": "Pensiune",
+    "category": "cazare",
+    "description": "Pensiune în Arad, zona Colonistilor.",
+    "address": "Strada Sigsmund Borlea 17, Arad",
+    "lat": 46.151104,
+    "lng": 21.300255,
+    "verified": true
+  },
+  {
+    "name": "Grant Hotel Boutique",
+    "category": "cazare",
+    "description": "Hotel în Arad, zona Electrometal.",
+    "address": "Strada Fulgerului 24, Arad",
+    "lat": 46.196627,
+    "lng": 21.30344,
+    "verified": true
+  },
+  {
+    "name": "Pensiune Eldopol",
+    "category": "cazare",
+    "description": "Pensiune în Arad, zona Caltunas.",
+    "address": "Strada Ștefan Tenețchi 2/4, Arad",
+    "lat": 46.210252,
+    "lng": 21.275509,
+    "verified": true
+  },
+  {
+    "name": "Pensiunea Larissa",
+    "category": "cazare",
+    "description": "Pensiune în Arad, zona Stan Dragul.",
+    "address": "Arad",
+    "lat": 46.145946,
+    "lng": 21.324354,
+    "verified": true
+  },
+  {
+    "name": "Hotel Voinicul",
+    "category": "cazare",
+    "description": "Hostel în Arad, zona Voinicilor.",
+    "address": "Strada Voinicilor 34, Arad",
+    "lat": 46.171635,
+    "lng": 21.355692,
+    "verified": true
+  },
+  {
+    "name": "Pensiune Johanna",
+    "category": "cazare",
+    "description": "Hostel în Arad, zona Maximilian.",
+    "address": "Calea Radnei 109, Arad",
+    "lat": 46.180254,
+    "lng": 21.345972,
+    "verified": true
+  },
+  {
+    "name": "Pensiune Adriana",
+    "category": "cazare",
+    "description": "Hostel în Arad, zona UTA.",
+    "address": "Strada Frații Neumann Vila 7, Arad",
+    "lat": 46.192565,
+    "lng": 21.309885,
+    "verified": true
+  },
+  {
+    "name": "Pensiunea Raluca",
+    "category": "cazare",
+    "description": "Hostel în Arad, zona Vladimirescu Via Carmina.",
+    "address": "Strada Minerva 2, Arad",
+    "lat": 46.165606,
+    "lng": 21.390639,
+    "verified": true
+  },
+  {
+    "name": "Pensiune Roberto",
+    "category": "cazare",
+    "description": "Hostel în Arad, zona Piata UTA.",
+    "address": "Strada Constantin Brâncoveanu 5, Arad",
+    "lat": 46.191628,
+    "lng": 21.306529,
+    "verified": true
+  },
+  {
+    "name": "Pensiune George's",
+    "category": "cazare",
+    "description": "Hostel în Arad, zona Vama Gradiste.",
+    "address": "Strada Petru Rareș 127, Arad",
+    "lat": 46.199711,
+    "lng": 21.338731,
+    "verified": true
+  },
+  {
+    "name": "Hotel Maxim",
+    "category": "cazare",
+    "description": "Hotel în Arad, zona Maximilian.",
+    "address": "Calea Radnei 122, Arad",
+    "lat": 46.18005,
+    "lng": 21.343127,
+    "verified": true
+  },
+  {
+    "name": "Pensiune Milly",
+    "category": "cazare",
+    "description": "Hostel în Arad, zona Gorunului.",
+    "address": "Strada Petru Rareș Nr.80 Pensiune Milly, Arad",
+    "lat": 46.197111,
+    "lng": 21.336731,
+    "verified": true
+  },
+  {
+    "name": "Hostel Moara cu Noroc",
+    "category": "cazare",
+    "description": "Hostel în Arad, zona Piata Romana.",
+    "address": "Strada Mucius Scaevola 11, Arad",
+    "lat": 46.164313,
+    "lng": 21.319592,
+    "verified": true
+  },
+  {
+    "name": "Hotel Ibis Styles",
+    "category": "cazare",
+    "description": "Hotel în Arad, zona Platforma Vest.",
+    "address": "Calea Aurel Vlaicu 306, Arad",
+    "lat": 46.203485,
+    "lng": 21.247867,
+    "verified": true
+  },
+  {
+    "name": "Pensiunea \"La Cuscrii\"",
+    "category": "cazare",
+    "description": "Pensiune în Arad, zona Pomenirea.",
+    "address": "Strada 9 Mai 20, Arad",
+    "lat": 46.169957,
+    "lng": 21.283323,
+    "verified": true
+  },
+  {
+    "name": "Profi · zona Piata UTA",
+    "category": "supermarket",
+    "description": "Supermarket Profi, zona Piata UTA.",
+    "address": "Arad",
+    "lat": 46.192374,
+    "lng": 21.308522,
+    "verified": true
+  },
+  {
+    "name": "Profi · zona Electrometal",
+    "category": "supermarket",
+    "description": "Supermarket Profi, zona Electrometal.",
+    "address": "Arad",
+    "lat": 46.194651,
+    "lng": 21.303089,
+    "verified": true
+  },
+  {
+    "name": "Unicarm · zona Fortuna",
+    "category": "supermarket",
+    "description": "Supermarket Unicarm, zona Fortuna.",
+    "address": "Arad",
+    "lat": 46.198476,
+    "lng": 21.295997,
+    "verified": true
+  },
+  {
+    "name": "Carrefour Market · Bulevardul Revoluției",
+    "category": "supermarket",
+    "description": "Supermarket Carrefour Market, Bulevardul Revoluției.",
+    "address": "Bulevardul Revoluției 39-41, Arad",
+    "lat": 46.179876,
+    "lng": 21.321892,
+    "verified": true
+  },
+  {
+    "name": "Penny · Bulevardul Nicolae Titulescu",
+    "category": "supermarket",
+    "description": "Supermarket Penny, Bulevardul Nicolae Titulescu.",
+    "address": "Bulevardul Nicolae Titulescu 3, Arad",
+    "lat": 46.169702,
+    "lng": 21.34639,
+    "verified": true
+  },
+  {
+    "name": "Profi · Calea Iuliu Maniu",
+    "category": "supermarket",
+    "description": "Supermarket Profi, Calea Iuliu Maniu.",
+    "address": "Calea Iuliu Maniu 1-3, Arad",
+    "lat": 46.182714,
+    "lng": 21.325095,
+    "verified": true
+  },
+  {
+    "name": "Profi · Strada Abrud",
+    "category": "supermarket",
+    "description": "Supermarket Profi, Strada Abrud.",
+    "address": "Strada Abrud Nr.105A Profi City, Arad",
+    "lat": 46.177324,
+    "lng": 21.34657,
+    "verified": true
+  },
+  {
+    "name": "Alimentara Galbena · zona Feroneria",
+    "category": "supermarket",
+    "description": "Supermarket Alimentara Galbena, zona Feroneria.",
+    "address": "Arad",
+    "lat": 46.197984,
+    "lng": 21.320324,
+    "verified": true
+  },
+  {
+    "name": "Profi · Strada Lucian Blaga",
+    "category": "supermarket",
+    "description": "Supermarket Profi, Strada Lucian Blaga.",
+    "address": "Strada Lucian Blaga 3, Arad",
+    "lat": 46.172133,
+    "lng": 21.315381,
+    "verified": true
+  },
+  {
+    "name": "Lidl · zona Banu Maracine",
+    "category": "supermarket",
+    "description": "Supermarket Lidl, zona Banu Maracine.",
+    "address": "Arad",
+    "lat": 46.184812,
+    "lng": 21.314476,
+    "verified": true
+  },
+  {
+    "name": "Alfa Market Comercial · Strada Zorilor",
+    "category": "supermarket",
+    "description": "Supermarket Alfa Market Comercial, Strada Zorilor.",
+    "address": "Strada Zorilor 1, Arad",
+    "lat": 46.162822,
+    "lng": 21.293801,
+    "verified": true
+  },
+  {
+    "name": "Carrefour Market · zona Aris",
+    "category": "supermarket",
+    "description": "Supermarket Carrefour Market, zona Aris.",
+    "address": "Arad",
+    "lat": 46.188505,
+    "lng": 21.303307,
+    "verified": true
+  },
+  {
+    "name": "Profi · zona Clujului",
+    "category": "supermarket",
+    "description": "Supermarket Profi, zona Clujului.",
+    "address": "Arad",
+    "lat": 46.164281,
+    "lng": 21.294607,
+    "verified": true
+  },
+  {
+    "name": "Profi · zona Caraiman",
+    "category": "supermarket",
+    "description": "Supermarket Profi, zona Caraiman.",
+    "address": "Arad",
+    "lat": 46.154191,
+    "lng": 21.321469,
+    "verified": true
+  },
+  {
+    "name": "CBA · Strada Câmpul Liniștii",
+    "category": "supermarket",
+    "description": "Supermarket CBA, Strada Câmpul Liniștii.",
+    "address": "Strada Câmpul Liniștii, Arad",
+    "lat": 46.197564,
+    "lng": 21.309087,
+    "verified": true
+  },
+  {
+    "name": "Profi · Strada Pictor Ștefan Luchian",
+    "category": "supermarket",
+    "description": "Supermarket Profi, Strada Pictor Ștefan Luchian.",
+    "address": "Strada Pictor Ștefan Luchian, Arad",
+    "lat": 46.20033,
+    "lng": 21.295951,
+    "verified": true
+  },
+  {
+    "name": "Profi city · Calea Aurel Vlaicu",
+    "category": "supermarket",
+    "description": "Supermarket Profi city, Calea Aurel Vlaicu.",
+    "address": "Calea Aurel Vlaicu, Arad",
+    "lat": 46.192267,
+    "lng": 21.306517,
+    "verified": true
+  },
+  {
+    "name": "Unicarm · Bulevardul Revoluției",
+    "category": "supermarket",
+    "description": "Supermarket Unicarm, Bulevardul Revoluției.",
+    "address": "Bulevardul Revoluției, Arad",
+    "lat": 46.187844,
+    "lng": 21.324969,
+    "verified": true
+  },
+  {
+    "name": "Profi · zona Vantului",
+    "category": "supermarket",
+    "description": "Supermarket Profi, zona Vantului.",
+    "address": "Arad",
+    "lat": 46.123969,
+    "lng": 21.383675,
+    "verified": true
+  },
+  {
+    "name": "Profi · zona Bagdazar",
+    "category": "supermarket",
+    "description": "Supermarket Profi, zona Bagdazar.",
+    "address": "Arad",
+    "lat": 46.140957,
+    "lng": 21.315601,
+    "verified": true
+  },
+  {
+    "name": "Profi · zona Pasunii",
+    "category": "supermarket",
+    "description": "Supermarket Profi, zona Pasunii.",
+    "address": "Arad",
+    "lat": 46.176714,
+    "lng": 21.353173,
+    "verified": true
+  },
+  {
+    "name": "Profi · zona Crisan",
+    "category": "supermarket",
+    "description": "Supermarket Profi, zona Crisan.",
+    "address": "Arad",
+    "lat": 46.180139,
+    "lng": 21.315638,
+    "verified": true
+  },
+  {
+    "name": "Profi · zona Piata Spitalului",
+    "category": "supermarket",
+    "description": "Supermarket Profi, zona Piata Spitalului.",
+    "address": "Arad",
+    "lat": 46.18291,
+    "lng": 21.311025,
+    "verified": true
+  },
+  {
+    "name": "Profi · zona Confectii",
+    "category": "supermarket",
+    "description": "Supermarket Profi, zona Confectii.",
+    "address": "Arad",
+    "lat": 46.179608,
+    "lng": 21.295935,
+    "verified": true
+  },
+  {
+    "name": "Profi · zona Euromedica",
+    "category": "supermarket",
+    "description": "Supermarket Profi, zona Euromedica.",
+    "address": "Arad",
+    "lat": 46.176447,
+    "lng": 21.342557,
+    "verified": true
+  },
+  {
+    "name": "Profi · zona Uzina Electrica",
+    "category": "supermarket",
+    "description": "Supermarket Profi, zona Uzina Electrica.",
+    "address": "Arad",
+    "lat": 46.179615,
+    "lng": 21.331748,
+    "verified": true
+  },
+  {
+    "name": "Profi · zona LicTehnCons",
+    "category": "supermarket",
+    "description": "Supermarket Profi, zona LicTehnCons.",
+    "address": "Arad",
+    "lat": 46.189438,
+    "lng": 21.300763,
+    "verified": true
+  },
+  {
+    "name": "ACA · zona Vladimirescu Moara",
+    "category": "supermarket",
+    "description": "Supermarket ACA, zona Vladimirescu Moara.",
+    "address": "Arad",
+    "lat": 46.163647,
+    "lng": 21.404946,
+    "verified": true
+  },
+  {
+    "name": "Profi · zona Vladimirescu Moara",
+    "category": "supermarket",
+    "description": "Supermarket Profi, zona Vladimirescu Moara.",
+    "address": "Arad",
+    "lat": 46.1579,
+    "lng": 21.406158,
+    "verified": true
+  },
+  {
+    "name": "Profi · zona Miorita",
+    "category": "supermarket",
+    "description": "Supermarket Profi, zona Miorita.",
+    "address": "Arad",
+    "lat": 46.179522,
+    "lng": 21.346779,
+    "verified": true
+  },
+  {
+    "name": "Penny · Strada Liviu Rebreanu",
+    "category": "supermarket",
+    "description": "Supermarket Penny, Strada Liviu Rebreanu.",
+    "address": "Strada Liviu Rebreanu 95, Arad",
+    "lat": 46.180523,
+    "lng": 21.293223,
+    "verified": true
+  },
+  {
+    "name": "Carrefour · zona Atrium",
+    "category": "supermarket",
+    "description": "Supermarket Carrefour, zona Atrium.",
+    "address": "Arad",
+    "lat": 46.191755,
+    "lng": 21.316739,
+    "verified": true
+  },
+  {
+    "name": "Flana Market · Strada Diogene",
+    "category": "supermarket",
+    "description": "Supermarket Flana Market, Strada Diogene.",
+    "address": "Strada Diogene 14, Arad",
+    "lat": 46.159108,
+    "lng": 21.331835,
+    "verified": true
+  },
+  {
+    "name": "La Doi Pași · zona Electrometal",
+    "category": "supermarket",
+    "description": "Supermarket La Doi Pași, zona Electrometal.",
+    "address": "Arad",
+    "lat": 46.193956,
+    "lng": 21.303169,
+    "verified": true
+  },
+  {
+    "name": "Senic · zona Galleria",
+    "category": "supermarket",
+    "description": "Supermarket Senic, zona Galleria.",
+    "address": "Arad",
+    "lat": 46.200007,
+    "lng": 21.287274,
+    "verified": true
+  },
+  {
+    "name": "Lidl · zona Piata Obor-fac.",
+    "category": "supermarket",
+    "description": "Supermarket Lidl, zona Piata Obor-fac..",
+    "address": "Arad",
+    "lat": 46.171067,
+    "lng": 21.291227,
+    "verified": true
+  },
+  {
+    "name": "Mondo Sera · Strada Anton Cehov",
+    "category": "supermarket",
+    "description": "Supermarket Mondo Sera, Strada Anton Cehov.",
+    "address": "Strada Anton Cehov 20, Arad",
+    "lat": 46.187792,
+    "lng": 21.342965,
+    "verified": true
+  },
+  {
+    "name": "Lidl · zona Armoniei",
+    "category": "supermarket",
+    "description": "Supermarket Lidl, zona Armoniei.",
+    "address": "Arad",
+    "lat": 46.14269,
+    "lng": 21.310548,
+    "verified": true
+  },
+  {
+    "name": "Supeco · Bulevardul Nicolae Titulescu",
+    "category": "supermarket",
+    "description": "Supermarket Supeco, Bulevardul Nicolae Titulescu.",
+    "address": "Bulevardul Nicolae Titulescu, Arad",
+    "lat": 46.172453,
+    "lng": 21.346009,
+    "verified": true
+  },
+  {
+    "name": "Kaufland · Strada Banu Mărăcine",
+    "category": "supermarket",
+    "description": "Supermarket Kaufland, Strada Banu Mărăcine.",
+    "address": "Strada Banu Mărăcine 6, Arad",
+    "lat": 46.185902,
+    "lng": 21.313319,
+    "verified": true
+  },
+  {
+    "name": "Profi · Piața Arenei",
+    "category": "supermarket",
+    "description": "Supermarket Profi, Piața Arenei.",
+    "address": "Piața Arenei 7, Arad",
+    "lat": 46.166632,
+    "lng": 21.3204,
+    "verified": true
+  },
+  {
+    "name": "La Cocoș · Calea Radnei",
+    "category": "supermarket",
+    "description": "Supermarket La Cocoș, Calea Radnei.",
+    "address": "Calea Radnei 298, Arad",
+    "lat": 46.168996,
+    "lng": 21.379932,
+    "verified": true
+  },
+  {
+    "name": "Profi · zona L.N.I.",
+    "category": "supermarket",
+    "description": "Supermarket Profi, zona L.N.I..",
+    "address": "Arad",
+    "lat": 46.182328,
+    "lng": 21.327022,
+    "verified": true
+  },
+  {
+    "name": "Carrefour Market · zona Gara Aradul Nou",
+    "category": "supermarket",
+    "description": "Supermarket Carrefour Market, zona Gara Aradul Nou.",
+    "address": "Arad",
+    "lat": 46.143923,
+    "lng": 21.333294,
+    "verified": true
+  },
+  {
+    "name": "Penny · Strada Condurașilor",
+    "category": "supermarket",
+    "description": "Supermarket Penny, Strada Condurașilor.",
+    "address": "Strada Condurașilor 21-23, Arad",
+    "lat": 46.165729,
+    "lng": 21.298273,
+    "verified": true
+  },
+  {
+    "name": "Lidl · Calea Aurel Vlaicu",
+    "category": "supermarket",
+    "description": "Supermarket Lidl, Calea Aurel Vlaicu.",
+    "address": "Calea Aurel Vlaicu, Arad",
+    "lat": 46.196579,
+    "lng": 21.297307,
+    "verified": true
+  },
+  {
+    "name": "Magazin ACA · Calea Aurel Vlaicu",
+    "category": "supermarket",
+    "description": "Supermarket Magazin ACA, Calea Aurel Vlaicu.",
+    "address": "Calea Aurel Vlaicu 185A, Arad",
+    "lat": 46.199669,
+    "lng": 21.293699,
+    "verified": true
+  },
+  {
+    "name": "Flana Market · Strada Dunării",
+    "category": "supermarket",
+    "description": "Supermarket Flana Market, Strada Dunării.",
+    "address": "Strada Dunării 84, Arad",
+    "lat": 46.209995,
+    "lng": 21.278194,
+    "verified": true
+  },
+  {
+    "name": "Lidl · Calea Timișorii",
+    "category": "supermarket",
+    "description": "Supermarket Lidl, Calea Timișorii.",
+    "address": "Calea Timișorii 1-3, Arad",
+    "lat": 46.157798,
+    "lng": 21.323509,
+    "verified": true
+  },
+  {
+    "name": "Profi · Strada Petru Rareș",
+    "category": "supermarket",
+    "description": "Supermarket Profi, Strada Petru Rareș.",
+    "address": "Strada Petru Rareș 20, Arad",
+    "lat": 46.190251,
+    "lng": 21.330091,
+    "verified": true
+  },
+  {
+    "name": "Venoli Impex · Strada Fragilor",
+    "category": "supermarket",
+    "description": "Supermarket Venoli Impex, Strada Fragilor.",
+    "address": "Strada Fragilor 2/A, Arad",
+    "lat": 46.198726,
+    "lng": 21.297089,
+    "verified": true
+  },
+  {
+    "name": "Lelia's Market · Strada Obedenaru",
+    "category": "supermarket",
+    "description": "Supermarket Lelia's Market, Strada Obedenaru.",
+    "address": "Strada Obedenaru 26-28, Arad",
+    "lat": 46.193411,
+    "lng": 21.300238,
+    "verified": true
+  },
+  {
+    "name": "Pronto Market · Strada Poetului",
+    "category": "supermarket",
+    "description": "Supermarket Pronto Market, Strada Poetului.",
+    "address": "Strada Poetului 96, Arad",
+    "lat": 46.209553,
+    "lng": 21.292583,
+    "verified": true
+  },
+  {
+    "name": "Kurt German Market · Strada Poetului",
+    "category": "supermarket",
+    "description": "Supermarket Kurt German Market, Strada Poetului.",
+    "address": "Strada Poetului 101B, Arad",
+    "lat": 46.204978,
+    "lng": 21.293026,
+    "verified": true
+  },
+  {
+    "name": "PENNY · Strada Poetului",
+    "category": "supermarket",
+    "description": "Supermarket PENNY, Strada Poetului.",
+    "address": "Strada Poetului Penny Market 1C, Arad",
+    "lat": 46.194189,
+    "lng": 21.309332,
+    "verified": true
+  },
+  {
+    "name": "Profi · zona Profi Micalaca",
+    "category": "supermarket",
+    "description": "Supermarket Profi, zona Profi Micalaca.",
+    "address": "Arad",
+    "lat": 46.171927,
+    "lng": 21.354106,
+    "verified": true
+  },
+  {
+    "name": "Kaufland · zona Maximilian",
+    "category": "supermarket",
+    "description": "Supermarket Kaufland, zona Maximilian.",
+    "address": "Arad",
+    "lat": 46.178879,
+    "lng": 21.34442,
+    "verified": true
+  },
+  {
+    "name": "Lidl · zona Pasunii",
+    "category": "supermarket",
+    "description": "Supermarket Lidl, zona Pasunii.",
+    "address": "Arad",
+    "lat": 46.177121,
+    "lng": 21.355329,
+    "verified": true
+  },
+  {
+    "name": "Kaufland · Calea Aurel Vlaicu",
+    "category": "supermarket",
+    "description": "Supermarket Kaufland, Calea Aurel Vlaicu.",
+    "address": "Calea Aurel Vlaicu, Arad",
+    "lat": 46.196017,
+    "lng": 21.296779,
+    "verified": true
+  },
+  {
+    "name": "Remarkt · Strada Constantin Brâncoveanu",
+    "category": "supermarket",
+    "description": "Supermarket Remarkt, Strada Constantin Brâncoveanu.",
+    "address": "Strada Constantin Brâncoveanu 54, Arad",
+    "lat": 46.190822,
+    "lng": 21.300622,
+    "verified": true
+  },
+  {
+    "name": "Profi · zona Vladimirescu Moara 2",
+    "category": "supermarket",
+    "description": "Supermarket Profi, zona Vladimirescu Moara.",
+    "address": "Arad",
+    "lat": 46.162894,
+    "lng": 21.404272,
+    "verified": true
+  },
+  {
+    "name": "Profi · Strada Steagului",
+    "category": "supermarket",
+    "description": "Supermarket Profi, Strada Steagului.",
+    "address": "Strada Steagului, Arad",
+    "lat": 46.139229,
+    "lng": 21.343861,
+    "verified": true
+  },
+  {
+    "name": "Lidl · Calea Aurel Vlaicu 2",
+    "category": "supermarket",
+    "description": "Supermarket Lidl, Calea Aurel Vlaicu.",
+    "address": "Calea Aurel Vlaicu 41-43, Arad",
+    "lat": 46.188919,
+    "lng": 21.320392,
+    "verified": true
+  },
+  {
+    "name": "Lidl · Strada Cetății Orod",
+    "category": "supermarket",
+    "description": "Supermarket Lidl, Strada Cetății Orod.",
+    "address": "Strada Cetății Orod 2, Arad",
+    "lat": 46.168068,
+    "lng": 21.387386,
+    "verified": true
+  },
+  {
+    "name": "Penny · zona Vladimirescu Moara",
+    "category": "supermarket",
+    "description": "Supermarket Penny, zona Vladimirescu Moara.",
+    "address": "Arad",
+    "lat": 46.162091,
+    "lng": 21.407685,
+    "verified": true
+  },
+  {
+    "name": "Lidl · zona Vama Gradiste",
+    "category": "supermarket",
+    "description": "Supermarket Lidl, zona Vama Gradiste.",
+    "address": "Arad",
+    "lat": 46.199657,
+    "lng": 21.340356,
+    "verified": true
+  },
+  {
+    "name": "BAT · zona Tribunul Corches",
+    "category": "benzinarie",
+    "description": "Benzinărie BAT, zona Tribunul Corches.",
+    "address": "Arad",
+    "lat": 46.214903,
+    "lng": 21.287203,
+    "verified": true
+  },
+  {
+    "name": "Cam Altodor · zona Abatorului",
+    "category": "benzinarie",
+    "description": "Benzinărie Cam Altodor, zona Abatorului.",
+    "address": "Arad",
+    "lat": 46.184087,
+    "lng": 21.295501,
+    "verified": true
+  },
+  {
+    "name": "Petrom · zona LicTehnCons",
+    "category": "benzinarie",
+    "description": "Benzinărie Petrom, zona LicTehnCons.",
+    "address": "Arad",
+    "lat": 46.187698,
+    "lng": 21.30211,
+    "verified": true
+  },
+  {
+    "name": "Euroil · zona Bela Bartok",
+    "category": "benzinarie",
+    "description": "Benzinărie Euroil, zona Bela Bartok.",
+    "address": "Arad",
+    "lat": 46.179064,
+    "lng": 21.308429,
+    "verified": true
+  },
+  {
+    "name": "Jet · zona Brancoveanu",
+    "category": "benzinarie",
+    "description": "Benzinărie Jet, zona Brancoveanu.",
+    "address": "Arad",
+    "lat": 46.190814,
+    "lng": 21.300961,
+    "verified": true
+  },
+  {
+    "name": "Rompetrol · zona Infanteriei",
+    "category": "benzinarie",
+    "description": "Benzinărie Rompetrol, zona Infanteriei.",
+    "address": "Arad",
+    "lat": 46.159945,
+    "lng": 21.32892,
+    "verified": true
+  },
+  {
+    "name": "Rompetrol Gaz BAMT · zona Uzina Electrica",
+    "category": "benzinarie",
+    "description": "Benzinărie Rompetrol Gaz BAMT, zona Uzina Electrica.",
+    "address": "Arad",
+    "lat": 46.180219,
+    "lng": 21.336815,
+    "verified": true
+  },
+  {
+    "name": "Rompetrol · zona Ana Ipatescu",
+    "category": "benzinarie",
+    "description": "Benzinărie Rompetrol, zona Ana Ipatescu.",
+    "address": "Arad",
+    "lat": 46.158597,
+    "lng": 21.321483,
+    "verified": true
+  },
+  {
+    "name": "OMW · Calea Timișorii",
+    "category": "benzinarie",
+    "description": "Benzinărie OMW, Calea Timișorii.",
+    "address": "Calea Timișorii 178, Arad",
+    "lat": 46.140384,
+    "lng": 21.320656,
+    "verified": true
+  },
+  {
+    "name": "Lukoil · zona Autoservice",
+    "category": "benzinarie",
+    "description": "Benzinărie Lukoil, zona Autoservice.",
+    "address": "Arad",
+    "lat": 46.144217,
+    "lng": 21.321792,
+    "verified": true
+  },
+  {
+    "name": "Crimbo Gas · zona Billa",
+    "category": "benzinarie",
+    "description": "Benzinărie Crimbo Gas, zona Billa.",
+    "address": "Arad",
+    "lat": 46.170518,
+    "lng": 21.347538,
+    "verified": true
+  },
+  {
+    "name": "Petrom · zona Ferma Plopi",
+    "category": "benzinarie",
+    "description": "Benzinărie Petrom, zona Ferma Plopi.",
+    "address": "Arad",
+    "lat": 46.204307,
+    "lng": 21.208326,
+    "verified": true
+  },
+  {
+    "name": "HU-RO Service Station · zona Toth Arpad",
+    "category": "benzinarie",
+    "description": "Benzinărie HU-RO Service Station, zona Toth Arpad.",
+    "address": "Arad",
+    "lat": 46.216115,
+    "lng": 21.302269,
+    "verified": true
+  },
+  {
+    "name": "Rompetrol · zona Vama Gradiste",
+    "category": "benzinarie",
+    "description": "Benzinărie Rompetrol, zona Vama Gradiste.",
+    "address": "Arad",
+    "lat": 46.200426,
+    "lng": 21.340641,
+    "verified": true
+  },
+  {
+    "name": "Rompetrol · zona Armoniei",
+    "category": "benzinarie",
+    "description": "Benzinărie Rompetrol, zona Armoniei.",
+    "address": "Arad",
+    "lat": 46.1404,
+    "lng": 21.301498,
+    "verified": true
+  },
+  {
+    "name": "Petrom · zona Caius Iacob",
+    "category": "benzinarie",
+    "description": "Benzinărie Petrom, zona Caius Iacob.",
+    "address": "Arad",
+    "lat": 46.184846,
+    "lng": 21.326273,
+    "verified": true
+  },
+  {
+    "name": "OMV · Șoseaua Câmpurilor",
+    "category": "benzinarie",
+    "description": "Benzinărie OMV, Șoseaua Câmpurilor.",
+    "address": "Șoseaua Câmpurilor 2A, Arad",
+    "lat": 46.215704,
+    "lng": 21.291954,
+    "verified": true
+  },
+  {
+    "name": "Crimbo Gaz · Calea 6 Vânători",
+    "category": "benzinarie",
+    "description": "Benzinărie Crimbo Gaz, Calea 6 Vânători.",
+    "address": "Calea 6 Vânători 25, Arad",
+    "lat": 46.201435,
+    "lng": 21.320256,
+    "verified": true
+  },
+  {
+    "name": "OMV · Strada Banu Mărăcine",
+    "category": "benzinarie",
+    "description": "Benzinărie OMV, Strada Banu Mărăcine.",
+    "address": "Strada Banu Mărăcine, Arad",
+    "lat": 46.185381,
+    "lng": 21.316048,
+    "verified": true
+  },
+  {
+    "name": "Tot-All · Strada Fabius",
+    "category": "benzinarie",
+    "description": "Benzinărie Tot-All, Strada Fabius.",
+    "address": "Strada Fabius 2, Arad",
+    "lat": 46.180279,
+    "lng": 21.345804,
+    "verified": true
+  },
+  {
+    "name": "Gazprom · Calea Radnei",
+    "category": "benzinarie",
+    "description": "Benzinărie Gazprom, Calea Radnei.",
+    "address": "Calea Radnei 116, Arad",
+    "lat": 46.180389,
+    "lng": 21.342632,
+    "verified": true
+  },
+  {
+    "name": "OMV · Calea Aurel Vlaicu",
+    "category": "benzinarie",
+    "description": "Benzinărie OMV, Calea Aurel Vlaicu.",
+    "address": "Calea Aurel Vlaicu 267, Arad",
+    "lat": 46.200962,
+    "lng": 21.28244,
+    "verified": true
+  },
+  {
+    "name": "Rompetrol · Calea Radnei",
+    "category": "benzinarie",
+    "description": "Benzinărie Rompetrol, Calea Radnei.",
+    "address": "Calea Radnei 190-192, Arad",
+    "lat": 46.178253,
+    "lng": 21.351932,
+    "verified": true
+  },
+  {
+    "name": "SOCAR · Strada Andrei Șaguna",
+    "category": "benzinarie",
+    "description": "Benzinărie SOCAR, Strada Andrei Șaguna.",
+    "address": "Strada Andrei Șaguna 99, Arad",
+    "lat": 46.170177,
+    "lng": 21.304282,
+    "verified": true
+  },
+  {
+    "name": "OMV · zona Sere",
+    "category": "benzinarie",
+    "description": "Benzinărie OMV, zona Sere.",
+    "address": "Arad",
+    "lat": 46.210237,
+    "lng": 21.349971,
+    "verified": true
+  },
+  {
+    "name": "Lucky · zona Tribunul Corches",
+    "category": "benzinarie",
+    "description": "Benzinărie Lucky, zona Tribunul Corches.",
+    "address": "Arad",
+    "lat": 46.213356,
+    "lng": 21.286091,
+    "verified": true
+  },
+  {
+    "name": "MOL · Calea Iuliu Maniu",
+    "category": "benzinarie",
+    "description": "Benzinărie MOL, Calea Iuliu Maniu.",
+    "address": "Calea Iuliu Maniu Nr.56-62, Arad",
+    "lat": 46.181036,
+    "lng": 21.330915,
+    "verified": true
+  },
+  {
+    "name": "Rompetrol · zona Gara Aradului Nou",
+    "category": "benzinarie",
+    "description": "Benzinărie Rompetrol, zona Gara Aradului Nou.",
+    "address": "Arad",
+    "lat": 46.147913,
+    "lng": 21.334993,
+    "verified": true
+  },
+  {
+    "name": "Lukoil · zona Autoservice 2",
+    "category": "benzinarie",
+    "description": "Benzinărie Lukoil, zona Autoservice.",
+    "address": "Arad",
+    "lat": 46.145548,
+    "lng": 21.320698,
+    "verified": true
+  },
+  {
+    "name": "Lukoil · zona Sere",
+    "category": "benzinarie",
+    "description": "Benzinărie Lukoil, zona Sere.",
+    "address": "Arad",
+    "lat": 46.209763,
+    "lng": 21.351218,
+    "verified": true
+  },
+  {
+    "name": "Gazprom · zona Sere",
+    "category": "benzinarie",
+    "description": "Benzinărie Gazprom, zona Sere.",
+    "address": "Arad",
+    "lat": 46.210489,
+    "lng": 21.35246,
+    "verified": true
+  },
+  {
+    "name": "Socar · zona Sere",
+    "category": "benzinarie",
+    "description": "Benzinărie Socar, zona Sere.",
+    "address": "Arad",
+    "lat": 46.211176,
+    "lng": 21.350492,
+    "verified": true
+  },
+  {
+    "name": "Petrom · Calea Zimandului",
+    "category": "benzinarie",
+    "description": "Benzinărie Petrom, Calea Zimandului.",
+    "address": "Calea Zimandului 45, Arad",
+    "lat": 46.210869,
+    "lng": 21.348023,
+    "verified": true
+  },
+  {
+    "name": "Lukoil · zona Ceala",
+    "category": "benzinarie",
+    "description": "Benzinărie Lukoil, zona Ceala.",
+    "address": "Arad",
+    "lat": 46.202572,
+    "lng": 21.232336,
+    "verified": true
+  },
+  {
+    "name": "OMV · zona Ogorului",
+    "category": "benzinarie",
+    "description": "Benzinărie OMV, zona Ogorului.",
+    "address": "Arad",
+    "lat": 46.129655,
+    "lng": 21.317752,
+    "verified": true
+  },
+  {
+    "name": "Gazprom · zona Bagdazar",
+    "category": "benzinarie",
+    "description": "Benzinărie Gazprom, zona Bagdazar.",
+    "address": "Arad",
+    "lat": 46.129563,
+    "lng": 21.316026,
+    "verified": true
+  },
+  {
+    "name": "MOL · Calea Radnei",
+    "category": "benzinarie",
+    "description": "Benzinărie MOL, Calea Radnei.",
+    "address": "Calea Radnei 294, Arad",
+    "lat": 46.173071,
+    "lng": 21.375215,
+    "verified": true
+  },
+  {
+    "name": "Gazprom · Calea Aurel Vlaicu",
+    "category": "benzinarie",
+    "description": "Benzinărie Gazprom, Calea Aurel Vlaicu.",
+    "address": "Calea Aurel Vlaicu 207, Arad",
+    "lat": 46.200813,
+    "lng": 21.291621,
+    "verified": true
+  },
+  {
+    "name": "MOL · Calea Aurel Vlaicu",
+    "category": "benzinarie",
+    "description": "Benzinărie MOL, Calea Aurel Vlaicu.",
+    "address": "Calea Aurel Vlaicu 244-246, Arad",
+    "lat": 46.201375,
+    "lng": 21.292038,
+    "verified": true
+  },
+  {
+    "name": "Rompetrol · zona Noua",
+    "category": "benzinarie",
+    "description": "Benzinărie Rompetrol, zona Noua.",
+    "address": "Arad",
+    "lat": 46.206988,
+    "lng": 21.26529,
+    "verified": true
+  },
+  {
+    "name": "Lukoil · zona Platforma Vest",
+    "category": "benzinarie",
+    "description": "Benzinărie Lukoil, zona Platforma Vest.",
+    "address": "Arad",
+    "lat": 46.20341,
+    "lng": 21.247368,
+    "verified": true
+  },
+  {
+    "name": "Petrom · Calea Radnei",
+    "category": "benzinarie",
+    "description": "Benzinărie Petrom, Calea Radnei.",
+    "address": "Calea Radnei 286, Arad",
+    "lat": 46.174662,
+    "lng": 21.367411,
+    "verified": true
+  },
+  {
+    "name": "Rompetrol · zona I.B. Deleanu",
+    "category": "benzinarie",
+    "description": "Benzinărie Rompetrol, zona I.B. Deleanu.",
+    "address": "Arad",
+    "lat": 46.194423,
+    "lng": 21.33505,
+    "verified": true
+  },
+  {
+    "name": "Aral · zona Pomenirea",
+    "category": "benzinarie",
+    "description": "Benzinărie Aral, zona Pomenirea.",
+    "address": "Arad",
+    "lat": 46.168911,
+    "lng": 21.292125,
     "verified": true
   }
 ]

@@ -1,5 +1,6 @@
 package ro.hack4arad.topul.ui.settings
 
+import ro.hack4arad.topul.ui.theme.OnInk
 import androidx.compose.material.icons.rounded.Explore
 import androidx.compose.material.icons.rounded.TaskAlt
 import androidx.compose.material.icons.rounded.ReportProblem
@@ -118,7 +119,7 @@ fun SettingsScreen(onBack: () -> Unit) {
             Text(tr("Setări", "Settings", "Beállítások"), color = Ink, fontSize = 24.sp, fontWeight = FontWeight.Black)
         }
         toast?.let {
-            Text(it, color = Color.White, modifier = Modifier.fillMaxWidth().clip(RoundedCornerShape(14.dp)).background(Ink).padding(12.dp))
+            Text(it, color = OnInk, modifier = Modifier.fillMaxWidth().clip(RoundedCornerShape(14.dp)).background(Ink).padding(12.dp))
             Spacer(Modifier.height(8.dp))
         }
 
@@ -192,7 +193,7 @@ fun SettingsScreen(onBack: () -> Unit) {
                 Lang.entries.forEach { l ->
                     val on = LangState.current == l
                     Text(
-                        l.label, color = if (on) Color.White else Ink, fontWeight = FontWeight.Bold,
+                        l.label, color = if (on) OnInk else Ink, fontWeight = FontWeight.Bold,
                         modifier = Modifier.weight(1f).clip(RoundedCornerShape(14.dp)).background(if (on) Ink else Track)
                             .clickable { LangState.select(context, l) }.padding(vertical = 12.dp),
                         textAlign = androidx.compose.ui.text.style.TextAlign.Center,
@@ -201,12 +202,30 @@ fun SettingsScreen(onBack: () -> Unit) {
             }
             Text(tr("Interfața (paleta de culori)", "Interface (color palette)", "Felület (színpaletta)"), color = Ink,
                 fontWeight = FontWeight.Bold, modifier = Modifier.padding(top = 16.dp, bottom = 8.dp))
+            // modul întunecat: opțiune separată, negru / gri / alb
+            Row(
+                Modifier.fillMaxWidth().padding(vertical = 4.dp).clip(RoundedCornerShape(16.dp))
+                    .background(Color(0xFF161616)).border(if (ThemeState.dark) 2.dp else 1.dp, if (ThemeState.dark) Ink else Track, RoundedCornerShape(16.dp))
+                    .clickable { ThemeState.setDark(context, !ThemeState.dark) }.padding(10.dp),
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                androidx.compose.foundation.Image(
+                    androidx.compose.ui.res.painterResource(ro.hack4arad.topul.R.drawable.logo_dark), contentDescription = null,
+                    modifier = Modifier.size(52.dp).clip(RoundedCornerShape(14.dp)),
+                )
+                Spacer(Modifier.width(10.dp))
+                Column(Modifier.weight(1f)) {
+                    Text(tr("Mod întunecat", "Dark mode", "Sötét mód"), color = Color.White, fontWeight = FontWeight.Bold)
+                    Text(tr("Negru, gri și alb", "Black, grey and white", "Fekete, szürke, fehér"), color = Color.White.copy(alpha = 0.6f), fontSize = 12.sp)
+                }
+                androidx.compose.material3.Switch(checked = ThemeState.dark, onCheckedChange = { ThemeState.setDark(context, it) })
+            }
             PALETTES.forEach { pal ->
-                val on = ThemeState.palette.id == pal.id
+                val on = !ThemeState.dark && ThemeState.palette.id == pal.id
                 Row(
                     Modifier.fillMaxWidth().padding(vertical = 4.dp).clip(RoundedCornerShape(16.dp))
-                        .border(if (on) 2.dp else 1.dp, if (on) pal.deep else Track, RoundedCornerShape(16.dp))
-                        .clickable { ThemeState.select(context, pal.id) }.padding(10.dp),
+                        .border(if (on) 2.dp else 1.dp, if (on) Ink else Track, RoundedCornerShape(16.dp))
+                        .clickable { ThemeState.setDark(context, false); ThemeState.select(context, pal.id) }.padding(10.dp),
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
                     // previzualizare: fundalul circular + cele 5 nuanțe
@@ -223,7 +242,7 @@ fun SettingsScreen(onBack: () -> Unit) {
                             }
                         }
                     }
-                    if (on) Icon(Icons.Rounded.Check, null, tint = pal.deep)
+                    if (on) Icon(Icons.Rounded.Check, null, tint = Ink)
                 }
             }
         }
@@ -371,7 +390,7 @@ private fun FeedbackDialog(onDismiss: () -> Unit, onSend: (String, String) -> Un
                     Row(Modifier.padding(bottom = 6.dp), horizontalArrangement = Arrangement.spacedBy(6.dp)) {
                         row.forEach { (code, label) ->
                             val on = kind == code
-                            Text(label, color = if (on) Color.White else Ink, fontSize = 13.sp, fontWeight = FontWeight.Bold,
+                            Text(label, color = if (on) OnInk else Ink, fontSize = 13.sp, fontWeight = FontWeight.Bold,
                                 textAlign = androidx.compose.ui.text.style.TextAlign.Center,
                                 modifier = Modifier.weight(1f).clip(RoundedCornerShape(12.dp)).background(if (on) Ink else Track)
                                     .clickable { kind = code }.padding(vertical = 10.dp))

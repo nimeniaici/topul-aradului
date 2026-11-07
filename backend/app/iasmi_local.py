@@ -40,7 +40,11 @@ CATEGORY_WORDS = {
     "terasa": ("teras", "afara", "aer liber"),
     "bar": ("bar", "bere", "cocktail", "iesit seara", "party", "petrecere"),
     "obiectiv": ("obiectiv", "istori", "muzeu", "palat", "cetat", "monument", "turist", "vizit", "statui", "teatr", "vechi"),
-    "manastire": ("manastir", "bisearic", "biseric", "catedral", "rugaciun"),
+    "manastire": ("manastir", "rugaciun"),
+    "biserica": ("bisearic", "biseric", "catedral", "sinagog", "slujb"),
+    "supermarket": ("supermarket", "market", "lidl", "kaufland", "profi", "penny", "carrefour", "cumparatur", "alimentar"),
+    "benzinarie": ("benzin", "motorin", "carburant", "alimentez", "petrom", "omv", "mol", "rompetrol", "lukoil", "gpl"),
+    "cazare": ("hotel", "pensiun", "cazar", "dorm", "inna", "camer", "motel", "hostel"),
     "natura": ("parc", "plimb", "natur", "strand", "mures", "copii", "joaca", "verde", "padur"),
     "mall": ("mall", "cumpar", "shopping", "magazin", "haine"),
 }
@@ -139,13 +143,16 @@ APP_HELP = [
 ]
 
 NOUNS = {"fastfood": "localuri de fast food", "restaurant": "restaurante", "cafenea": "cafenele", "cofetarie": "cofetării",
-         "gelaterie": "gelaterii", "terasa": "terase", "bar": "baruri", "obiectiv": "obiective", "manastire": "mănăstiri",
+         "gelaterie": "gelaterii", "terasa": "terase", "bar": "baruri", "obiectiv": "obiective", "manastire": "mănăstiri", "biserica": "biserici", "supermarket": "supermarketuri",
+         "benzinarie": "benzinării", "cazare": "hoteluri și pensiuni",
          "natura": "parcuri și locuri în natură", "mall": "centre comerciale", "eveniment": "evenimente"}
 
 ARTICLE = {"restaurant": "Restaurantul", "cafenea": "Cafeneaua", "cofetarie": "Cofetăria", "gelaterie": "Gelateria",
-           "bar": "Barul", "terasa": "Terasa", "fastfood": "Localul"}
+           "bar": "Barul", "terasa": "Terasa", "fastfood": "Localul",
+           "supermarket": "Magazinul", "benzinarie": "Benzinăria"}
 OWN_TYPE = ("pizz", "rest", "cafe", "coffee", "cofet", "gelat", "bar", "teras", "bistro", "kfc", "mcdonald", "burger",
-            "parcul", "manastir", "palatul", "cetatea", "muzeul", "teatrul", "catedral", "statui")
+            "parcul", "manastir", "palatul", "cetatea", "muzeul", "teatrul", "catedral", "statui", "biseric", "hotel", "pensiun", "motel", "hostel", "lidl", "kaufland", "profi",
+            "penny", "carrefour", "petrom", "omv", "mol", "rompetrol", "lukoil")
 
 
 def _where(p: Place, d: dict) -> str:
@@ -224,12 +231,12 @@ def answer(db: Session, text: str, near: tuple[float, float] | None) -> tuple[st
 
     # cunoștințe despre servicii publice
     for roots, reply in KNOWLEDGE:
-        if _has(t, *roots):
+        if _has(t, *roots) and not _has(t, "ajung", "traseu"):   # „cum ajung cu tramvaiul la X” = rută, nu bilete
             return reply, []
 
     # cum ajung la ...
-    phrases = (" unde e ", " unde este ", " unde se afla ", " cum ajung ", " drumul ")
-    if _has(t, "ajung", "traseu", "navig") or any(ph in f" {t} " for ph in phrases):
+    phrases = (" unde e ", " unde este ", " unde se afla ", " cum ajung ", " drumul ", " ce tramvai ", " ce autobuz ", " cu ce ")
+    if _has(t, "ajung", "traseu", "navig", "tramvai", "autobuz") and _match_places(db, t, _intent_category(t)) or _has(t, "ajung", "traseu", "navig") or any(ph in f" {t} " for ph in phrases):
         places = _match_places(db, t, _intent_category(t))
         # întâi locul al cărui nume se potrivește cel mai bine, apoi cel mai apropiat
         words = _keywords(t)
@@ -238,11 +245,17 @@ def answer(db: Session, text: str, near: tuple[float, float] | None) -> tuple[st
         if places:
             p = places[0]
             d = _place_dict(p, near)
-            where = f" Ești la {_fmt_dist(d['distance_m'])}, {_walk(d['distance_m'])}." if near else ""
             addr = p.address if p.address and p.address.strip().lower() != "arad" else ""
             first = f"{p.name} e pe {addr}." if addr else f"Am găsit {p.name}."
-            return (f"{first}{where} Apasă pe el mai jos și apoi „Du-mă acolo”: pornește navigarea "
-                    f"în Google Maps."), [d]
+            if near:
+                from .route_planner import plan
+                try:
+                    route = plan(near[0], near[1], p.lat, p.lng)["text"]
+                except Exception:
+                    route = f"Ești la {_fmt_dist(d['distance_m'])}, {_walk(d['distance_m'])}."
+                return f"{first} {route} Pentru navigare pas cu pas, apasă pe el mai jos și „Du-mă acolo”.", [d]
+            return (f"{first} Pornește locația și îți spun ce tramvai sau autobuz iei. Sau apasă pe el mai jos "
+                    f"și „Du-mă acolo”: pornește navigarea în Google Maps."), [d]
         return "Spune-mi numele locului (de exemplu „Cetatea Aradului” sau „Palatul Cultural”) și îți arăt drumul.", []
 
     # ghidul aplicației

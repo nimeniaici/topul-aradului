@@ -85,6 +85,7 @@ fun AudioGuide(story: String, modifier: Modifier = Modifier) {
     val context = LocalContext.current
     var ready by remember { mutableStateOf(false) }
     var missingVoice by remember { mutableStateOf(false) }
+    var noEngine by remember { mutableStateOf(false) }
     var speaking by remember { mutableStateOf(false) }
     val tts = remember { mutableStateOf<TextToSpeech?>(null) }
 
@@ -92,14 +93,16 @@ fun AudioGuide(story: String, modifier: Modifier = Modifier) {
         var engine: TextToSpeech? = null
         engine = TextToSpeech(context.applicationContext) { status ->
             val e = engine ?: return@TextToSpeech
-            if (status != TextToSpeech.SUCCESS) { missingVoice = true; return@TextToSpeech }
+            if (status != TextToSpeech.SUCCESS) { noEngine = true; ready = true; return@TextToSpeech }
             val result = e.setLanguage(Locale.forLanguageTag("ro-RO"))
+            // fără voce română: citim totuși (motorul o poate descărca singur), iar instalarea rămâne opțională
             missingVoice = result == TextToSpeech.LANG_MISSING_DATA || result == TextToSpeech.LANG_NOT_SUPPORTED
             e.setSpeechRate(0.95f)
             e.setOnUtteranceProgressListener(object : UtteranceProgressListener() {
                 override fun onStart(id: String?) { speaking = true }
                 override fun onDone(id: String?) { speaking = false }
                 @Deprecated("Deprecated in Java") override fun onError(id: String?) { speaking = false }
+                override fun onError(id: String?, errorCode: Int) { speaking = false; if (errorCode == TextToSpeech.ERROR_NOT_INSTALLED_YET) missingVoice = true }
             })
             ready = true
         }
@@ -113,11 +116,12 @@ fun AudioGuide(story: String, modifier: Modifier = Modifier) {
             .clickable(enabled = ready) {
                 val engine = tts.value ?: return@clickable
                 when {
-                    missingVoice -> try {
-                        context.startActivity(Intent(TextToSpeech.Engine.ACTION_INSTALL_TTS_DATA).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
-                    } catch (_: ActivityNotFoundException) {}
+                    noEngine -> installVoice(context)
                     speaking -> { engine.stop(); speaking = false }
-                    else -> engine.speak(story, TextToSpeech.QUEUE_FLUSH, null, "poveste")
+                    else -> {
+                        speaking = true
+                        if (engine.speak(story, TextToSpeech.QUEUE_FLUSH, null, "poveste") != TextToSpeech.SUCCESS) { speaking = false; installVoice(context) }
+                    }
                 }
             }
             .padding(14.dp),
@@ -130,17 +134,19 @@ fun AudioGuide(story: String, modifier: Modifier = Modifier) {
         Column(Modifier.weight(1f)) {
             Text(
                 when {
-                    missingVoice -> "Instalează vocea română"
+                    noEngine -> "Instalează un motor de voce"
                     speaking -> "Ascultă… (atinge ca să oprești)"
                     else -> "Ascultă povestea locului"
                 },
                 color = Ink, fontWeight = FontWeight.Black, fontSize = 16.sp,
             )
             Text(
-                if (missingVoice) "Telefonul nu are încă vocea în română. Atinge ca s-o descarci."
+                if (noEngine) "Telefonul nu are „Text în vorbire”. Atinge ca să-l instalezi."
                 else "Ghid audio în română · ~30 de secunde",
                 color = TextMuted, fontSize = 13.sp,
             )
+            if (missingVoice && !noEngine) Text("Vocea română nu e descărcată – atinge aici ca s-o instalezi", color = Gold, fontSize = 12.sp,
+                fontWeight = FontWeight.Bold, modifier = Modifier.padding(top = 2.dp).clickable { installVoice(context) })
         }
         if (speaking) SoundBars()
     }
@@ -210,5 +216,16 @@ fun ThenAndNow(place: PlaceDetail, old: OldPhoto, modifier: Modifier = Modifier)
             ) { Icon(Icons.Rounded.SwapHoriz, null, tint = Night) }
         }
         Text("Trage de mâner: ${old.year} ↔ azi · ${old.credit}", color = TextMuted, fontSize = 11.sp, modifier = Modifier.padding(top = 6.dp))
+    }
+}
+
+private fun installVoice(context: android.content.Context) {
+    try {
+        context.startActivity(Intent(TextToSpeech.Engine.ACTION_INSTALL_TTS_DATA).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
+    } catch (_: ActivityNotFoundException) {
+        try {
+            context.startActivity(Intent(Intent.ACTION_VIEW, android.net.Uri.parse("market://details?id=com.google.android.tts"))
+                .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
+        } catch (_: ActivityNotFoundException) {}
     }
 }

@@ -143,6 +143,18 @@ interface Api {
     @GET("transit/stops/{id}/next")
     suspend fun nextTrams(@Path("id") stopId: String): NextTrams
 
+    @GET("users/{id}/public")
+    suspend fun publicProfile(@Path("id") id: Int): PublicProfile
+
+    @GET("transit/stops/{id}/timetable")
+    suspend fun timetable(@Path("id") stopId: String): Timetable
+
+    @POST("transit/checkin")
+    suspend fun stopCheckin(@Body body: StopCheckinIn): StopCheckinOut
+
+    @GET("me/rewards")
+    suspend fun rewards(): RewardsOut
+
     @GET("transit/vehicles")
     suspend fun vehicles(): VehiclesOut
 

@@ -257,3 +257,42 @@ def my_tickets(user: User = Depends(get_current_user), db: Session = Depends(get
     rows = db.scalars(select(TransitTicket).where(TransitTicket.user_id == user.id)
                       .order_by(TransitTicket.created_at.desc()).limit(20)).all()
     return [_ticket_out(t) for t in rows]
+
+
+@router.get("/stops/{stop_id}/timetable")
+def timetable(stop_id: str):
+    """Orarul stației pentru restul zilei (toate plecările, pe linii), din orarul CTP + întârzierile live."""
+    stop = _stop_index().get(stop_id)
+    if not stop:
+        raise HTTPException(404, "Stația nu există.")
+    raw = _fetch(f"/stops/{stop_id}/times?numberOfDepartures=200", ttl=120)
+    now = datetime.now(timezone.utc)
+    lines_out: dict[str, dict] = {}
+    for group in raw or []:
+        ref = group.get("route") or {}
+        route = _routes_by_id().get(ref.get("routeId"))
+        if not route:
+            continue
+        pat = _pattern(route, ref.get("index"))
+        key = f"{route['ref']}|{pat['to'] if pat else ''}"
+        entry = lines_out.setdefault(key, {"line": route["ref"], "mode": route["mode"], "color": route["color"],
+                                           "towards": pat["to"] if pat else route["name"], "times": []})
+        for t in group.get("times") or []:
+            sched = _parse(t.get("scheduledArrival"))
+            if not sched:
+                continue
+            delay = t.get("arrivalDelay") or 0
+            real = sched + timedelta(seconds=delay)
+            if real < now - timedelta(minutes=1):
+                continue
+            entry["times"].append({"time": sched.astimezone(TZ).strftime("%H:%M"),
+                                   "expected": real.astimezone(TZ).strftime("%H:%M"),
+                                   "delay_min": round(delay / 60), "live": bool(t.get("realtime")),
+                                   "in_min": max(0, int((real - now).total_seconds() // 60)),
+                                   "tomorrow": sched.astimezone(TZ).date() > datetime.now(TZ).date()})
+    out = [v for v in lines_out.values() if v["times"]]
+    for v in out:
+        v["times"].sort(key=lambda x: x["in_min"])
+    out.sort(key=lambda v: (v["mode"] != "tram", v["line"].zfill(4)))
+    return {"stop": stop, "lines": out, "available": raw is not None, "date": datetime.now(TZ).strftime("%d.%m.%Y"),
+            "source": "Orar CTP Arad / Telelink"}

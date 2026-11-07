@@ -129,7 +129,7 @@ fun HomeScreen(onOpen: (HomeTarget) -> Unit) {
             Tile(tr("Calendar gunoi", "Waste calendar", "Hulladéknaptár"), tr("Când vine mașina pe strada ta", "Pickup days on your street", "Szállítási napok"),
                 Icons.Rounded.Recycling, Mint, HomeTarget.Screen("gunoi")),
             Tile(tr("Sesizările mele", "My reports", "Bejelentéseim"), tr("Ce a răspuns Primăria", "City Hall replies", "A városháza válaszai"), Icons.Rounded.Assignment, Lilac, HomeTarget.Screen("reports")),
-            Tile(tr("Alerte urgente", "Urgent alerts", "Sürgős riasztás"), tr("Furtună, inundație, canal", "Storm, flood, manhole", "Vihar, árvíz, csatorna"), Icons.Rounded.Thunderstorm, Pink, HomeTarget.Map(MapRequest(report = true))),
+            Tile(tr("Alerte urgente", "Urgent alerts", "Sürgős riasztás"), tr("Inundații, gaze, cutremur, explozii", "Floods, gas, earthquake, explosions", "Árvíz, gáz, földrengés"), Icons.Rounded.Thunderstorm, Pink, HomeTarget.Map(MapRequest(report = true, emergency = true))),
         ),
         tr("Comunitate", "Community", "Közösség") to listOf(
             Tile(tr("Comunitatea Aradului", "Arad community", "Aradi közösség"), tr("Chat, anunțuri, evenimente", "Chat, news, events", "Chat, események"),
@@ -227,7 +227,7 @@ private fun MapHero(onClick: () -> Unit) {
     val shape = RoundedCornerShape(26.dp)
     Box(
         Modifier.fillMaxWidth().height(150.dp).clip(shape)
-            .background(Brush.linearGradient(listOf(NightDeep, Violet, Electric)))
+            .background(Brush.linearGradient(if (ro.hack4arad.topul.ui.theme.ThemeState.dark) listOf(Color(0xFF000000), Color(0xFF2A2A2A), Color(0xFF4A4A4A)) else listOf(NightDeep, Violet, Electric)))
             .clickable(onClick = onClick).padding(20.dp),
     ) {
         Column(Modifier.align(Alignment.CenterStart)) {

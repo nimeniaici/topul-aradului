@@ -8,6 +8,13 @@
          iar dacă am declara-o fără să o cerem, intent-ul ar fi blocat. -->
     <uses-feature android:name="android.hardware.camera" android:required="false" />
 
+    <!-- Android 11+: fără asta aplicația nu „vede” motorul de voce, iar ghidul audio nu pornește -->
+    <queries>
+        <intent>
+            <action android:name="android.intent.action.TTS_SERVICE" />
+        </intent>
+    </queries>
+
     <application
         android:name=".TopulApp"
         android:networkSecurityConfig="@xml/network_security_config"

@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Typography
+import androidx.compose.material3.darkColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -46,14 +47,29 @@ val PALETTES = listOf(
 )
 const val DEFAULT_PALETTE = 3 // Trandafir și prună
 
+/** Modul întunecat: negru, gri și alb (independent de paletă). „deep” = textul (deschis), „center/edge” = fundalul. */
+val DARK_PALETTE = AppPalette(0, "Întunecat", Color(0xFFF2F2F2), Color(0xFF6E6E6E), Color(0xFFE6E6E6), Color(0xFFBDBDBD),
+    Color(0xFF2E2E2E), Color(0xFF161616), Color(0xFF000000), R.drawable.logo_dark)
+
 /** Setările de aspect (paleta), ținute minte pe telefon. */
 object ThemeState {
     var palette by mutableStateOf(PALETTES.first { it.id == DEFAULT_PALETTE })
         private set
+    var dark by mutableStateOf(false)
+        private set
+
+    /** Paleta folosită acum: cea întunecată, dacă modul întunecat e pornit. */
+    val active: AppPalette get() = if (dark) DARK_PALETTE else palette
+
+    fun setDark(context: Context, on: Boolean) {
+        context.getSharedPreferences("settings", Context.MODE_PRIVATE).edit().putBoolean("dark_mode", on).apply()
+        dark = on
+    }
 
     fun init(context: Context) {
         val id = context.getSharedPreferences("settings", Context.MODE_PRIVATE).getInt("palette_v2", DEFAULT_PALETTE)
         palette = PALETTES.firstOrNull { it.id == id } ?: palette
+        dark = context.getSharedPreferences("settings", Context.MODE_PRIVATE).getBoolean("dark_mode", false)
         ro.hack4arad.topul.util.AppIcon.apply(context, palette.id) // iconița de pe telefon = paleta salvată
     }
 
@@ -64,27 +80,29 @@ object ThemeState {
     }
 }
 
-private val P get() = ThemeState.palette
+private val P get() = ThemeState.active
+private val D get() = ThemeState.dark
 
 // Numele vechi rămân (sunt folosite peste tot), dar acum vin din paleta aleasă.
 val Night: Color get() = P.center            // fundalul ecranelor
-val NightDeep: Color get() = P.deep          // bara de jos, panouri închise
-val Panel: Color get() = Color.White         // carduri
+val NightDeep: Color get() = if (D) Color(0xFF000000) else P.deep   // bara de jos, panouri închise
+val Panel: Color get() = if (D) Color(0xFF1F1F1F) else Color.White  // carduri
 val PanelHigh: Color get() = P.a4
 val Track: Color get() = P.a4
 val Gold: Color get() = P.a2                 // accentul principal (butoane, evidențieri)
-val GoldDark: Color get() = Color.White      // text pe accent
+val GoldDark: Color get() = if (D) Color.Black else Color.White   // text pe accent
+val OnInk: Color get() = if (D) Color.Black else Color.White      // text pe fundal „Ink”
 val Pink: Color get() = P.a1                 // alerte, sesizări
 val Mint: Color get() = P.a3
-val MintDark: Color get() = P.deep
+val MintDark: Color get() = NightDeep
 val Electric: Color get() = P.a2
 val Violet: Color get() = P.a1
-val VioletDeep: Color get() = P.deep
+val VioletDeep: Color get() = NightDeep
 val Lilac: Color get() = P.deep.copy(alpha = 0.72f)   // text secundar
 val Leaf: Color get() = P.a3
 val TextMuted: Color get() = P.deep.copy(alpha = 0.5f)
 val Ink: Color get() = P.deep                // textul principal
-val Scrim: Color get() = P.deep              // umbră peste poze (text alb deasupra)
+val Scrim: Color get() = if (D) Color.Black else P.deep   // umbră peste poze (text alb deasupra)
 val BackgroundBrush: Brush get() = Brush.radialGradient(0.0f to P.center, 0.5f to P.center, 1.0f to P.edge)
 
 private val AppType = Typography().let { t ->
@@ -100,8 +118,22 @@ private val AppType = Typography().let { t ->
 
 @Composable
 fun TopulTheme(content: @Composable () -> Unit) {
-    val p = ThemeState.palette
-    val colors = lightColorScheme(
+    val p = ThemeState.active
+    val colors = if (ThemeState.dark) darkColorScheme(
+        primary = p.a2, onPrimary = Color.Black,
+        primaryContainer = p.a4, onPrimaryContainer = p.deep,
+        secondary = p.a1, onSecondary = Color.White,
+        secondaryContainer = p.a4, onSecondaryContainer = p.deep,
+        tertiary = p.a3, onTertiary = Color.Black,
+        background = p.center, onBackground = p.deep,
+        surface = p.center, onSurface = p.deep,
+        surfaceVariant = Color(0xFF1F1F1F), onSurfaceVariant = p.deep.copy(alpha = 0.6f),
+        surfaceContainerLowest = Color(0xFF1F1F1F), surfaceContainerLow = Color(0xFF1F1F1F),
+        surfaceContainer = Color(0xFF1F1F1F), surfaceContainerHigh = Color(0xFF242424), surfaceContainerHighest = p.a4,
+        inverseSurface = p.deep, inverseOnSurface = Color.Black, inversePrimary = p.a4,
+        outline = p.deep.copy(alpha = 0.45f), outlineVariant = p.a4,
+        error = Color(0xFFFF8A80),
+    ) else lightColorScheme(
         primary = p.a2, onPrimary = Color.White,
         primaryContainer = p.a4, onPrimaryContainer = p.deep,
         secondary = p.a1, onSecondary = Color.White,

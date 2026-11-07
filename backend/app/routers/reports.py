@@ -31,9 +31,23 @@ REPORT_CATEGORIES = {
     "parcare": "Mașină parcată ilegal",
     "animale": "Animale fără stăpân",
     "altele": "Altceva",
+    # ALERTE URGENTE (din „Alerte urgente”): pericol major, au prioritate maximă la Primărie
+    "inundatie_majora": "Inundație / revărsarea Mureșului",
+    "cutremur": "Cutremur – clădire avariată",
+    "gaze": "Scurgere / miros puternic de gaze",
+    "explozie": "Explozie / incendiu",
+    "prabusire": "Clădire sau structură prăbușită",
+    "cablu": "Cablu electric căzut",
+    "alunecare": "Surpare de teren / drum prăbușit",
 }
 # cele care pot pune oameni în pericol apar primele la Primărie
-URGENT = {"furtuna", "inundatie", "canal", "semnalizare"}
+EMERGENCY = {"inundatie_majora", "cutremur", "gaze", "explozie", "prabusire", "cablu", "alunecare"}
+URGENT = {"furtuna", "inundatie", "canal", "semnalizare"} | EMERGENCY
+
+
+def priority(category: str) -> int:
+    """0 = alertă majoră (pericol pentru vieți), 1 = urgent, 2 = normal."""
+    return 0 if category in EMERGENCY else 1 if category in URGENT else 2
 XP_REPORT = 10
 XP_RESOLVED = 20  # bonus când Primăria rezolvă problema semnalată de tine
 
@@ -51,6 +65,8 @@ class ReportOut(BaseModel):
     status: str
     status_label: str = ""
     urgent: bool = False
+    emergency: bool = False
+    priority: int = 2
     user_name: str
     created_at: datetime
     admin_note: str | None = None
@@ -67,13 +83,14 @@ class ReportCreated(BaseModel):
 def _out(r: Report) -> ReportOut:
     return ReportOut(id=r.id, category=r.category, category_label=REPORT_CATEGORIES.get(r.category, r.category),
                      description=r.description, lat=r.lat, lng=r.lng, photo_url=photo_url(r.photo_path),
-                     status=r.status, status_label=STATUSES.get(r.status, r.status), urgent=r.category in URGENT, user_name=r.user.name,
+                     status=r.status, status_label=STATUSES.get(r.status, r.status), urgent=r.category in URGENT,
+                     emergency=r.category in EMERGENCY, priority=priority(r.category), user_name=r.user.name,
                      created_at=r.created_at, admin_note=r.admin_note, updated_at=r.updated_at)
 
 
 @router.get("/categories")
 def categories():
-    return [{"code": c, "label": l, "urgent": c in URGENT} for c, l in REPORT_CATEGORIES.items()]
+    return [{"code": c, "label": l, "urgent": c in URGENT, "emergency": c in EMERGENCY} for c, l in REPORT_CATEGORIES.items()]
 
 
 @router.post("", response_model=ReportCreated, status_code=201)
@@ -96,7 +113,7 @@ async def create_report(
         raise HTTPException(400, "Sesizările se pot face doar în județul Arad.")
     recent = db.scalar(select(Report.id).where(Report.user_id == user.id,
                                               Report.created_at >= utcnow() - timedelta(seconds=30)).limit(1))
-    if recent:
+    if recent and category not in EMERGENCY:   # o alertă majoră nu o blocăm niciodată
         raise HTTPException(429, "Ai trimis o sesizare chiar acum. Mai așteaptă puțin.")
     path = await _save_photo(photo) if photo and photo.filename else None
     report = Report(user_id=user.id, category=category, description=description.strip(), lat=lat, lng=lng, photo_path=path)
@@ -107,8 +124,8 @@ async def create_report(
     db.refresh(user)
     db.refresh(report)
     out = _out(report)
-    background.add_task(hub.broadcast, {"type": "report", "lat": lat, "lng": lng, "place_name": out.category_label,
-                                        "user_name": user.name})
+    background.add_task(hub.broadcast, {"type": "alert" if out.emergency else "report", "lat": lat, "lng": lng,
+                                        "place_name": out.category_label, "user_name": user.name})
     return ReportCreated(report=out, xp_gained=XP_REPORT, total_xp=user.xp, level=level(user.xp))
 
 
@@ -155,7 +172,10 @@ def admin_list(status: str | None = None, days: int = Query(90, ge=1, le=3650), 
          .where(Report.created_at >= utcnow() - timedelta(days=days)).order_by(Report.created_at.desc()).limit(1000))
     if status:
         q = q.where(Report.status == status)
-    return [AdminReportOut(**_out(r).model_dump(), user_id=r.user_id) for r in db.scalars(q)]
+    rows = [AdminReportOut(**_out(r).model_dump(), user_id=r.user_id) for r in db.scalars(q)]
+    open_first = {"nou": 0, "in_lucru": 1}
+    rows.sort(key=lambda r: (open_first.get(r.status, 2), r.priority if r.status in open_first else 2))
+    return rows
 
 
 @admin_router.get("/stats", dependencies=[Depends(require_primarie)])

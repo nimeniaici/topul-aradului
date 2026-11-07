@@ -179,7 +179,13 @@ private fun MainScaffold() {
             composable("settings") { SettingsScreen(onBack = { nav.popBackStack() }) }
             composable("discover") { DiscoverScreen(onBack = { nav.popBackStack() }, onPlace = openPlace) }
             composable("duels") { DuelScreen() }
-            composable("top") { LeaderboardScreen(onPlace = openPlace) }
+            composable("top") { LeaderboardScreen(onPlace = openPlace, onUser = { id -> nav.navigate("user/$id") }) }
+            composable("user/{id}", arguments = listOf(navArgument("id") { type = NavType.IntType })) { entry ->
+                ro.hack4arad.topul.ui.social.UserProfileScreen(
+                    userId = entry.arguments?.getInt("id") ?: 0, onBack = { nav.popBackStack() }, onPlace = openPlace,
+                    onChat = { id -> nav.navigate("chat/$id") },
+                )
+            }
             composable("profile") { ProfileScreen(onPlace = openPlace) }
             composable(
                 "place/{id}",

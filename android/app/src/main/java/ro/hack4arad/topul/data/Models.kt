@@ -246,6 +246,18 @@ data class FriendProfile(val id: Int, val name: String, val level: Int, val xp: 
 data class FriendLocation(val id: Int, val name: String, val avatarUrl: String?, val avatarColor: String?, val avatarEmoji: String?,
                           val lat: Double, val lng: Double, val updatedAt: String, val thrones: Int, val level: Int)
 
+data class PublicProfile(val id: Int, val name: String, val level: Int, val xp: Int, val avatarEmoji: String?, val avatarColor: String?,
+                         val avatarUrl: String?, val thrones: Int, val rank: Int, val checkins: Int, val placesVisited: Int,
+                         val badges: List<Badge>, val conquered: List<ConqueredPlace>, val friendship: String)
+data class TimeEntry(val time: String, val expected: String, val delayMin: Int, val live: Boolean, val inMin: Int, val tomorrow: Boolean = false)
+data class TimetableLine(val line: String, val mode: String, val color: String, val towards: String, val times: List<TimeEntry>)
+data class Timetable(val stop: TransitStop, val lines: List<TimetableLine>, val available: Boolean, val date: String, val source: String)
+data class StopCheckinIn(val stopId: String, val lat: Double, val lng: Double, val isMock: Boolean = false)
+data class StopCheckinOut(val detail: String, val total: Int)
+data class Reward(val code: String, val kind: String, val title: String, val description: String, val progress: Int, val goal: Int,
+                  val unlocked: Boolean, val voucher: String?, val placeId: Int?, val placeName: String?)
+data class RewardsOut(val rewards: List<Reward>, val stopCheckins: Int, val note: String)
+
 // ---------- comunitate ----------
 data class RoomTag(val code: String, val label: String)
 data class Room(val id: Int, val kind: String, val tag: String, val tagLabel: String, val name: String, val description: String,
