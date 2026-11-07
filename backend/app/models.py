@@ -165,3 +165,72 @@ class TransitTicket(Base):
     code: Mapped[str] = mapped_column(String(20))
     valid_until: Mapped[datetime] = mapped_column(DateTime)
     created_at: Mapped[datetime] = mapped_column(DateTime, default=utcnow)
+
+
+# ---------------- prieteni ----------------
+class Friendship(Base):
+    """Relația dintre doi utilizatori: cerere (pending), prieteni (accepted) sau blocat (blocked).
+    requester = cine a trimis cererea (sau cine a blocat, la blocked)."""
+    __tablename__ = "friendships"
+    __table_args__ = (UniqueConstraint("requester_id", "addressee_id"),)
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    requester_id: Mapped[int] = mapped_column(ForeignKey("users.id"), index=True)
+    addressee_id: Mapped[int] = mapped_column(ForeignKey("users.id"), index=True)
+    status: Mapped[str] = mapped_column(String(10), default="pending")
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=utcnow)
+
+
+class SharedLocation(Base):
+    """Ultima poziție a unui utilizator care a ales să se arate prietenilor pe hartă (opțional, oprit implicit)."""
+    __tablename__ = "shared_locations"
+
+    user_id: Mapped[int] = mapped_column(ForeignKey("users.id"), primary_key=True)
+    sharing: Mapped[bool] = mapped_column(Boolean, default=False)
+    lat: Mapped[float | None] = mapped_column(Float, nullable=True)
+    lng: Mapped[float | None] = mapped_column(Float, nullable=True)
+    updated_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+
+
+# ---------------- comunitate (chat) ----------------
+class ChatRoom(Base):
+    """general = comunitatea Aradului (toată lumea); group = vecini, bloc, școală…; direct = între doi prieteni."""
+    __tablename__ = "chat_rooms"
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    kind: Mapped[str] = mapped_column(String(10), index=True)
+    tag: Mapped[str] = mapped_column(String(20), default="")          # vecini, cartier, bloc, scoala, altele
+    name: Mapped[str] = mapped_column(String(60))
+    description: Mapped[str] = mapped_column(String(200), default="")
+    owner_id: Mapped[int | None] = mapped_column(ForeignKey("users.id"), nullable=True)
+    invite_code: Mapped[str | None] = mapped_column(String(12), nullable=True, unique=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=utcnow)
+
+
+class ChatMember(Base):
+    __tablename__ = "chat_members"
+    __table_args__ = (UniqueConstraint("room_id", "user_id"),)
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    room_id: Mapped[int] = mapped_column(ForeignKey("chat_rooms.id"), index=True)
+    user_id: Mapped[int] = mapped_column(ForeignKey("users.id"), index=True)
+    joined_at: Mapped[datetime] = mapped_column(DateTime, default=utcnow)
+
+
+class ChatMessage(Base):
+    """Mesaj; kind = text, anunt sau eveniment (cu titlu, dată și loc)."""
+    __tablename__ = "chat_messages"
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    room_id: Mapped[int] = mapped_column(ForeignKey("chat_rooms.id"), index=True)
+    user_id: Mapped[int] = mapped_column(ForeignKey("users.id"), index=True)
+    kind: Mapped[str] = mapped_column(String(12), default="text")
+    text: Mapped[str] = mapped_column(Text)
+    event_title: Mapped[str | None] = mapped_column(String(100), nullable=True)
+    event_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+    event_place: Mapped[str | None] = mapped_column(String(120), nullable=True)
+    event_lat: Mapped[float | None] = mapped_column(Float, nullable=True)
+    event_lng: Mapped[float | None] = mapped_column(Float, nullable=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=utcnow, index=True)
+
+    user: Mapped[User] = relationship()

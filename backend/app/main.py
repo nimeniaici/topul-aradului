@@ -9,7 +9,7 @@ from fastapi.staticfiles import StaticFiles
 from . import config
 from .db import Base, SessionLocal, engine, ensure_columns, scrub_checkin_gps
 from . import usernames
-from .routers import auth, checkins, crashes, feedback, iasmi, primarie, transit, download, duels, leaderboard, live, pages, places, reports, tour3d, users
+from .routers import auth, checkins, community, crashes, feedback, friends, iasmi, primarie, transit, download, duels, leaderboard, live, pages, places, reports, tour3d, users
 from .seed import seed_places
 
 
@@ -19,6 +19,7 @@ async def lifespan(_app: FastAPI):
     ensure_columns()
     scrub_checkin_gps()
     usernames.migrate(engine)
+    community.ensure_general()
     config.UPLOAD_DIR.mkdir(parents=True, exist_ok=True)
     if config.SEED_ON_STARTUP:
         with SessionLocal() as db:
@@ -40,7 +41,7 @@ app.mount("/uploads", StaticFiles(directory=config.UPLOAD_DIR), name="uploads")
 app.mount("/static", StaticFiles(directory=Path(__file__).parent / "static"), name="static")
 
 app.include_router(reports.admin_router)
-for r in (auth, places, leaderboard, checkins, duels, users, live, pages, tour3d, download, reports, crashes, primarie, feedback, iasmi, transit):
+for r in (auth, places, leaderboard, checkins, duels, users, live, pages, tour3d, download, reports, crashes, primarie, feedback, iasmi, transit, friends, community):
     app.include_router(r.router)
 
 

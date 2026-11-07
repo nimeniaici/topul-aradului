@@ -1,5 +1,6 @@
 package ro.hack4arad.topul.ui.map
 
+import androidx.compose.material.icons.rounded.Group
 import androidx.compose.material.icons.rounded.Tram
 import com.google.maps.android.compose.Circle
 import com.google.maps.android.compose.Polyline
@@ -276,6 +277,13 @@ class MapViewModel : ViewModel() {
     var tramLines by mutableStateOf<List<ro.hack4arad.topul.data.TransitLine>>(emptyList())
         private set
 
+    var friendLocs by mutableStateOf<List<ro.hack4arad.topul.data.FriendLocation>>(emptyList())
+        private set
+
+    suspend fun refreshFriends() {
+        runCatching { Network.api.friendLocations() }.onSuccess { friendLocs = it }
+    }
+
     fun loadTram() {
         if (tramLines.isNotEmpty()) return
         viewModelScope.launch { runCatching { Network.api.transitLines() }.onSuccess { tramLines = it } }
@@ -358,6 +366,8 @@ fun MapScreen(onPlace: (Int) -> Unit, onOpenReports: () -> Unit = {}, vm: MapVie
     var showHeat by rememberSaveable { mutableStateOf(false) }
     var showTram by rememberSaveable { mutableStateOf(false) }
     var showReports by rememberSaveable { mutableStateOf(true) }
+    var showFriends by rememberSaveable { mutableStateOf(false) }
+    LaunchedEffect(showFriends) { while (showFriends) { vm.refreshFriends(); kotlinx.coroutines.delay(30_000) } }
     LaunchedEffect(showTram) { if (showTram) vm.loadTram() }
     var reporting by remember { mutableStateOf(false) }
     var query by rememberSaveable { mutableStateOf("") }
@@ -403,7 +413,7 @@ fun MapScreen(onPlace: (Int) -> Unit, onOpenReports: () -> Unit = {}, vm: MapVie
         } else {
             PlacesMap(
                 vm = vm, places = shown, camera = camera, look = look, hasPermission = hasPermission, showHeat = showHeat,
-                showTram = showTram, showReports = showReports,
+                showTram = showTram, showReports = showReports, showFriends = showFriends,
                 highlightedId = if (selecting) carouselPlace?.id else null,
                 bottomPadding = if (selecting) 270.dp else 16.dp,
                 onPlaceTap = { p ->
@@ -484,7 +494,8 @@ fun MapScreen(onPlace: (Int) -> Unit, onOpenReports: () -> Unit = {}, vm: MapVie
         ) {
             MapMenu(
                 vm = vm, listMode = listMode, look = look, showHeat = showHeat, hasPermission = hasPermission,
-                showTram = showTram, showReports = showReports,
+                showTram = showTram, showReports = showReports, showFriends = showFriends,
+                onFriends = { showFriends = !showFriends; menuOpen = false; listMode = false },
                 onTram = { showTram = !showTram; menuOpen = false; listMode = false },
                 onReports = { showReports = !showReports },
                 onList = { listMode = !listMode; menuOpen = false },
@@ -525,6 +536,7 @@ fun MapScreen(onPlace: (Int) -> Unit, onOpenReports: () -> Unit = {}, vm: MapVie
 private fun MapMenu(
     vm: MapViewModel, listMode: Boolean, look: MapLook, showHeat: Boolean, hasPermission: Boolean,
     showTram: Boolean, showReports: Boolean, onTram: () -> Unit, onReports: () -> Unit,
+    showFriends: Boolean = false, onFriends: () -> Unit = {},
     onList: () -> Unit, onLook: (MapLook) -> Unit, onHeat: () -> Unit, onMe: () -> Unit,
     onCategory: (String?) -> Unit, onReport: () -> Unit, onMyReports: () -> Unit,
 ) {
@@ -540,6 +552,8 @@ private fun MapMenu(
         MenuRow(Icons.Rounded.LocalFireDepartment, "Agitație acum",
             if (showHeat) "Pornită: unde sunt oamenii acum" else "Unde sunt oamenii acum", Gold, active = showHeat, onClick = onHeat)
         Text("Straturi pe hartă", color = TextMuted, fontSize = 13.sp, modifier = Modifier.padding(top = 14.dp, bottom = 4.dp, start = 4.dp))
+        MenuRow(Icons.Rounded.Group, "Prietenii mei", if (showFriends) "Pornit: prietenii care se arată pe hartă" else "Cine dintre prieteni e prin oraș",
+            Mint, active = showFriends, onClick = onFriends)
         MenuRow(Icons.Rounded.Tram, "Liniile de tramvai", if (showTram) "Pornit: traseele și stațiile CTP" else "Traseele și stațiile CTP",
             Electric, active = showTram, onClick = onTram)
         MenuRow(Icons.Rounded.ReportProblem, "Sesizări din oraș", if (showReports) "Pornit: gropi, furtună, iluminat…" else "Oprit",
@@ -742,6 +756,7 @@ private fun PlacesMap(
     showHeat: Boolean,
     showTram: Boolean = false,
     showReports: Boolean = true,
+    showFriends: Boolean = false,
     highlightedId: Int?,
     bottomPadding: androidx.compose.ui.unit.Dp = 16.dp,
     onPlaceTap: (Place) -> Unit,
@@ -795,6 +810,17 @@ private fun PlacesMap(
                 l.stops.forEach { st ->
                     Circle(center = LatLng(st.lat, st.lng), radius = 16.0, fillColor = Color.White, strokeColor = Color(0xFF263238), strokeWidth = 4f)
                 }
+            }
+        }
+        // prietenii care au ales să se arate (doar prietenii acceptați îi văd)
+        if (showFriends) vm.friendLocs.forEach { f ->
+            key("friend-${f.id}") {
+                Marker(
+                    state = MarkerState(LatLng(f.lat, f.lng)),
+                    title = "@${f.name}",
+                    snippet = "Nivel ${f.level} · ${f.thrones} tronuri",
+                    icon = BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_VIOLET),
+                )
             }
         }
         if (showReports) vm.reports.filter { it.status != "respins" }.forEach { r ->

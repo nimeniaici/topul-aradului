@@ -1,5 +1,7 @@
 package ro.hack4arad.topul.ui.home
 
+import androidx.compose.material.icons.rounded.Group
+import androidx.compose.material.icons.rounded.Forum
 import androidx.compose.material.icons.rounded.Tram
 import ro.hack4arad.topul.ui.components.AppLogo
 import ro.hack4arad.topul.ui.iasmi.IasmiOrb
@@ -124,6 +126,12 @@ fun HomeScreen(onOpen: (HomeTarget) -> Unit) {
                 Icons.Rounded.Tram, Electric, HomeTarget.Screen("transit")),
             Tile(tr("Sesizările mele", "My reports", "Bejelentéseim"), tr("Ce a răspuns Primăria", "City Hall replies", "A városháza válaszai"), Icons.Rounded.Assignment, Lilac, HomeTarget.Screen("reports")),
             Tile(tr("Alerte urgente", "Urgent alerts", "Sürgős riasztás"), tr("Furtună, inundație, canal", "Storm, flood, manhole", "Vihar, árvíz, csatorna"), Icons.Rounded.Thunderstorm, Pink, HomeTarget.Map(MapRequest(report = true))),
+        ),
+        tr("Comunitate", "Community", "Közösség") to listOf(
+            Tile(tr("Comunitatea Aradului", "Arad community", "Aradi közösség"), tr("Chat, anunțuri, evenimente", "Chat, news, events", "Chat, események"),
+                Icons.Rounded.Forum, Violet, HomeTarget.Screen("community")),
+            Tile(tr("Prieteni", "Friends", "Barátok"), tr("Pe hartă, chat, tronurile lor", "On the map, chat, thrones", "Térkép, chat"),
+                Icons.Rounded.Group, Mint, HomeTarget.Screen("friends")),
         ),
         tr("Joacă", "Play", "Játék") to listOf(
             Tile(tr("Dueluri", "Duels", "Párbaj"), tr("Care loc e mai tare?", "Which place is better?", "Melyik hely jobb?"), Icons.Rounded.SportsMma, Electric, HomeTarget.Tab("duels")),

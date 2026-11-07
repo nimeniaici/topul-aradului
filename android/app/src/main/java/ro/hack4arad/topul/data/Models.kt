@@ -134,6 +134,7 @@ data class LiveEvent(
     val newMayorName: String?,
     // pentru „report_status” (Primăria a schimbat statusul unei sesizări)
     val userId: Int? = null,
+    val roomId: Int? = null,
     val status: String? = null,
     val statusLabel: String? = null,
     val xpGained: Int? = null,
@@ -205,3 +206,33 @@ data class TransitReportOut(val line: String, val kind: String, val label: Strin
 data class TicketIn(val type: String)
 data class Ticket(val id: Int, val type: String, val label: String, val price: Double, val code: String,
                   val validFrom: String, val validUntil: String, val active: Boolean, val demo: Boolean)
+
+// ---------- prieteni ----------
+data class UserCard(val id: Int, val name: String, val level: Int, val xp: Int, val avatarEmoji: String?, val avatarColor: String?,
+                    val avatarUrl: String?, val thrones: Int)
+data class FriendsOut(val friends: List<UserCard>, val incoming: List<UserCard>, val outgoing: List<UserCard>,
+                      val blocked: List<UserCard>, val sharing: Boolean)
+data class UsernameIn(val username: String)
+data class SharingIn(val sharing: Boolean)
+data class LatLngIn(val lat: Double, val lng: Double)
+data class ConqueredPlace(val id: Int, val name: String, val category: String, val lat: Double, val lng: Double)
+data class FriendProfile(val id: Int, val name: String, val level: Int, val xp: Int, val avatarEmoji: String?, val avatarColor: String?,
+                         val avatarUrl: String?, val thrones: Int, val conquered: List<ConqueredPlace>)
+data class FriendLocation(val id: Int, val name: String, val avatarUrl: String?, val avatarColor: String?, val avatarEmoji: String?,
+                          val lat: Double, val lng: Double, val updatedAt: String, val thrones: Int, val level: Int)
+
+// ---------- comunitate ----------
+data class RoomTag(val code: String, val label: String)
+data class Room(val id: Int, val kind: String, val tag: String, val tagLabel: String, val name: String, val description: String,
+                val members: Int?, val inviteCode: String?, val isOwner: Boolean, val lastText: String?, val lastAt: String?,
+                val avatarUrl: String?)
+data class RoomsOut(val rooms: List<Room>, val tags: List<RoomTag>)
+data class RoomIn(val name: String, val tag: String, val description: String = "")
+data class CodeIn(val code: String)
+data class ChatMsg(val id: Int, val kind: String, val text: String, val userId: Int, val userName: String, val avatarUrl: String?,
+                   val avatarColor: String?, val mine: Boolean, val eventTitle: String?, val eventAt: String?, val eventPlace: String?,
+                   val createdAt: String)
+data class ChatMsgIn(val text: String, val kind: String = "text", val eventTitle: String? = null, val eventAt: String? = null,
+                     val eventPlace: String? = null, val eventLat: Double? = null, val eventLng: Double? = null)
+data class CityEvent(val id: Int, val title: String, val text: String, val at: String, val place: String?, val lat: Double?,
+                     val lng: Double?, val by: String)

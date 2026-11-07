@@ -1,5 +1,8 @@
 package ro.hack4arad.topul.ui
 
+import ro.hack4arad.topul.ui.social.ChatScreen
+import ro.hack4arad.topul.ui.social.CommunityScreen
+import ro.hack4arad.topul.ui.social.FriendsScreen
 import ro.hack4arad.topul.ui.transit.TransitScreen
 import ro.hack4arad.topul.ui.iasmi.IasmiScreen
 import ro.hack4arad.topul.ui.theme.tr
@@ -81,6 +84,14 @@ private fun MainScaffold() {
     val backStack by nav.currentBackStackEntryAsState()
     val route = backStack?.destination?.route
 
+    val appContext = androidx.compose.ui.platform.LocalContext.current
+    LaunchedEffect(Unit) {
+        while (true) {
+            ro.hack4arad.topul.util.LocationShare.pushNow(appContext)
+            kotlinx.coroutines.delay(60_000)
+        }
+    }
+
     // Notificări live: cineva a făcut check-in / ți-a luat titlul de Primar
     LaunchedEffect(Unit) {
         Network.live.events.collect { e ->
@@ -94,6 +105,8 @@ private fun MainScaffold() {
                     "Primăria a rezolvat sesizarea ta (${e.placeName})! +${e.xpGained ?: 0} XP"
                 e.type == "report_status" && e.userId == me.userId ->
                     "Sesizarea ta (${e.placeName}) e acum: ${e.statusLabel}" + (e.note?.let { ". Primăria: $it" } ?: "")
+                e.type == "friend_request" && e.userId == me.userId ->
+                    "@${e.userName} vrea să fie prietenul tău (Acasă → Prieteni)"
                 e.type == "checkin" && e.userName != me.userName ->
                     "${e.userName} a făcut check-in la ${e.placeName}"
                 else -> null
@@ -148,6 +161,15 @@ private fun MainScaffold() {
             }
             composable("map") { MapScreen(onPlace = openPlace, onOpenReports = { nav.navigate("reports") }) }
             composable("reports") { MyReportsScreen(onBack = { nav.popBackStack() }, onNew = newReport) }
+            composable("friends") {
+                FriendsScreen(onBack = { nav.popBackStack() }, onChat = { id -> nav.navigate("chat/$id") }, onPlace = openPlace)
+            }
+            composable("community") {
+                CommunityScreen(onBack = { nav.popBackStack() }, onRoom = { id, _ -> nav.navigate("chat/$id") })
+            }
+            composable("chat/{id}", arguments = listOf(navArgument("id") { type = NavType.IntType })) { entry ->
+                ChatScreen(roomId = entry.arguments?.getInt("id") ?: 0, title = "", onBack = { nav.popBackStack() })
+            }
             composable("transit") { TransitScreen(onBack = { nav.popBackStack() }) }
             composable("iasmi") { IasmiScreen(onBack = { nav.popBackStack() }, onPlace = openPlace) }
             composable("settings") { SettingsScreen(onBack = { nav.popBackStack() }) }

@@ -9,6 +9,7 @@ import retrofit2.http.PATCH
 import retrofit2.http.GET
 import retrofit2.http.Multipart
 import retrofit2.http.POST
+import retrofit2.http.PUT
 import retrofit2.http.Part
 import retrofit2.http.Path
 import retrofit2.http.Query
@@ -153,4 +154,66 @@ interface Api {
 
     @GET("transit/tickets/mine")
     suspend fun myTickets(): List<Ticket>
+
+    // ---------- prieteni ----------
+    @GET("friends")
+    suspend fun friends(): FriendsOut
+
+    @GET("users/search")
+    suspend fun searchUsers(@Query("q") q: String): List<UserCard>
+
+    @POST("friends/request")
+    suspend fun friendRequest(@Body body: UsernameIn): MessageOut
+
+    @POST("friends/{id}/accept")
+    suspend fun acceptFriend(@Path("id") id: Int): MessageOut
+
+    @DELETE("friends/{id}")
+    suspend fun removeFriend(@Path("id") id: Int): MessageOut
+
+    @POST("friends/{id}/block")
+    suspend fun blockUser(@Path("id") id: Int): MessageOut
+
+    @POST("friends/{id}/unblock")
+    suspend fun unblockUser(@Path("id") id: Int): MessageOut
+
+    @GET("friends/{id}/profile")
+    suspend fun friendProfile(@Path("id") id: Int): FriendProfile
+
+    @PUT("me/sharing")
+    suspend fun setSharing(@Body body: SharingIn): SharingIn
+
+    @PUT("me/location")
+    suspend fun putLocation(@Body body: LatLngIn): Response<Unit>
+
+    @GET("friends/locations")
+    suspend fun friendLocations(): List<FriendLocation>
+
+    // ---------- comunitate ----------
+    @GET("community/rooms")
+    suspend fun rooms(): RoomsOut
+
+    @POST("community/rooms")
+    suspend fun createRoom(@Body body: RoomIn): Room
+
+    @POST("community/rooms/join")
+    suspend fun joinRoom(@Body body: CodeIn): Room
+
+    @POST("community/rooms/{id}/members")
+    suspend fun addMember(@Path("id") id: Int, @Body body: UsernameIn): MessageOut
+
+    @POST("community/rooms/{id}/leave")
+    suspend fun leaveRoom(@Path("id") id: Int): MessageOut
+
+    @POST("community/direct/{id}")
+    suspend fun directRoom(@Path("id") friendId: Int): Room
+
+    @GET("community/rooms/{id}/messages")
+    suspend fun roomMessages(@Path("id") id: Int, @Query("after_id") afterId: Int = 0): List<ChatMsg>
+
+    @POST("community/rooms/{id}/messages")
+    suspend fun sendMessage(@Path("id") id: Int, @Body body: ChatMsgIn): ChatMsg
+
+    @GET("community/events")
+    suspend fun events(): List<CityEvent>
 }
