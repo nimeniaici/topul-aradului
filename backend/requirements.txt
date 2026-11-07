@@ -15,3 +15,6 @@ psycopg[binary]==3.3.8
 # teste
 httpx==0.28.1
 pytest==9.2.0
+
+# asistentul AI Iasmi (Claude)
+anthropic==2.6.0

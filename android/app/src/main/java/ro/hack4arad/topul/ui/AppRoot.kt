@@ -1,5 +1,6 @@
 package ro.hack4arad.topul.ui
 
+import ro.hack4arad.topul.ui.iasmi.IasmiScreen
 import ro.hack4arad.topul.ui.theme.tr
 import ro.hack4arad.topul.ui.settings.SettingsScreen
 import ro.hack4arad.topul.ui.theme.PanelHigh
@@ -146,6 +147,7 @@ private fun MainScaffold() {
             }
             composable("map") { MapScreen(onPlace = openPlace, onOpenReports = { nav.navigate("reports") }) }
             composable("reports") { MyReportsScreen(onBack = { nav.popBackStack() }, onNew = newReport) }
+            composable("iasmi") { IasmiScreen(onBack = { nav.popBackStack() }, onPlace = openPlace) }
             composable("settings") { SettingsScreen(onBack = { nav.popBackStack() }) }
             composable("discover") { DiscoverScreen(onBack = { nav.popBackStack() }, onPlace = openPlace) }
             composable("duels") { DuelScreen() }

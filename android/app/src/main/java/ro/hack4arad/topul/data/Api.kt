@@ -126,4 +126,7 @@ interface Api {
 
     @POST("feedback")
     suspend fun sendFeedback(@Body body: FeedbackIn): MessageOut
+
+    @POST("iasmi")
+    suspend fun iasmi(@Body body: IasmiIn): IasmiOut
 }

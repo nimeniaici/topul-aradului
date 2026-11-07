@@ -181,3 +181,9 @@ data class MyCheckin(val id: Int, val placeId: Int, val placeName: String, val p
 data class PasswordIn(val oldPassword: String, val newPassword: String)
 data class MyStats(val rank: Int, val totalUsers: Int, val reports: Int, val reportsResolved: Int, val memberSince: String)
 data class FeedbackIn(val kind: String, val message: String, val appVersion: String, val device: String)
+
+/** Chat cu Iasmi (asistentul AI). role = "user" sau "assistant". */
+data class IasmiMessage(val role: String, val content: String)
+data class IasmiIn(val messages: List<IasmiMessage>, val lat: Double? = null, val lng: Double? = null)
+data class IasmiPlace(val id: Int, val name: String, val category: String, val address: String, val distanceM: Double? = null)
+data class IasmiOut(val reply: String, val ai: Boolean, val places: List<IasmiPlace> = emptyList())

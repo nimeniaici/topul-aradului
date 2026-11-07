@@ -1,5 +1,6 @@
 package ro.hack4arad.topul.ui.home
 
+import ro.hack4arad.topul.ui.iasmi.IasmiOrb
 import androidx.compose.material.icons.rounded.Settings
 import ro.hack4arad.topul.ui.theme.tr
 import ro.hack4arad.topul.ui.theme.NightDeep
@@ -142,7 +143,22 @@ fun HomeScreen(onOpen: (HomeTarget) -> Unit) {
 
     Column(Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(16.dp)) {
         Header(profile)
-        Spacer(Modifier.height(16.dp))
+        Spacer(Modifier.height(14.dp))
+        // bara „Întreab-o pe Iasmi” (asistentul AI), mereu sus
+        Row(
+            Modifier.fillMaxWidth().clip(RoundedCornerShape(28.dp)).background(Panel).border(1.dp, Track, RoundedCornerShape(28.dp))
+                .clickable { onOpen(HomeTarget.Screen("iasmi")) }.padding(horizontal = 10.dp, vertical = 8.dp),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            IasmiOrb(36)
+            Spacer(Modifier.width(10.dp))
+            Column(Modifier.weight(1f)) {
+                Text(tr("Întreab-o pe Iasmi", "Ask Iasmi", "Kérdezd Iasmit"), color = Ink, fontWeight = FontWeight.Black)
+                Text(tr("„Cum plătesc taxa?” · „Unde mănânc?”", "\"How do I pay?\" · \"Where to eat?\"", "„Hol egyek?”"), color = TextMuted, fontSize = 12.sp)
+            }
+            Icon(Icons.Rounded.ChevronRight, null, tint = TextMuted)
+        }
+        Spacer(Modifier.height(14.dp))
         MapHero { onOpen(HomeTarget.Tab("map")) }
 
         var index = 0
