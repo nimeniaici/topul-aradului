@@ -1,5 +1,6 @@
 package ro.hack4arad.topul.ui.profile
 
+import ro.hack4arad.topul.ui.theme.t
 import ro.hack4arad.topul.ui.theme.Ink
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.activity.result.PickVisualMediaRequest
@@ -202,7 +203,7 @@ private fun relativeTime(iso: String): String = runCatching {
     val then = LocalDateTime.parse(iso.take(19)).toInstant(ZoneOffset.UTC)
     val d = Duration.between(then, java.time.Instant.now())
     when {
-        d.toMinutes() < 1 -> "chiar acum"
+        d.toMinutes() < 1 -> t("chiar acum")
         d.toMinutes() < 60 -> "acum ${d.toMinutes()} min"
         d.toHours() < 24 -> "acum ${d.toHours()} h"
         d.toDays() == 1L -> "ieri"
@@ -231,7 +232,7 @@ fun ProfileScreen(onPlace: (Int) -> Unit, vm: ProfileViewModel = viewModel()) {
                 }
                 TextButton(onClick = { editing = true }) {
                     Icon(Icons.Rounded.Edit, null, tint = Lilac, modifier = Modifier.size(18.dp))
-                    Text(" Editează", color = Lilac)
+                    Text(t(" Editează"), color = Lilac)
                 }
             }
             Spacer(Modifier.height(8.dp))
@@ -242,7 +243,7 @@ fun ProfileScreen(onPlace: (Int) -> Unit, vm: ProfileViewModel = viewModel()) {
             // ---- harta mea
             val visited = vm.visits.mapNotNull { vm.places[it.placeId] }.distinctBy { it.id }
             val total = vm.places.size
-            SectionTitle("Harta mea")
+            SectionTitle(t("Harta mea"))
             Box(Modifier.fillMaxWidth().height(200.dp).clip(RoundedCornerShape(20.dp)).background(Panel)) {
                 if (BuildConfig.HAS_MAPS_KEY) MyMap(visited)
                 Text(
@@ -256,9 +257,9 @@ fun ProfileScreen(onPlace: (Int) -> Unit, vm: ProfileViewModel = viewModel()) {
             ProgressBar(if (total == 0) 0f else visited.size / total.toFloat(), color = Mint, height = 6.dp)
 
             // ---- jurnalul vizitelor
-            SectionTitle("Ultimele vizite")
+            SectionTitle(t("Ultimele vizite"))
             if (vm.visits.isEmpty()) {
-                Text("Încă nicio vizită. Fă primul check-in și locul apare aici, pe harta ta.", color = Lilac)
+                Text(t("Încă nicio vizită. Fă primul check-in și locul apare aici, pe harta ta."), color = Lilac)
             } else {
                 vm.visits.take(8).forEach { v ->
                     val place = vm.places[v.placeId]
@@ -273,7 +274,7 @@ fun ProfileScreen(onPlace: (Int) -> Unit, vm: ProfileViewModel = viewModel()) {
                             Text(v.placeName, color = Ink, fontWeight = FontWeight.Bold, maxLines = 1, overflow = TextOverflow.Ellipsis)
                             Text(listOfNotNull(place?.categoryLabel, relativeTime(v.createdAt)).joinToString(" · "), color = TextMuted, fontSize = 12.sp)
                         }
-                        if (place?.mayorId == p.id) Icon(Icons.Rounded.WorkspacePremium, "Primar", tint = Gold)
+                        if (place?.mayorId == p.id) Icon(Icons.Rounded.WorkspacePremium, t("Primar"), tint = Gold)
                     }
                 }
             }
@@ -283,7 +284,7 @@ fun ProfileScreen(onPlace: (Int) -> Unit, vm: ProfileViewModel = viewModel()) {
 
             // ---- misiuni
             if (p.missions.isNotEmpty()) {
-                SectionTitle("Misiuni")
+                SectionTitle(t("Misiuni"))
                 p.missions.take(3).forEach { m ->
                     Column(Modifier.fillMaxWidth().padding(bottom = 8.dp).clip(RoundedCornerShape(16.dp)).background(Panel).border(1.dp, Track, RoundedCornerShape(16.dp)).padding(12.dp)) {
                         Row(verticalAlignment = Alignment.CenterVertically) {
@@ -311,7 +312,7 @@ fun ProfileScreen(onPlace: (Int) -> Unit, vm: ProfileViewModel = viewModel()) {
             }
 
             // ---- cont
-            SectionTitle("Cont")
+            SectionTitle(t("Cont"))
             GamePanel(Modifier.fillMaxWidth()) {
                 Column {
                     Text(p.email, color = Ink, fontWeight = FontWeight.Bold)
@@ -323,8 +324,8 @@ fun ProfileScreen(onPlace: (Int) -> Unit, vm: ProfileViewModel = viewModel()) {
             }
             vm.actionError?.let { Text(it, color = Pink, modifier = Modifier.padding(top = 8.dp)) }
             Spacer(Modifier.height(12.dp))
-            OutlinedButton(onClick = { Network.session.logout() }, modifier = Modifier.fillMaxWidth()) { Text("Ieși din cont", color = TextMuted) }
-            TextButton(onClick = { deleting = true }, modifier = Modifier.fillMaxWidth()) { Text("Șterge contul definitiv", color = Pink) }
+            OutlinedButton(onClick = { Network.session.logout() }, modifier = Modifier.fillMaxWidth()) { Text(t("Ieși din cont"), color = TextMuted) }
+            TextButton(onClick = { deleting = true }, modifier = Modifier.fillMaxWidth()) { Text(t("Șterge contul definitiv"), color = Pink) }
             Spacer(Modifier.height(12.dp))
         }
     }
@@ -403,7 +404,7 @@ private fun EditProfileDialog(
     var color by remember { mutableStateOf(p.avatarColor ?: "violet") }
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text("Profilul tău") },
+        title = { Text(t("Profilul tău")) },
         text = {
             Column(Modifier.verticalScroll(rememberScrollState())) {
                 Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center) {
@@ -418,15 +419,15 @@ private fun EditProfileDialog(
                         enabled = !saving,
                     ) {
                         Icon(Icons.Rounded.PhotoCamera, null, tint = Gold)
-                        Text(if (p.avatarUrl == null) "  Pune o poză" else "  Schimbă poza", color = Gold)
+                        Text(if (p.avatarUrl == null) t("  Pune o poză") else t("  Schimbă poza"), color = Gold)
                     }
                     if (p.avatarUrl != null) TextButton(onClick = { onPhoto(null) }, enabled = !saving) {
-                        Text("Șterge poza", color = TextMuted)
+                        Text(t("Șterge poza"), color = TextMuted)
                     }
                 }
                 Spacer(Modifier.height(4.dp))
                 UsernameField(name, { name = it }, { nameOk = it }, current = p.name)
-                Text(if (p.avatarUrl == null) "Sau alege un avatar" else "Avatar (dacă ștergi poza)", color = TextMuted, fontSize = 13.sp, modifier = Modifier.padding(top = 12.dp, bottom = 6.dp))
+                Text(if (p.avatarUrl == null) t("Sau alege un avatar") else t("Avatar (dacă ștergi poza)"), color = TextMuted, fontSize = 13.sp, modifier = Modifier.padding(top = 12.dp, bottom = 6.dp))
                 AVATAR_EMOJIS.chunked(6).forEach { row ->
                     Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
                         row.forEach { e ->
@@ -439,7 +440,7 @@ private fun EditProfileDialog(
                         }
                     }
                 }
-                Text("Culoare", color = TextMuted, fontSize = 13.sp, modifier = Modifier.padding(top = 12.dp, bottom = 6.dp))
+                Text(t("Culoare"), color = TextMuted, fontSize = 13.sp, modifier = Modifier.padding(top = 12.dp, bottom = 6.dp))
                 Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
                     AVATAR_COLORS.forEach { k ->
                         Box(
@@ -452,8 +453,8 @@ private fun EditProfileDialog(
                 error?.let { Text(it, color = Pink, modifier = Modifier.padding(top = 8.dp)) }
             }
         },
-        confirmButton = { Button(onClick = { onSave(name, emoji, color) }, enabled = !saving && nameOk) { Text("Salvează") } },
-        dismissButton = { TextButton(onClick = onDismiss) { Text("Renunță", color = TextMuted) } },
+        confirmButton = { Button(onClick = { onSave(name, emoji, color) }, enabled = !saving && nameOk) { Text(t("Salvează")) } },
+        dismissButton = { TextButton(onClick = onDismiss) { Text(t("Renunță"), color = TextMuted) } },
     )
 }
 
@@ -462,14 +463,14 @@ private fun DeleteAccountDialog(saving: Boolean, onConfirm: () -> Unit, onDismis
     var typed by remember { mutableStateOf("") }
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text("Ștergi contul?") },
+        title = { Text(t("Ștergi contul?")) },
         text = {
             Column {
-                Text("Se șterg definitiv: check-in-urile, pozele, voturile, sesizările, insignele și tronurile tale. Nu se poate anula.", color = Lilac)
+                Text(t("Se șterg definitiv: check-in-urile, pozele, voturile, sesizările, insignele și tronurile tale. Nu se poate anula."), color = Lilac)
                 Spacer(Modifier.height(12.dp))
                 OutlinedTextField(
                     value = typed, onValueChange = { typed = it },
-                    label = { Text("Scrie STERGE ca să confirmi") }, singleLine = true, modifier = Modifier.fillMaxWidth(),
+                    label = { Text(t("Scrie STERGE ca să confirmi")) }, singleLine = true, modifier = Modifier.fillMaxWidth(),
                 )
             }
         },
@@ -477,8 +478,8 @@ private fun DeleteAccountDialog(saving: Boolean, onConfirm: () -> Unit, onDismis
             Button(
                 onClick = onConfirm, enabled = !saving && typed.trim().uppercase() == "STERGE",
                 colors = ButtonDefaults.buttonColors(containerColor = Pink, contentColor = Color.White),
-            ) { Text("Șterge definitiv") }
+            ) { Text(t("Șterge definitiv")) }
         },
-        dismissButton = { TextButton(onClick = onDismiss) { Text("Renunță", color = TextMuted) } },
+        dismissButton = { TextButton(onClick = onDismiss) { Text(t("Renunță"), color = TextMuted) } },
     )
 }

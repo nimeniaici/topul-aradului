@@ -1,5 +1,6 @@
 package ro.hack4arad.topul.ui.auth
 
+import ro.hack4arad.topul.ui.theme.t
 import ro.hack4arad.topul.ui.components.AppLogo
 import ro.hack4arad.topul.ui.theme.Ink
 import androidx.compose.runtime.remember
@@ -152,12 +153,12 @@ fun AuthScreen(vm: AuthViewModel = viewModel()) {
             style = MaterialTheme.typography.headlineMedium,
             color = Gold, fontWeight = FontWeight.Black, letterSpacing = 2.sp,
         )
-        Text("Orașul tău, conectat. Joacă, semnalează, descoperă.", color = Ink, textAlign = TextAlign.Center)
+        Text(t("Orașul tău, conectat. Joacă, semnalează, descoperă."), color = Ink, textAlign = TextAlign.Center)
         Spacer(Modifier.height(16.dp))
         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
             Pill("Check-in", Pink, Color.White)
-            Pill("Dueluri", Electric, Color.White)
-            Pill("Topuri", Mint, MintDark)
+            Pill(t("Dueluri"), Electric, Color.White)
+            Pill(t("Topuri"), Mint, MintDark)
         }
         Spacer(Modifier.height(28.dp))
 
@@ -170,11 +171,11 @@ fun AuthScreen(vm: AuthViewModel = viewModel()) {
             ) {
                 Text("G", color = Electric, fontWeight = FontWeight.Black, fontSize = 20.sp)
                 Spacer(Modifier.size(10.dp))
-                Text("Continuă cu Google", fontWeight = FontWeight.Bold)
+                Text(t("Continuă cu Google"), fontWeight = FontWeight.Bold)
             }
             Row(Modifier.padding(vertical = 18.dp), verticalAlignment = Alignment.CenterVertically) {
                 HorizontalDivider(Modifier.weight(1f), color = Track)
-                Text("  sau cu email  ", color = TextMuted, fontSize = 13.sp)
+                Text(t("  sau cu email  "), color = TextMuted, fontSize = 13.sp)
                 HorizontalDivider(Modifier.weight(1f), color = Track)
             }
         }
@@ -194,7 +195,7 @@ fun AuthScreen(vm: AuthViewModel = viewModel()) {
         Spacer(Modifier.height(8.dp))
         OutlinedTextField(
             value = password, onValueChange = { password = it },
-            label = { Text("Parolă (min. 6 caractere)") }, singleLine = true,
+            label = { Text(t("Parolă (min. 6 caractere)")) }, singleLine = true,
             visualTransformation = PasswordVisualTransformation(),
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password, imeAction = ImeAction.Done),
             keyboardActions = KeyboardActions(onDone = {
@@ -215,15 +216,15 @@ fun AuthScreen(vm: AuthViewModel = viewModel()) {
             modifier = Modifier.fillMaxWidth().height(54.dp),
         ) {
             if (vm.loading) CircularProgressIndicator(Modifier.size(22.dp), strokeWidth = 2.dp)
-            else Text(if (register) "Începe jocul" else "Intră în joc", fontSize = 17.sp)
+            else Text(if (register) t("Începe jocul") else t("Intră în joc"), fontSize = 17.sp)
         }
         Box(Modifier.fillMaxWidth()) {
             TextButton(onClick = { register = !register; vm.error = null }, modifier = Modifier.align(Alignment.CenterStart)) {
-                Text(if (register) "Ai deja cont? Intră" else "Nu ai cont? Creează unul", color = Lilac)
+                Text(if (register) t("Ai deja cont? Intră") else t("Nu ai cont? Creează unul"), color = Lilac)
             }
             if (!register) {
                 TextButton(onClick = { vm.resetStep = 1; vm.resetError = null }, modifier = Modifier.align(Alignment.CenterEnd)) {
-                    Text("Ai uitat parola?", color = Gold)
+                    Text(t("Ai uitat parola?"), color = Gold)
                 }
             }
         }
@@ -240,11 +241,11 @@ private fun ResetPasswordDialog(vm: AuthViewModel, initialEmail: String) {
     val step = vm.resetStep ?: return
     AlertDialog(
         onDismissRequest = { vm.resetStep = null },
-        title = { Text(if (step == 1) "Resetează parola" else "Verifică emailul") },
+        title = { Text(if (step == 1) t("Resetează parola") else t("Verifică emailul")) },
         text = {
             Column {
                 if (step == 1) {
-                    Text("Îți trimitem un cod de 6 cifre pe email.", color = Lilac)
+                    Text(t("Îți trimitem un cod de 6 cifre pe email."), color = Lilac)
                     Spacer(Modifier.height(12.dp))
                     OutlinedTextField(
                         value = email, onValueChange = { email = it }, label = { Text("Email") }, singleLine = true,
@@ -255,13 +256,13 @@ private fun ResetPasswordDialog(vm: AuthViewModel, initialEmail: String) {
                     Spacer(Modifier.height(12.dp))
                     OutlinedTextField(
                         value = code, onValueChange = { if (it.length <= 6 && it.all(Char::isDigit)) code = it },
-                        label = { Text("Codul de 6 cifre") }, singleLine = true,
+                        label = { Text(t("Codul de 6 cifre")) }, singleLine = true,
                         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.NumberPassword), modifier = Modifier.fillMaxWidth(),
                     )
                     Spacer(Modifier.height(8.dp))
                     OutlinedTextField(
                         value = newPassword, onValueChange = { newPassword = it },
-                        label = { Text("Parola nouă (min. 6)") }, singleLine = true,
+                        label = { Text(t("Parola nouă (min. 6)")) }, singleLine = true,
                         visualTransformation = PasswordVisualTransformation(),
                         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password), modifier = Modifier.fillMaxWidth(),
                     )
@@ -276,9 +277,9 @@ private fun ResetPasswordDialog(vm: AuthViewModel, initialEmail: String) {
                 Button(
                     onClick = { vm.resetPassword(email, code, newPassword) },
                     enabled = !vm.loading && code.length == 6 && newPassword.length >= 6,
-                ) { Text("Schimbă parola") }
+                ) { Text(t("Schimbă parola")) }
             }
         },
-        dismissButton = { TextButton(onClick = { vm.resetStep = null }) { Text("Renunță", color = TextMuted) } },
+        dismissButton = { TextButton(onClick = { vm.resetStep = null }) { Text(t("Renunță"), color = TextMuted) } },
     )
 }

@@ -1,5 +1,6 @@
 package ro.hack4arad.topul.ui.duels
 
+import ro.hack4arad.topul.ui.theme.t
 import ro.hack4arad.topul.ui.theme.Pink
 import ro.hack4arad.topul.ui.theme.Scrim
 import ro.hack4arad.topul.ui.theme.Ink
@@ -143,7 +144,7 @@ fun DuelScreen(vm: DuelViewModel = viewModel()) {
                 Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
                     Column(Modifier.weight(1f)) {
                         Text("DUEL · ${duel.categoryLabel.uppercase()}", color = Gold, fontWeight = FontWeight.Black, fontSize = 12.sp, letterSpacing = 2.sp)
-                        Text("Care e mai tare?", color = Ink, fontSize = 24.sp, fontWeight = FontWeight.Black)
+                        Text(t("Care e mai tare?"), color = Ink, fontSize = 24.sp, fontWeight = FontWeight.Black)
                     }
                     if (vm.streak > 0) {
                         Row(
@@ -177,7 +178,7 @@ fun DuelScreen(vm: DuelViewModel = viewModel()) {
                 )
                 TextButton(onClick = vm::next, modifier = Modifier.align(Alignment.CenterHorizontally)) {
                     Icon(Icons.Rounded.SkipNext, null, tint = Lilac)
-                    Text(" Sari peste", color = Lilac)
+                    Text(t(" Sari peste"), color = Lilac)
                 }
             }
         }

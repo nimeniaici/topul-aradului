@@ -259,3 +259,49 @@ class RewardVoucher(Base):
     place_id: Mapped[int | None] = mapped_column(ForeignKey("places.id"), nullable=True)
     code: Mapped[str] = mapped_column(String(20))
     created_at: Mapped[datetime] = mapped_column(DateTime, default=utcnow)
+
+
+# ---------------- sondaje ----------------
+class Poll(Base):
+    """Sondaj: al Primăriei (official) sau al unui cetățean, în comunitatea generală."""
+    __tablename__ = "polls"
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    user_id: Mapped[int | None] = mapped_column(ForeignKey("users.id"), nullable=True, index=True)
+    question: Mapped[str] = mapped_column(String(200))
+    official: Mapped[bool] = mapped_column(Boolean, default=False)
+    closes_at: Mapped[datetime] = mapped_column(DateTime)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=utcnow, index=True)
+
+    user: Mapped["User | None"] = relationship()
+
+
+class PollOption(Base):
+    __tablename__ = "poll_options"
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    poll_id: Mapped[int] = mapped_column(ForeignKey("polls.id"), index=True)
+    text: Mapped[str] = mapped_column(String(100))
+    position: Mapped[int] = mapped_column(Integer, default=0)
+
+
+class PollVote(Base):
+    __tablename__ = "poll_votes"
+    __table_args__ = (UniqueConstraint("poll_id", "user_id"),)
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    poll_id: Mapped[int] = mapped_column(ForeignKey("polls.id"), index=True)
+    option_id: Mapped[int] = mapped_column(ForeignKey("poll_options.id"))
+    user_id: Mapped[int] = mapped_column(ForeignKey("users.id"), index=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=utcnow)
+
+
+class ReportConfirmation(Base):
+    """Alt cetățean confirmă aceeași problemă, în același loc (o sesizare e „confirmată” de la 3 oameni)."""
+    __tablename__ = "report_confirmations"
+    __table_args__ = (UniqueConstraint("report_id", "user_id"),)
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    report_id: Mapped[int] = mapped_column(ForeignKey("reports.id"), index=True)
+    user_id: Mapped[int] = mapped_column(ForeignKey("users.id"), index=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=utcnow)

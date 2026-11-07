@@ -92,6 +92,9 @@ interface Api {
     @GET("reports/mine")
     suspend fun myReports(): List<Report>
 
+    @POST("reports/{id}/confirm")
+    suspend fun confirmReport(@Path("id") id: Int, @Body body: ConfirmIn): ReportCreated
+
     @GET("places/discover")
     suspend fun discover(): List<DiscoverPlace>
 
@@ -249,4 +252,20 @@ interface Api {
 
     @GET("community/events")
     suspend fun events(): List<CityEvent>
+
+    @GET("polls")
+    suspend fun polls(): List<Poll>
+
+    @POST("polls")
+    suspend fun createPoll(@Body body: PollIn): Poll
+
+    @POST("polls/{id}/vote")
+    suspend fun vote(@Path("id") id: Int, @Body body: PollVoteIn): Poll
+
+    @retrofit2.http.DELETE("polls/{id}")
+    suspend fun deletePoll(@Path("id") id: Int): retrofit2.Response<Unit>
+
+    @GET("servicii")
+    suspend fun servicii(@Query("type") type: String? = null, @Query("lat") lat: Double? = null, @Query("lng") lng: Double? = null,
+                         @Query("limit") limit: Int = 120): ServiciiOut
 }

@@ -11,7 +11,7 @@ from .. import config
 from ..db import get_db
 from ..gamification import level
 from ..live import hub
-from ..models import Report, User, utcnow
+from ..models import ReportConfirmation, Report, User, utcnow
 from ..security import get_current_user
 from ..serializers import photo_url
 from .checkins import _save_photo
@@ -49,6 +49,10 @@ def priority(category: str) -> int:
     """0 = alertă majoră (pericol pentru vieți), 1 = urgent, 2 = normal."""
     return 0 if category in EMERGENCY else 1 if category in URGENT else 2
 XP_REPORT = 10
+XP_CONFIRM = 5
+CONFIRMS_NEEDED = 3        # autorul + încă 2 oameni => sesizarea e confirmată și ajunge „aprobată” la Primărie
+SAME_SPOT_M = 60           # aceeași problemă = aceeași categorie, la max. 60 m, în ultimele 30 de zile
+CONFIRM_RADIUS_M = 150     # ca să confirmi, trebuie să fii lângă problemă
 XP_RESOLVED = 20  # bonus când Primăria rezolvă problema semnalată de tine
 
 STATUSES = {"nou": "Nouă", "in_lucru": "În lucru", "rezolvat": "Rezolvată", "respins": "Respinsă"}
@@ -67,6 +71,9 @@ class ReportOut(BaseModel):
     urgent: bool = False
     emergency: bool = False
     priority: int = 2
+    confirmations: int = 1
+    confirms_needed: int = CONFIRMS_NEEDED
+    confirmed: bool = False
     user_name: str
     created_at: datetime
     admin_note: str | None = None
@@ -78,10 +85,19 @@ class ReportCreated(BaseModel):
     xp_gained: int
     total_xp: int
     level: int
+    confirmed_existing: bool = False   # n-am creat una nouă: am confirmat sesizarea existentă de acolo
+
+
+def _confirm_count(r: Report) -> int:
+    from sqlalchemy.orm import object_session
+    db = object_session(r)
+    n = db.scalar(select(func.count()).select_from(ReportConfirmation).where(ReportConfirmation.report_id == r.id)) if db else 0
+    return 1 + (n or 0)
 
 
 def _out(r: Report) -> ReportOut:
-    return ReportOut(id=r.id, category=r.category, category_label=REPORT_CATEGORIES.get(r.category, r.category),
+    n = _confirm_count(r)
+    return ReportOut(confirmations=n, confirmed=r.category in EMERGENCY or n >= CONFIRMS_NEEDED,id=r.id, category=r.category, category_label=REPORT_CATEGORIES.get(r.category, r.category),
                      description=r.description, lat=r.lat, lng=r.lng, photo_url=photo_url(r.photo_path),
                      status=r.status, status_label=STATUSES.get(r.status, r.status), urgent=r.category in URGENT,
                      emergency=r.category in EMERGENCY, priority=priority(r.category), user_name=r.user.name,
@@ -115,6 +131,11 @@ async def create_report(
                                               Report.created_at >= utcnow() - timedelta(seconds=30)).limit(1))
     if recent and category not in EMERGENCY:   # o alertă majoră nu o blocăm niciodată
         raise HTTPException(429, "Ai trimis o sesizare chiar acum. Mai așteaptă puțin.")
+    # aceeași problemă, semnalată deja de altcineva chiar aici -> o confirmăm în loc să facem o sesizare nouă
+    if category not in EMERGENCY:
+        existing = _same_problem(db, category, lat, lng, exclude_user=user.id)
+        if existing:
+            return _do_confirm(db, existing, user, background)
     path = await _save_photo(photo) if photo and photo.filename else None
     report = Report(user_id=user.id, category=category, description=description.strip(), lat=lat, lng=lng, photo_path=path)
     db.add(report)
@@ -127,6 +148,56 @@ async def create_report(
     background.add_task(hub.broadcast, {"type": "alert" if out.emergency else "report", "lat": lat, "lng": lng,
                                         "place_name": out.category_label, "user_name": user.name})
     return ReportCreated(report=out, xp_gained=XP_REPORT, total_xp=user.xp, level=level(user.xp))
+
+
+def _same_problem(db: Session, category: str, lat: float, lng: float, exclude_user: int) -> Report | None:
+    from ..geo import distance_m
+    rows = db.scalars(select(Report).where(Report.category == category, Report.status.in_(("nou", "in_lucru")),
+                                           Report.created_at >= utcnow() - timedelta(days=30))).all()
+    near = [r for r in rows if distance_m(lat, lng, r.lat, r.lng) <= SAME_SPOT_M]
+    near.sort(key=lambda r: distance_m(lat, lng, r.lat, r.lng))
+    return near[0] if near else None
+
+
+def _do_confirm(db: Session, report: Report, user: User, background: BackgroundTasks) -> "ReportCreated":
+    if report.user_id == user.id:
+        raise HTTPException(400, "Ai semnalat deja problema asta. Ai nevoie de alți 2 arădeni care s-o confirme.")
+    already = db.scalar(select(ReportConfirmation.id).where(ReportConfirmation.report_id == report.id,
+                                                           ReportConfirmation.user_id == user.id))
+    if already:
+        raise HTTPException(409, "Ai confirmat deja această problemă.")
+    db.add(ReportConfirmation(report_id=report.id, user_id=user.id))
+    db.execute(update(User).where(User.id == user.id).values(xp=User.xp + XP_CONFIRM))
+    db.commit()
+    db.refresh(user)
+    out = _out(report)
+    if out.confirmations == CONFIRMS_NEEDED:   # tocmai a devenit confirmată
+        background.add_task(hub.broadcast, {"type": "report", "lat": report.lat, "lng": report.lng,
+                                            "place_name": f"Confirmată de {CONFIRMS_NEEDED} arădeni: {out.category_label}",
+                                            "user_name": user.name})
+    return ReportCreated(report=out, xp_gained=XP_CONFIRM, total_xp=user.xp, level=level(user.xp), confirmed_existing=True)
+
+
+class ConfirmIn(BaseModel):
+    lat: float
+    lng: float
+    is_mock: bool = False
+
+
+@router.post("/{report_id}/confirm", response_model=ReportCreated)
+def confirm(report_id: int, body: ConfirmIn, background: BackgroundTasks, user: User = Depends(get_current_user),
+            db: Session = Depends(get_db)):
+    """„Și eu văd problema asta”: confirmi o sesizare de pe hartă, dacă ești lângă ea."""
+    from ..geo import distance_m
+    r = db.get(Report, report_id)
+    if not r or r.status not in ("nou", "in_lucru"):
+        raise HTTPException(404, "Sesizarea nu mai e deschisă.")
+    if body.is_mock:
+        raise HTTPException(403, "Am detectat o locație simulată.")
+    d = distance_m(body.lat, body.lng, r.lat, r.lng)
+    if not config.SKIP_DISTANCE_CHECK and d > CONFIRM_RADIUS_M:
+        raise HTTPException(400, f"Ca să confirmi, trebuie să fii lângă problemă (ești la {round(d)} m).")
+    return _do_confirm(db, r, user, background)
 
 
 @router.get("/mine", response_model=list[ReportOut])
@@ -174,7 +245,7 @@ def admin_list(status: str | None = None, days: int = Query(90, ge=1, le=3650), 
         q = q.where(Report.status == status)
     rows = [AdminReportOut(**_out(r).model_dump(), user_id=r.user_id) for r in db.scalars(q)]
     open_first = {"nou": 0, "in_lucru": 1}
-    rows.sort(key=lambda r: (open_first.get(r.status, 2), r.priority if r.status in open_first else 2))
+    rows.sort(key=lambda r: (open_first.get(r.status, 2), not r.confirmed, r.priority if r.status in open_first else 2))
     return rows
 
 

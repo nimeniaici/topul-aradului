@@ -1,5 +1,6 @@
 package ro.hack4arad.topul.ui.leaderboard
 
+import ro.hack4arad.topul.ui.theme.t
 import ro.hack4arad.topul.ui.theme.NightDeep
 import ro.hack4arad.topul.ui.theme.Scrim
 import ro.hack4arad.topul.ui.theme.Ink
@@ -173,8 +174,8 @@ fun LeaderboardScreen(onPlace: (Int) -> Unit, onUser: (Int) -> Unit = {}, vm: Le
             indicator = { pos -> TabRowDefaults.SecondaryIndicator(Modifier.tabIndicatorOffset(pos[tab]), color = Gold, height = 3.dp) },
             divider = {},
         ) {
-            Tab(selected = tab == 0, onClick = { tab = 0; vm.refresh() }, text = { Text("Locuri", fontWeight = FontWeight.Black) })
-            Tab(selected = tab == 1, onClick = { tab = 1; vm.refresh() }, text = { Text("Arădeni", fontWeight = FontWeight.Black) })
+            Tab(selected = tab == 0, onClick = { tab = 0; vm.refresh() }, text = { Text(t("Locuri"), fontWeight = FontWeight.Black) })
+            Tab(selected = tab == 1, onClick = { tab = 1; vm.refresh() }, text = { Text(t("Arădeni"), fontWeight = FontWeight.Black) })
         }
         if (vm.error != null) {
             ErrorState(vm.error!!, onRetry = vm::refresh)
@@ -242,7 +243,7 @@ private fun ChampionPlace(p: Place, mixed: Boolean, onClick: () -> Unit) {
             verticalAlignment = Alignment.CenterVertically,
         ) {
             Icon(Icons.Rounded.EmojiEvents, null, tint = Night, modifier = Modifier.size(16.dp))
-            Text(" #1 ${if (mixed) "ÎN ARAD" else p.categoryLabel.uppercase()}", color = Night, fontWeight = FontWeight.Black, fontSize = 12.sp)
+            Text(" #1 ${if (mixed) t("ÎN ARAD") else p.categoryLabel.uppercase()}", color = Night, fontWeight = FontWeight.Black, fontSize = 12.sp)
         }
         Column(Modifier.align(Alignment.BottomStart).padding(16.dp)) {
             Text(p.name, color = Color.White, fontSize = 24.sp, fontWeight = FontWeight.Black, maxLines = 1, overflow = TextOverflow.Ellipsis)
@@ -272,7 +273,7 @@ private fun ChampionUser(u: UserRank, isMe: Boolean, onClick: () -> Unit = {}) {
         Column(Modifier.weight(1f)) {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Icon(Icons.Rounded.EmojiEvents, null, tint = Gold, modifier = Modifier.size(16.dp))
-                Text(" #1 EXPLORATOR AL ARADULUI", color = Gold, fontWeight = FontWeight.Black, fontSize = 11.sp)
+                Text(t(" #1 EXPLORATOR AL ARADULUI"), color = Gold, fontWeight = FontWeight.Black, fontSize = 11.sp)
             }
             Text(u.name + if (isMe) " (tu)" else "", color = Color.White, fontSize = 22.sp, fontWeight = FontWeight.Black, maxLines = 1, overflow = TextOverflow.Ellipsis)
             Text("Nivel ${u.level} · ${u.xp} XP", color = Lilac, fontSize = 13.sp)

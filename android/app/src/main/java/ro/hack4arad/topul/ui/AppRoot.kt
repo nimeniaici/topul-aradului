@@ -172,6 +172,8 @@ private fun MainScaffold() {
             composable("chat/{id}", arguments = listOf(navArgument("id") { type = NavType.IntType })) { entry ->
                 ChatScreen(roomId = entry.arguments?.getInt("id") ?: 0, title = "", onBack = { nav.popBackStack() })
             }
+            composable("polls") { ro.hack4arad.topul.ui.social.PollsScreen(onBack = { nav.popBackStack() }) }
+            composable("servicii") { ro.hack4arad.topul.ui.city.ServiciiScreen(onBack = { nav.popBackStack() }) }
             composable("gunoi") { GunoiScreen(onBack = { nav.popBackStack() }) }
             composable("turism") { TurismScreen(onBack = { nav.popBackStack() }) }
             composable("transit") { TransitScreen(onBack = { nav.popBackStack() }) }

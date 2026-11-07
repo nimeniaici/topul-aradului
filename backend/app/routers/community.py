@@ -220,5 +220,32 @@ def events(days: int = Query(30, ge=1, le=365), db: Session = Depends(get_db)):
                       .where(ChatRoom.kind == "general", ChatMessage.kind == "eveniment",
                              ChatMessage.event_at >= now - timedelta(hours=6), ChatMessage.event_at <= now + timedelta(days=days))
                       .order_by(ChatMessage.event_at)).all()
-    return [{"id": m.id, "title": m.event_title, "text": m.text, "at": m.event_at.isoformat(), "place": m.event_place,
-             "lat": m.event_lat, "lng": m.event_lng, "by": m.user.name} for m in rows]
+    out = []
+    for m in rows:
+        lat, lng = m.event_lat, m.event_lng
+        if lat is None and m.event_place:
+            # evenimentul spune doar „unde” în cuvinte: îl punem pe hartă dacă locul e unul cunoscut
+            hit = _place_by_name(db, m.event_place)
+            if hit:
+                lat, lng = hit.lat, hit.lng
+        out.append({"id": m.id, "title": m.event_title, "text": m.text, "at": m.event_at.isoformat(), "place": m.event_place,
+                    "lat": lat, "lng": lng, "by": m.user.name})
+    return out
+
+
+def _place_by_name(db: Session, text: str):
+    from ..models import Place
+    import unicodedata
+
+    def n(s: str) -> str:
+        s = unicodedata.normalize("NFKD", (s or "").lower())
+        return "".join(c for c in s if not unicodedata.combining(c) and (c.isalnum() or c == " "))
+    t = n(text)
+    if len(t) < 3:
+        return None
+    best = None
+    for p in db.scalars(select(Place)):
+        pn = n(p.name)
+        if pn and (pn in t or t in pn) and (not best or len(pn) > len(n(best.name))):
+            best = p
+    return best

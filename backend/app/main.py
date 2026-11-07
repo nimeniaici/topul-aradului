@@ -9,7 +9,7 @@ from fastapi.staticfiles import StaticFiles
 from . import config
 from .db import Base, SessionLocal, engine, ensure_columns, scrub_checkin_gps
 from . import usernames
-from .routers import auth, checkins, community, crashes, feedback, friends, gunoi, iasmi, rewards, turism, primarie, transit, download, duels, leaderboard, live, pages, places, reports, tour3d, users
+from .routers import auth, checkins, community, crashes, feedback, friends, gunoi, iasmi, polls, rewards, servicii, turism, primarie, transit, download, duels, leaderboard, live, pages, places, reports, tour3d, users
 from .seed import seed_places
 
 
@@ -41,7 +41,8 @@ app.mount("/uploads", StaticFiles(directory=config.UPLOAD_DIR), name="uploads")
 app.mount("/static", StaticFiles(directory=Path(__file__).parent / "static"), name="static")
 
 app.include_router(reports.admin_router)
-for r in (auth, places, leaderboard, checkins, duels, users, live, pages, tour3d, download, reports, crashes, primarie, feedback, iasmi, transit, friends, community, gunoi, turism, rewards):
+app.include_router(polls.admin_router)
+for r in (auth, places, leaderboard, checkins, duels, users, live, pages, tour3d, download, reports, crashes, primarie, feedback, iasmi, transit, friends, community, gunoi, turism, rewards, polls, servicii):
     app.include_router(r.router)
 
 

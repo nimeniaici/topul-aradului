@@ -1,5 +1,8 @@
 package ro.hack4arad.topul.ui.map
 
+import androidx.compose.material.icons.rounded.School
+import ro.hack4arad.topul.ui.theme.t
+import androidx.compose.material.icons.rounded.Celebration
 import androidx.compose.material.icons.rounded.Call
 import ro.hack4arad.topul.ui.theme.OnInk
 import androidx.compose.material.icons.rounded.Landscape
@@ -291,6 +294,20 @@ class MapViewModel : ViewModel() {
         private set
     var turism by mutableStateOf<List<ro.hack4arad.topul.data.TurismLoc>>(emptyList())
         private set
+    var events by mutableStateOf<List<ro.hack4arad.topul.data.CityEvent>>(emptyList())
+        private set
+
+    var schools by mutableStateOf<List<ro.hack4arad.topul.data.ServiceItem>>(emptyList())
+        private set
+
+    fun loadSchools() {
+        if (schools.isNotEmpty()) return
+        viewModelScope.launch { runCatching { Network.api.servicii(type = "scoala", limit = 300) }.onSuccess { schools = it.items } }
+    }
+
+    fun loadEvents() {
+        viewModelScope.launch { runCatching { Network.api.events() }.onSuccess { events = it.filter { e -> e.lat != null && e.lng != null } } }
+    }
 
     suspend fun refreshVehicles() {
         runCatching { Network.api.vehicles() }.onSuccess { vehicles = it.vehicles }
@@ -323,7 +340,7 @@ class MapViewModel : ViewModel() {
 
     fun checkIn(place: Place, fix: Fix?) {
         if (fix == null) {
-            message = "Nu am putut afla locația. Pornește GPS-ul și încearcă din nou."
+            message = t("Nu am putut afla locația. Pornește GPS-ul și încearcă din nou.")
             return
         }
         viewModelScope.launch {
@@ -332,6 +349,19 @@ class MapViewModel : ViewModel() {
                 .onSuccess { celebration = it to place.name; loadProfile(); load() }
                 .onFailure { message = it.userMessage() }
             busy = false
+        }
+    }
+
+    /** „Și eu văd problema asta”: confirmarea unei sesizări de pe hartă (trebuie să fii lângă ea). */
+    fun confirmReport(id: Int, fix: Fix?) {
+        if (fix == null) { message = "Pornește locația ca să confirmi problema."; return }
+        viewModelScope.launch {
+            runCatching { Network.api.confirmReport(id, ro.hack4arad.topul.data.ConfirmIn(fix.lat, fix.lng, fix.isMock)) }
+                .onSuccess {
+                    message = if (it.report.confirmed) "Confirmată! Sesizarea ajunge acum la Primărie. +${it.xpGained} XP"
+                    else "Ai confirmat problema (${it.report.confirmations}/${it.report.confirmsNeeded}). +${it.xpGained} XP"
+                    loadReports(); loadProfile()
+                }.onFailure { message = it.userMessage() }
         }
     }
 
@@ -353,7 +383,9 @@ class MapViewModel : ViewModel() {
                     photo = photo?.let { MultipartBody.Part.createFormData("photo", "sesizare.jpg", it.toRequestBody("image/jpeg".toMediaType())) },
                 )
             }.onSuccess {
-                message = "Sesizare trimisă. Mulțumim! +${it.xpGained} XP"
+                message = if (it.confirmedExisting)
+                    "Problema era deja semnalată aici – ai confirmat-o (${it.report.confirmations}/${it.report.confirmsNeeded}). +${it.xpGained} XP"
+                else "Sesizare trimisă. Ajunge la Primărie după ce o confirmă încă ${it.report.confirmsNeeded - 1} arădeni. +${it.xpGained} XP"
                 loadReports(); loadProfile(); onDone()
             }.onFailure { message = it.userMessage() }
             busy = false
@@ -391,6 +423,10 @@ fun MapScreen(onPlace: (Int) -> Unit, onOpenReports: () -> Unit = {}, vm: MapVie
         while (showTram) { vm.refreshVehicles(); kotlinx.coroutines.delay(15_000) }
     }
     LaunchedEffect(showTurism) { if (showTurism) vm.loadTurism() }
+    var showEvents by rememberSaveable { mutableStateOf(true) }
+    var showSchools by rememberSaveable { mutableStateOf(false) }
+    LaunchedEffect(showSchools) { if (showSchools) vm.loadSchools() }
+    LaunchedEffect(showEvents) { if (showEvents) vm.loadEvents() }
     var reporting by remember { mutableStateOf(false) }
     var emergencyForm by remember { mutableStateOf(false) }
     var query by rememberSaveable { mutableStateOf("") }
@@ -436,7 +472,7 @@ fun MapScreen(onPlace: (Int) -> Unit, onOpenReports: () -> Unit = {}, vm: MapVie
         } else {
             PlacesMap(
                 vm = vm, places = shown, camera = camera, look = look, hasPermission = hasPermission, showHeat = showHeat,
-                showTram = showTram, showReports = showReports, showFriends = showFriends, showTurism = showTurism,
+                showTram = showTram, showReports = showReports, showFriends = showFriends, showTurism = showTurism, showEvents = showEvents, showSchools = showSchools,
                 highlightedId = if (selecting) carouselPlace?.id else null,
                 bottomPadding = if (selecting) 270.dp else 16.dp,
                 onPlaceTap = { p ->
@@ -458,7 +494,7 @@ fun MapScreen(onPlace: (Int) -> Unit, onOpenReports: () -> Unit = {}, vm: MapVie
                     onClick = { menuOpen = true },
                     containerColor = Gold, contentColor = GoldDark,
                     modifier = Modifier.size(48.dp),
-                ) { Icon(Icons.Rounded.Menu, "Meniu hartă") }
+                ) { Icon(Icons.Rounded.Menu, t("Meniu hartă")) }
             }
             vm.selectedCategory?.let { code ->
                 val label = vm.categories.firstOrNull { it.code == code }?.label ?: code
@@ -483,6 +519,22 @@ fun MapScreen(onPlace: (Int) -> Unit, onOpenReports: () -> Unit = {}, vm: MapVie
                         .background((if (vm.message != null) Violet else NightDeep).copy(alpha = 0.92f)).padding(10.dp),
                 )
             }
+        }
+
+        // ---- butonul de centrare pe tine (ca în Google Maps)
+        if (!listMode) {
+            SmallFloatingActionButton(
+                onClick = {
+                    if (!hasPermission) permissionLauncher.launch(LOCATION_PERMISSIONS)
+                    else scope.launch {
+                        val here = vm.myLocation ?: runCatching { currentFix(context) }.getOrNull()?.let { LatLng(it.lat, it.lng) }
+                        here?.let { camera.animate(CameraUpdateFactory.newLatLngZoom(it, 16f), 350) }
+                            ?: run { vm.message = t("Nu am putut afla locația. Pornește GPS-ul și încearcă din nou.") }
+                    }
+                },
+                containerColor = Panel, contentColor = Ink,
+                modifier = Modifier.align(Alignment.BottomEnd).padding(end = 16.dp, bottom = if (selecting && shown.isNotEmpty()) 300.dp else 20.dp).size(52.dp),
+            ) { Icon(Icons.Rounded.MyLocation, t("Unde sunt eu")) }
         }
 
         // ---- jos: caruselul locului ales (tragi și harta te urmează); atingi harta ca să-l ascunzi
@@ -517,10 +569,12 @@ fun MapScreen(onPlace: (Int) -> Unit, onOpenReports: () -> Unit = {}, vm: MapVie
         ) {
             MapMenu(
                 vm = vm, listMode = listMode, look = look, showHeat = showHeat, hasPermission = hasPermission,
-                showTram = showTram, showReports = showReports, showFriends = showFriends, showTurism = showTurism,
+                showTram = showTram, showReports = showReports, showFriends = showFriends, showTurism = showTurism, showEvents = showEvents, showSchools = showSchools,
                 onFriends = { showFriends = !showFriends; menuOpen = false; listMode = false },
                 onTram = { showTram = !showTram; menuOpen = false; listMode = false },
                 onTurism = { showTurism = !showTurism; menuOpen = false; listMode = false },
+                onEvents = { showEvents = !showEvents; menuOpen = false; listMode = false },
+                onSchools = { showSchools = !showSchools; menuOpen = false; listMode = false },
                 onReports = { showReports = !showReports },
                 onList = { listMode = !listMode; menuOpen = false },
                 onLook = { look = it },
@@ -562,31 +616,38 @@ private fun MapMenu(
     showTram: Boolean, showReports: Boolean, onTram: () -> Unit, onReports: () -> Unit,
     showFriends: Boolean = false, onFriends: () -> Unit = {},
     showTurism: Boolean = false, onTurism: () -> Unit = {},
+    showEvents: Boolean = false, onEvents: () -> Unit = {},
+    showSchools: Boolean = false, onSchools: () -> Unit = {},
     onList: () -> Unit, onLook: (MapLook) -> Unit, onHeat: () -> Unit, onMe: () -> Unit,
     onCategory: (String?) -> Unit, onReport: () -> Unit, onMyReports: () -> Unit,
 ) {
     Column(Modifier.fillMaxWidth().verticalScroll(rememberScrollState()).padding(horizontal = 16.dp).padding(bottom = 28.dp)) {
-        Text("Meniu hartă", color = Ink, fontSize = 22.sp, fontWeight = FontWeight.Black,
+        Text(t("Meniu hartă"), color = Ink, fontSize = 22.sp, fontWeight = FontWeight.Black,
             modifier = Modifier.padding(start = 4.dp, bottom = 8.dp))
-        MenuRow(Icons.Rounded.ReportProblem, "Semnalează o problemă", "Groapă, furtună, inundație, vandalism…", Pink, onClick = onReport)
-        MenuRow(Icons.Rounded.Assignment, "Sesizările mele", "Vezi ce a răspuns Primăria", Lilac, onClick = onMyReports)
-        MenuRow(if (listMode) Icons.Rounded.Map else Icons.Rounded.ViewAgenda, if (listMode) "Arată harta" else "Arată ca listă",
+        MenuRow(Icons.Rounded.ReportProblem, t("Semnalează o problemă"), t("Groapă, furtună, inundație, vandalism…"), Pink, onClick = onReport)
+        MenuRow(Icons.Rounded.Assignment, t("Sesizările mele"), t("Vezi ce a răspuns Primăria"), Lilac, onClick = onMyReports)
+        MenuRow(if (listMode) Icons.Rounded.Map else Icons.Rounded.ViewAgenda, if (listMode) t("Arată harta") else t("Arată ca listă"),
             "Toate locurile, cu poze", Mint, onClick = onList)
-        MenuRow(Icons.Rounded.MyLocation, "Unde sunt eu", if (hasPermission) "Centrează harta pe tine" else "Permite locația",
+        MenuRow(Icons.Rounded.MyLocation, t("Unde sunt eu"), if (hasPermission) t("Centrează harta pe tine") else t("Permite locația"),
             Electric, onClick = onMe)
-        MenuRow(Icons.Rounded.LocalFireDepartment, "Agitație acum",
-            if (showHeat) "Pornită: unde sunt oamenii acum" else "Unde sunt oamenii acum", Gold, active = showHeat, onClick = onHeat)
-        Text("Straturi pe hartă", color = TextMuted, fontSize = 13.sp, modifier = Modifier.padding(top = 14.dp, bottom = 4.dp, start = 4.dp))
-        MenuRow(Icons.Rounded.Group, "Prietenii mei", if (showFriends) "Pornit: prietenii care se arată pe hartă" else "Cine dintre prieteni e prin oraș",
+        MenuRow(Icons.Rounded.LocalFireDepartment, t("Agitație acum"),
+            if (showHeat) t("Pornită: unde sunt oamenii acum") else t("Unde sunt oamenii acum"), Gold, active = showHeat, onClick = onHeat)
+        Text(t("Straturi pe hartă"), color = TextMuted, fontSize = 13.sp, modifier = Modifier.padding(top = 14.dp, bottom = 4.dp, start = 4.dp))
+        MenuRow(Icons.Rounded.Group, t("Prietenii mei"), if (showFriends) t("Pornit: prietenii care se arată pe hartă") else t("Cine dintre prieteni e prin oraș"),
             Mint, active = showFriends, onClick = onFriends)
-        MenuRow(Icons.Rounded.Tram, "Tramvaie și autobuze live", if (showTram) "Pornit: unde sunt acum + traseele CTP" else "Unde sunt acum, pe toate liniile CTP",
+        MenuRow(Icons.Rounded.Tram, t("Tramvaie și autobuze live"), if (showTram) t("Pornit: unde sunt acum + traseele CTP") else t("Unde sunt acum, pe toate liniile CTP"),
             Electric, active = showTram, onClick = onTram)
-        MenuRow(Icons.Rounded.Landscape, "Obiective turistice", if (showTurism) "Pornit: obiective și agrement (CNIPT)" else "Monumente, muzee, agrement din județ",
+        MenuRow(Icons.Rounded.School, ro.hack4arad.topul.ui.theme.tr("Școli și grădinițe", "Schools and kindergartens", "Iskolák, óvodák"),
+            if (showSchools) ro.hack4arad.topul.ui.theme.tr("Pornit: școlile din Arad", "On: schools in Arad", "Bekapcsolva") else ro.hack4arad.topul.ui.theme.tr("Toate școlile, liceele și grădinițele", "All schools and kindergartens", "Minden iskola"),
+            Mint, active = showSchools, onClick = onSchools)
+        MenuRow(Icons.Rounded.Celebration, t("Evenimente în oraș"), if (showEvents) t("Pornit: ce anunță comunitatea") else t("Ce se întâmplă în Arad"),
+            Violet, active = showEvents, onClick = onEvents)
+        MenuRow(Icons.Rounded.Landscape, t("Obiective turistice"), if (showTurism) t("Pornit: obiective și agrement (CNIPT)") else t("Monumente, muzee, agrement din județ"),
             Gold, active = showTurism, onClick = onTurism)
-        MenuRow(Icons.Rounded.ReportProblem, "Sesizări din oraș", if (showReports) "Pornit: gropi, furtună, iluminat…" else "Oprit",
+        MenuRow(Icons.Rounded.ReportProblem, t("Sesizări din oraș"), if (showReports) t("Pornit: gropi, furtună, iluminat…") else t("Oprit"),
             Pink, active = showReports, onClick = onReports)
 
-        Text("Stil hartă", color = TextMuted, fontSize = 13.sp, modifier = Modifier.padding(top = 14.dp, bottom = 8.dp, start = 4.dp))
+        Text(t("Stil hartă"), color = TextMuted, fontSize = 13.sp, modifier = Modifier.padding(top = 14.dp, bottom = 8.dp, start = 4.dp))
         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
             MapLook.entries.forEach { l ->
                 val on = l == look
@@ -598,7 +659,7 @@ private fun MapMenu(
             }
         }
 
-        Text("Ce vrei să vezi", color = TextMuted, fontSize = 13.sp, modifier = Modifier.padding(top = 16.dp, bottom = 8.dp, start = 4.dp))
+        Text(t("Ce vrei să vezi"), color = TextMuted, fontSize = 13.sp, modifier = Modifier.padding(top = 16.dp, bottom = 8.dp, start = 4.dp))
         CategoryGrid(vm.categories, vm.selectedCategory, onCategory)
     }
 }
@@ -642,7 +703,7 @@ private fun CategoryGrid(categories: List<Category>, selected: String?, onSelect
                         tint = if (on) GoldDark else (c?.let { categoryColor(it.code) } ?: Ink),
                     )
                     Text(
-                        c?.label ?: "Toate", color = if (on) GoldDark else Ink, fontSize = 12.sp, fontWeight = FontWeight.Bold,
+                        c?.label ?: t("Toate"), color = if (on) GoldDark else Ink, fontSize = 12.sp, fontWeight = FontWeight.Bold,
                         maxLines = 1, overflow = TextOverflow.Ellipsis, modifier = Modifier.padding(horizontal = 4.dp),
                     )
                 }
@@ -704,12 +765,12 @@ private fun LiveTicker(latest: String?, modifier: Modifier = Modifier) {
 }
 
 fun levelTitle(level: Int) = when {
-    level <= 1 -> "Turist"
-    level == 2 -> "Localnic"
-    level <= 4 -> "Explorator"
-    level <= 6 -> "Cunoscător"
-    level <= 9 -> "Ambasador"
-    else -> "Legenda Aradului"
+    level <= 1 -> t("Turist")
+    level == 2 -> t("Localnic")
+    level <= 4 -> t("Explorator")
+    level <= 6 -> t("Cunoscător")
+    level <= 9 -> t("Ambasador")
+    else -> t("Legenda Aradului")
 }
 
 fun formatDistance(m: Double): String = if (m < 1000) "${m.roundToInt()} m" else "%.1f km".format(m / 1000)
@@ -742,7 +803,7 @@ private fun CarouselCard(place: Place, busy: Boolean, onOpen: () -> Unit, onChec
                 Spacer(Modifier.width(4.dp))
                 Text(
                     listOfNotNull(
-                        when (place.mayorId) { null -> "Tron liber"; me -> "Tu ești Primarul"; else -> "Primar: ${place.mayorName}" },
+                        when (place.mayorId) { null -> t("Tron liber"); me -> t("Tu ești Primarul"); else -> "Primar: ${place.mayorName}" },
                         place.distanceM?.let { "${formatDistance(it)} · ${walkingMinutes(it)} min pe jos" },
                     ).joinToString(" · "),
                     color = if (place.mayorId == null) Gold else TextMuted, fontSize = 12.sp, maxLines = 1, overflow = TextOverflow.Ellipsis,
@@ -755,10 +816,10 @@ private fun CarouselCard(place: Place, busy: Boolean, onOpen: () -> Unit, onChec
                     contentPadding = PaddingValues(horizontal = 10.dp),
                 ) {
                     if (busy) CircularProgressIndicator(Modifier.size(18.dp), strokeWidth = 2.dp, color = GoldDark)
-                    else Text(if (place.mayorId == null) "Cucerește tronul" else "Fă check-in", fontSize = 13.sp, maxLines = 1, softWrap = false, overflow = TextOverflow.Ellipsis)
+                    else Text(if (place.mayorId == null) t("Cucerește tronul") else t("Fă check-in"), fontSize = 13.sp, maxLines = 1, softWrap = false, overflow = TextOverflow.Ellipsis)
                 }
                 OutlinedButton(onClick = onOpen, modifier = Modifier.height(42.dp), contentPadding = PaddingValues(horizontal = 12.dp)) {
-                    Text("Detalii", color = Ink, fontSize = 14.sp)
+                    Text(t("Detalii"), color = Ink, fontSize = 14.sp)
                 }
                 // „Du-mă acolo”: navigare ca în Google Maps
                 val navContext = LocalContext.current
@@ -785,6 +846,8 @@ private fun PlacesMap(
     showReports: Boolean = true,
     showFriends: Boolean = false,
     showTurism: Boolean = false,
+    showEvents: Boolean = false,
+    showSchools: Boolean = false,
     highlightedId: Int?,
     bottomPadding: androidx.compose.ui.unit.Dp = 16.dp,
     onPlaceTap: (Place) -> Unit,
@@ -852,6 +915,26 @@ private fun PlacesMap(
                 )
             }
         }
+        // școlile, liceele și grădinițele (OpenStreetMap)
+        if (showSchools) vm.schools.forEach { sc ->
+            key("sc-${sc.id}") {
+                Marker(
+                    state = remember { MarkerState(LatLng(sc.lat, sc.lng)) }, title = sc.name,
+                    snippet = listOf(sc.kind, sc.address).filter { it.isNotBlank() }.joinToString(" · "),
+                    icon = BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_CYAN),
+                )
+            }
+        }
+        // evenimentele anunțate în comunitate (cu loc cunoscut)
+        if (showEvents) vm.events.forEach { e ->
+            key("ev-${e.id}") {
+                Marker(
+                    state = remember { MarkerState(LatLng(e.lat!!, e.lng!!)) }, title = "🎉 " + e.title,
+                    snippet = listOfNotNull(e.at.take(16).replace("T", " "), e.place).joinToString(" · "),
+                    icon = BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_MAGENTA), zIndex = 2f,
+                )
+            }
+        }
         // obiective turistice (CNIPT Arad)
         if (showTurism) vm.turism.forEach { t ->
             key("tur-${t.id}") {
@@ -878,8 +961,16 @@ private fun PlacesMap(
                 Marker(
                     state = remember { MarkerState(LatLng(r.lat, r.lng)) },
                     title = "${r.categoryLabel} · ${r.statusLabel ?: r.status}",
-                    snippet = listOfNotNull(r.adminNote?.let { "Primăria: $it" }, r.description.takeIf { it.isNotBlank() }, "semnalat de @${r.userName}")
+                    snippet = listOfNotNull(
+                        if (r.confirmed) "confirmată" else "confirmări ${r.confirmations}/${r.confirmsNeeded} · atinge aici dacă o vezi și tu",
+                        r.adminNote?.let { "Primăria: $it" }, r.description.takeIf { it.isNotBlank() }, "semnalat de @${r.userName}")
                         .joinToString(" · "),
+                    onInfoWindowClick = {
+                        if (!r.confirmed && r.status == "nou") scope.launch {
+                            val fix = if (hasLocationPermission(context)) runCatching { currentFix(context) }.getOrNull() else null
+                            vm.confirmReport(r.id, fix)
+                        }
+                    },
                     icon = BitmapDescriptorFactory.defaultMarker(
                         when (r.status) {
                             "rezolvat" -> BitmapDescriptorFactory.HUE_GREEN
@@ -950,7 +1041,7 @@ private fun ReportForm(busy: Boolean, emergency: Boolean = false, onSend: (Strin
         Row(verticalAlignment = Alignment.CenterVertically) {
             Icon(Icons.Rounded.ReportProblem, null, tint = Pink, modifier = Modifier.size(26.dp))
             Spacer(Modifier.width(10.dp))
-            Text(if (emergency) "Alertă urgentă" else "Semnalează o problemă", color = Ink, fontSize = 22.sp, fontWeight = FontWeight.Black)
+            Text(if (emergency) t("Alertă urgentă") else t("Semnalează o problemă"), color = Ink, fontSize = 22.sp, fontWeight = FontWeight.Black)
         }
         if (emergency) {
             // întâi 112: aplicația nu înlocuiește serviciul de urgență
@@ -961,12 +1052,12 @@ private fun ReportForm(busy: Boolean, emergency: Boolean = false, onSend: (Strin
                 verticalAlignment = Alignment.CenterVertically,
             ) {
                 Icon(Icons.Rounded.Call, null, tint = Color.White)
-                Text("  Pericol pentru oameni? Sună acum la 112", color = Color.White, fontWeight = FontWeight.Black)
+                Text(t("  Pericol pentru oameni? Sună acum la 112"), color = Color.White, fontWeight = FontWeight.Black)
             }
-            Text("Doar pentru situații extrem de grave. Alerta ajunge prima în lista Primăriei, cu prioritate maximă, și e anunțată live în oraș.",
+            Text(t("Doar pentru situații extrem de grave. Alerta ajunge prima în lista Primăriei, cu prioritate maximă, și e anunțată live în oraș."),
                 color = TextMuted, fontSize = 13.sp, modifier = Modifier.padding(top = 8.dp))
         } else {
-            Text("Ajunge direct la Primăria Aradului, cu poza și locul exact. +10 XP, iar +20 XP când e rezolvată.", color = TextMuted, fontSize = 13.sp)
+            Text(t("Ajunge direct la Primăria Aradului, cu poza și locul exact. +10 XP, iar +20 XP când e rezolvată."), color = TextMuted, fontSize = 13.sp)
         }
         Spacer(Modifier.height(14.dp))
         // grilă cu toate tipurile de alerte (cele urgente au un semn roșu)
@@ -997,7 +1088,7 @@ private fun ReportForm(busy: Boolean, emergency: Boolean = false, onSend: (Strin
         Spacer(Modifier.height(12.dp))
         OutlinedTextField(
             value = description, onValueChange = { if (it.length <= 500) description = it },
-            label = { Text("Descriere (opțional)") }, modifier = Modifier.fillMaxWidth(), minLines = 2,
+            label = { Text(t("Descriere (opțional)")) }, modifier = Modifier.fillMaxWidth(), minLines = 2,
         )
         Spacer(Modifier.height(12.dp))
         OutlinedButton(
@@ -1006,7 +1097,7 @@ private fun ReportForm(busy: Boolean, emergency: Boolean = false, onSend: (Strin
         ) {
             Icon(Icons.Rounded.CameraAlt, null, tint = Ink)
             Spacer(Modifier.width(8.dp))
-            Text(if (photoTaken) "Poză adăugată · refă" else "Adaugă poză", color = Ink)
+            Text(if (photoTaken) t("Poză adăugată · refă") else t("Adaugă poză"), color = Ink)
         }
         Spacer(Modifier.height(12.dp))
         Button(
@@ -1024,7 +1115,7 @@ private fun ReportForm(busy: Boolean, emergency: Boolean = false, onSend: (Strin
             else {
                 Icon(Icons.Rounded.Flag, null)
                 Spacer(Modifier.width(8.dp))
-                Text(if (emergency) "Trimite alerta" else "Trimite sesizarea", fontSize = 16.sp)
+                Text(if (emergency) t("Trimite alerta") else t("Trimite sesizarea"), fontSize = 16.sp)
             }
         }
     }
@@ -1060,7 +1151,7 @@ private fun SearchBar(query: String, onChange: (String) -> Unit, modifier: Modif
         Icon(Icons.Rounded.Search, null, tint = Lilac, modifier = Modifier.size(22.dp))
         Spacer(Modifier.width(10.dp))
         Box(Modifier.weight(1f)) {
-            if (query.isEmpty()) Text("Caută un loc, ex. pizza, cafenea, KFC", color = TextMuted, fontSize = 15.sp, maxLines = 1)
+            if (query.isEmpty()) Text(t("Caută un loc, ex. pizza, cafenea, KFC"), color = TextMuted, fontSize = 15.sp, maxLines = 1)
             BasicTextField(
                 value = query, onValueChange = onChange, singleLine = true,
                 textStyle = TextStyle(color = Ink, fontSize = 15.sp),

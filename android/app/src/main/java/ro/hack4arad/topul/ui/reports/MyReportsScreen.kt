@@ -1,5 +1,6 @@
 package ro.hack4arad.topul.ui.reports
 
+import ro.hack4arad.topul.ui.theme.t
 import ro.hack4arad.topul.ui.theme.Ink
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -71,7 +72,7 @@ fun MyReportsScreen(onBack: () -> Unit, onNew: () -> Unit) {
     Column(Modifier.fillMaxSize()) {
         Row(Modifier.fillMaxWidth().padding(8.dp), verticalAlignment = Alignment.CenterVertically) {
             IconButton(onClick = onBack) { Icon(Icons.AutoMirrored.Rounded.ArrowBack, "Înapoi", tint = Ink) }
-            Text("Sesizările mele", color = Ink, fontSize = 22.sp, fontWeight = FontWeight.Black, modifier = Modifier.weight(1f))
+            Text(t("Sesizările mele"), color = Ink, fontSize = 22.sp, fontWeight = FontWeight.Black, modifier = Modifier.weight(1f))
         }
         val list = items
         when {
@@ -79,8 +80,8 @@ fun MyReportsScreen(onBack: () -> Unit, onNew: () -> Unit) {
             list == null -> Loading()
             list.isEmpty() -> Column(Modifier.fillMaxSize().padding(24.dp), horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.Center) {
-                Text("Încă n-ai semnalat nimic.", color = Ink, fontWeight = FontWeight.Bold, fontSize = 18.sp)
-                Text("Ai văzut o groapă, un copac căzut sau un semafor stricat? Spune-i Primăriei.", color = TextMuted)
+                Text(t("Încă n-ai semnalat nimic."), color = Ink, fontWeight = FontWeight.Bold, fontSize = 18.sp)
+                Text(t("Ai văzut o groapă, un copac căzut sau un semafor stricat? Spune-i Primăriei."), color = TextMuted)
                 Spacer(Modifier.height(16.dp))
                 NewButton(onNew)
             }
@@ -97,7 +98,7 @@ private fun NewButton(onNew: () -> Unit) {
     Button(
         onClick = onNew, colors = ButtonDefaults.buttonColors(containerColor = Pink, contentColor = Color.White),
         modifier = Modifier.fillMaxWidth().height(52.dp),
-    ) { Icon(Icons.Rounded.Add, null); Text("  Semnalează o problemă nouă", fontWeight = FontWeight.Bold) }
+    ) { Icon(Icons.Rounded.Add, null); Text(t("  Semnalează o problemă nouă"), fontWeight = FontWeight.Bold) }
 }
 
 @Composable
@@ -119,6 +120,16 @@ private fun ReportCard(r: Report) {
                 modifier = Modifier.clip(RoundedCornerShape(50)).background(color.copy(alpha = 0.18f)).padding(horizontal = 10.dp, vertical = 4.dp),
             )
         }
+        Text(
+            when {
+                r.emergency -> ro.hack4arad.topul.ui.theme.tr("Alertă majoră · ajunsă imediat la Primărie", "Major alert · sent straight to City Hall", "Riasztás · azonnal a városházán")
+                r.confirmed -> ro.hack4arad.topul.ui.theme.tr("Confirmată de ${r.confirmations} arădeni · ajunsă la Primărie", "Confirmed by ${r.confirmations} people · sent to City Hall", "${r.confirmations} ember megerősítette")
+                else -> ro.hack4arad.topul.ui.theme.tr("În așteptare: ${r.confirmations}/${r.confirmsNeeded} confirmări. Roagă vecinii s-o confirme de pe hartă.",
+                    "Waiting: ${r.confirmations}/${r.confirmsNeeded} confirmations. Ask neighbours to confirm it on the map.", "Várakozik: ${r.confirmations}/${r.confirmsNeeded}")
+            },
+            color = if (r.confirmed || r.emergency) Gold else TextMuted, fontSize = 12.sp, fontWeight = FontWeight.Bold,
+            modifier = Modifier.padding(top = 6.dp),
+        )
         if (r.description.isNotBlank()) Text(r.description, color = Lilac, modifier = Modifier.padding(top = 8.dp))
         Network.fullUrl(r.photoUrl)?.let {
             AsyncImage(it, null, contentScale = ContentScale.Crop,

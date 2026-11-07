@@ -1,5 +1,6 @@
 package ro.hack4arad.topul.ui.place
 
+import ro.hack4arad.topul.ui.theme.t
 import ro.hack4arad.topul.ui.theme.Scrim
 import ro.hack4arad.topul.ui.theme.Ink
 import android.content.ActivityNotFoundException
@@ -15,6 +16,7 @@ import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.gestures.detectHorizontalDragGestures
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Box
@@ -83,11 +85,23 @@ import java.util.Locale
 @Composable
 fun AudioGuide(story: String, modifier: Modifier = Modifier) {
     val context = LocalContext.current
+    val prefs = remember { context.getSharedPreferences("tts", android.content.Context.MODE_PRIVATE) }
     var ready by remember { mutableStateOf(false) }
     var missingVoice by remember { mutableStateOf(false) }
     var noEngine by remember { mutableStateOf(false) }
     var speaking by remember { mutableStateOf(false) }
+    var choosing by remember { mutableStateOf(false) }
+    var voices by remember { mutableStateOf<List<android.speech.tts.Voice>>(emptyList()) }
+    var voiceName by remember { mutableStateOf(prefs.getString("voice", null)) }
+    var rate by remember { mutableFloatStateOf(prefs.getFloat("rate", 0.95f)) }
+    var pitch by remember { mutableFloatStateOf(prefs.getFloat("pitch", 1.0f)) }
     val tts = remember { mutableStateOf<TextToSpeech?>(null) }
+
+    fun applySettings(e: TextToSpeech) {
+        e.setSpeechRate(rate)
+        e.setPitch(pitch)
+        voices.firstOrNull { it.name == voiceName }?.let { e.voice = it }
+    }
 
     DisposableEffect(Unit) {
         var engine: TextToSpeech? = null
@@ -97,7 +111,11 @@ fun AudioGuide(story: String, modifier: Modifier = Modifier) {
             val result = e.setLanguage(Locale.forLanguageTag("ro-RO"))
             // fără voce română: citim totuși (motorul o poate descărca singur), iar instalarea rămâne opțională
             missingVoice = result == TextToSpeech.LANG_MISSING_DATA || result == TextToSpeech.LANG_NOT_SUPPORTED
-            e.setSpeechRate(0.95f)
+            // vocile disponibile: întâi cele românești, apoi restul (pentru cine vrea alt accent)
+            voices = runCatching { e.voices.orEmpty().toList() }.getOrDefault(emptyList())
+                .filter { !it.features.orEmpty().contains(TextToSpeech.Engine.KEY_FEATURE_NOT_INSTALLED) }
+                .sortedWith(compareBy({ it.locale.language != "ro" }, { it.isNetworkConnectionRequired }, { it.name }))
+            applySettings(e)
             e.setOnUtteranceProgressListener(object : UtteranceProgressListener() {
                 override fun onStart(id: String?) { speaking = true }
                 override fun onDone(id: String?) { speaking = false }
@@ -111,44 +129,107 @@ fun AudioGuide(story: String, modifier: Modifier = Modifier) {
     }
 
     val shape = RoundedCornerShape(20.dp)
-    Row(
-        modifier.fillMaxWidth().clip(shape).background(Panel).border(1.dp, Track, shape)
-            .clickable(enabled = ready) {
+    Column(modifier.fillMaxWidth().clip(shape).background(Panel).border(1.dp, Track, shape)) {
+        Row(
+            Modifier.fillMaxWidth().clickable(enabled = ready) {
                 val engine = tts.value ?: return@clickable
                 when {
                     noEngine -> installVoice(context)
                     speaking -> { engine.stop(); speaking = false }
                     else -> {
+                        applySettings(engine)
                         speaking = true
                         if (engine.speak(story, TextToSpeech.QUEUE_FLUSH, null, "poveste") != TextToSpeech.SUCCESS) { speaking = false; installVoice(context) }
                     }
                 }
+            }.padding(14.dp),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Box(Modifier.size(48.dp).clip(CircleShape).background(Gold), contentAlignment = Alignment.Center) {
+                Icon(if (speaking) Icons.Rounded.Stop else Icons.AutoMirrored.Rounded.VolumeUp, null, tint = GoldDark)
             }
-            .padding(14.dp),
-        verticalAlignment = Alignment.CenterVertically,
-    ) {
-        Box(Modifier.size(48.dp).clip(CircleShape).background(Gold), contentAlignment = Alignment.Center) {
-            Icon(if (speaking) Icons.Rounded.Stop else Icons.AutoMirrored.Rounded.VolumeUp, null, tint = GoldDark)
+            Spacer(Modifier.width(14.dp))
+            Column(Modifier.weight(1f)) {
+                Text(
+                    when {
+                        noEngine -> t("Instalează un motor de voce")
+                        speaking -> t("Ascultă… (atinge ca să oprești)")
+                        else -> t("Ascultă povestea locului")
+                    },
+                    color = Ink, fontWeight = FontWeight.Black, fontSize = 16.sp,
+                )
+                Text(
+                    if (noEngine) t("Telefonul nu are „Text în vorbire”. Atinge ca să-l instalezi.")
+                    else t("Ghid audio în română · ~30 de secunde"),
+                    color = TextMuted, fontSize = 13.sp,
+                )
+                if (missingVoice && !noEngine) Text(t("Vocea română nu e descărcată – atinge aici ca s-o instalezi"), color = Gold, fontSize = 12.sp,
+                    fontWeight = FontWeight.Bold, modifier = Modifier.padding(top = 2.dp).clickable { installVoice(context) })
+            }
+            if (speaking) SoundBars()
         }
-        Spacer(Modifier.width(14.dp))
-        Column(Modifier.weight(1f)) {
-            Text(
-                when {
-                    noEngine -> "Instalează un motor de voce"
-                    speaking -> "Ascultă… (atinge ca să oprești)"
-                    else -> "Ascultă povestea locului"
-                },
-                color = Ink, fontWeight = FontWeight.Black, fontSize = 16.sp,
-            )
-            Text(
-                if (noEngine) "Telefonul nu are „Text în vorbire”. Atinge ca să-l instalezi."
-                else "Ghid audio în română · ~30 de secunde",
-                color = TextMuted, fontSize = 13.sp,
-            )
-            if (missingVoice && !noEngine) Text("Vocea română nu e descărcată – atinge aici ca s-o instalezi", color = Gold, fontSize = 12.sp,
-                fontWeight = FontWeight.Bold, modifier = Modifier.padding(top = 2.dp).clickable { installVoice(context) })
+        if (ready && !noEngine) {
+            Text(t("Schimbă vocea · viteză · ton"), color = Gold, fontWeight = FontWeight.Bold, fontSize = 13.sp,
+                modifier = Modifier.fillMaxWidth().clickable { choosing = true }.padding(start = 76.dp, bottom = 12.dp))
         }
-        if (speaking) SoundBars()
+    }
+
+    if (choosing) {
+        val engine = tts.value
+        fun preview() {
+            engine ?: return
+            applySettings(engine)
+            engine.speak("Bună! Eu te plimb prin poveștile Aradului.", TextToSpeech.QUEUE_FLUSH, null, "proba")
+        }
+        fun save() {
+            prefs.edit().putString("voice", voiceName).putFloat("rate", rate).putFloat("pitch", pitch).apply()
+        }
+        androidx.compose.material3.AlertDialog(
+            onDismissRequest = { save(); choosing = false },
+            title = { Text(t("Vocea ghidului"), fontWeight = FontWeight.Black) },
+            text = {
+                Column(Modifier.verticalScroll(androidx.compose.foundation.rememberScrollState())) {
+                    // stiluri rapide: același motor, alt ton și ritm
+                    Text(t("Stil"), color = TextMuted, fontSize = 13.sp)
+                    Row(Modifier.padding(vertical = 6.dp)) {
+                        listOf(Triple(ro.hack4arad.topul.ui.theme.tr("Calm", "Calm", "Nyugodt"), 0.85f, 0.9f), Triple("Normal", 0.95f, 1.0f), Triple(ro.hack4arad.topul.ui.theme.tr("Vioi", "Lively", "Élénk"), 1.1f, 1.15f), Triple(ro.hack4arad.topul.ui.theme.tr("Grav", "Deep", "Mély"), 0.9f, 0.75f))
+                            .forEach { (label, r, p) ->
+                                val on = kotlin.math.abs(rate - r) < 0.01f && kotlin.math.abs(pitch - p) < 0.01f
+                                Text(label, color = if (on) GoldDark else Ink, fontWeight = FontWeight.Bold, fontSize = 13.sp,
+                                    modifier = Modifier.padding(end = 6.dp).clip(RoundedCornerShape(50)).background(if (on) Gold else Track)
+                                        .clickable { rate = r; pitch = p; preview() }.padding(horizontal = 10.dp, vertical = 6.dp))
+                            }
+                    }
+                    Text(ro.hack4arad.topul.ui.theme.tr("Viteză", "Speed", "Sebesség") + ": ${"%.2f".format(rate)}", color = TextMuted, fontSize = 13.sp)
+                    androidx.compose.material3.Slider(value = rate, onValueChange = { rate = it }, valueRange = 0.6f..1.5f,
+                        onValueChangeFinished = { preview() })
+                    Text(ro.hack4arad.topul.ui.theme.tr("Ton", "Pitch", "Hangmagasság") + ": ${"%.2f".format(pitch)}", color = TextMuted, fontSize = 13.sp)
+                    androidx.compose.material3.Slider(value = pitch, onValueChange = { pitch = it }, valueRange = 0.6f..1.5f,
+                        onValueChangeFinished = { preview() })
+                    Text(t("Voci instalate pe telefon"), color = TextMuted, fontSize = 13.sp, modifier = Modifier.padding(top = 6.dp))
+                    if (voices.isEmpty()) Text(t("Telefonul nu raportează alte voci."), color = TextMuted, fontSize = 12.sp)
+                    voices.take(25).forEachIndexed { i, v ->
+                        val on = v.name == voiceName
+                        val lang = if (v.locale.language == "ro") "română" else v.locale.displayName
+                        Text(ro.hack4arad.topul.ui.theme.tr("Vocea", "Voice", "Hang") + " ${i + 1} · $lang" + (if (v.isNetworkConnectionRequired) " · online" else ""),
+                            color = if (on) GoldDark else Ink, fontSize = 14.sp, fontWeight = if (on) FontWeight.Black else FontWeight.Normal,
+                            modifier = Modifier.fillMaxWidth().padding(vertical = 2.dp).clip(RoundedCornerShape(10.dp))
+                                .background(if (on) Gold else Color.Transparent)
+                                .clickable { voiceName = v.name; preview() }.padding(horizontal = 10.dp, vertical = 8.dp))
+                    }
+                    Text(t("Mai multe voci (din setările telefonului)"), color = Gold, fontWeight = FontWeight.Bold, fontSize = 13.sp,
+                        modifier = Modifier.padding(top = 8.dp).clickable {
+                            try {
+                                context.startActivity(Intent("com.android.settings.TTS_SETTINGS").addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
+                            } catch (_: ActivityNotFoundException) { installVoice(context) }
+                        })
+                }
+            },
+            confirmButton = { androidx.compose.material3.TextButton(onClick = { save(); engine?.stop(); choosing = false }) { Text(t("Gata")) } },
+            dismissButton = {
+                androidx.compose.material3.TextButton(onClick = { voiceName = null; rate = 0.95f; pitch = 1.0f; save(); preview() }) { Text(t("Implicit")) }
+            },
+        )
     }
 }
 
@@ -203,7 +284,7 @@ fun ThenAndNow(place: PlaceDetail, old: OldPhoto, modifier: Modifier = Modifier)
             )
             Text(old.year, color = Night, fontWeight = FontWeight.Black,
                 modifier = Modifier.align(Alignment.TopStart).padding(10.dp).clip(RoundedCornerShape(50)).background(Gold).padding(horizontal = 10.dp, vertical = 4.dp))
-            Text("Azi", color = Color.White, fontWeight = FontWeight.Black,
+            Text(t("Azi"), color = Color.White, fontWeight = FontWeight.Black,
                 modifier = Modifier.align(Alignment.TopEnd).padding(10.dp).clip(RoundedCornerShape(50)).background(Scrim.copy(alpha = 0.8f)).padding(horizontal = 10.dp, vertical = 4.dp))
             // linia + mânerul
             val x = with(density) { (widthPx * split).toDp() }

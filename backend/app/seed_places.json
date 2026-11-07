@@ -54,15 +54,6 @@
     "verified": true
   },
   {
-    "name": "Mr. Paco",
-    "category": "fastfood",
-    "description": "Pui și cartofi prăjiți.",
-    "address": "Bulevardul Revoluției 35 Sc.A, Arad",
-    "lat": 46.180805,
-    "lng": 21.322382,
-    "verified": true
-  },
-  {
     "name": "Shock Kebab Teatru",
     "category": "fastfood",
     "description": "Kebab, lângă teatru.",
@@ -141,15 +132,6 @@
     "address": "Arad",
     "lat": 46.173306,
     "lng": 21.317534,
-    "verified": true
-  },
-  {
-    "name": "KHARMA",
-    "category": "restaurant",
-    "description": "Steak, burgeri, bucătărie italiană.",
-    "address": "Strada 9 Mai 83, Arad",
-    "lat": 46.173312,
-    "lng": 21.317159,
     "verified": true
   },
   {
@@ -270,15 +252,6 @@
     "verified": true
   },
   {
-    "name": "Falezza",
-    "category": "restaurant",
-    "description": "Restaurant lângă Mureș.",
-    "address": "Aleea Răsăritului Bl. 23, Arad",
-    "lat": 46.179682,
-    "lng": 21.332692,
-    "verified": true
-  },
-  {
     "name": "Snooze Coffee",
     "category": "cafenea",
     "description": "Cafenea cu terasă.",
@@ -294,15 +267,6 @@
     "address": "Strada Cloșca 1, Arad",
     "lat": 46.177641,
     "lng": 21.318856,
-    "verified": true
-  },
-  {
-    "name": "Makor Specialty Coffee",
-    "category": "cafenea",
-    "description": "Cafea de specialitate.",
-    "address": "Bulevardul Revoluției, Arad",
-    "lat": 46.170984,
-    "lng": 21.315213,
     "verified": true
   },
   {
@@ -483,24 +447,6 @@
     "address": "Arad",
     "lat": 46.173746,
     "lng": 21.316411,
-    "verified": true
-  },
-  {
-    "name": "Luci Bar",
-    "category": "bar",
-    "description": "Bar.",
-    "address": "Arad",
-    "lat": 46.1763,
-    "lng": 21.319187,
-    "verified": true
-  },
-  {
-    "name": "One More Beer",
-    "category": "bar",
-    "description": "Bere și terasă.",
-    "address": "Strada Ștefan Cicio Pop 12, Arad",
-    "lat": 46.172342,
-    "lng": 21.31165,
     "verified": true
   },
   {
@@ -1080,15 +1026,6 @@
     "verified": true
   },
   {
-    "name": "Maria Rustic Resort (Cuied)",
-    "category": "cazare",
-    "description": "Maria-Rustic-Resort este un complex turistic așezat într-un cadru natural de excepție, o oază de liniște și frumos, un loc superb de recreere sau petrecerea unui sfârșit…",
-    "address": "Cuied Lac, comuna Buteni, Cuied",
-    "lat": 46.312715,
-    "lng": 22.043612,
-    "verified": true
-  },
-  {
     "name": "Hanul Moților (Hălmagiu)",
     "category": "cazare",
     "description": "Hanul Moților se află chiar în centrul Hălmagiului la doar 50m de DN76.",
@@ -1131,15 +1068,6 @@
     "address": "Strada Petru Rareș nr. 24, Arad",
     "lat": 46.192056,
     "lng": 21.331129,
-    "verified": true
-  },
-  {
-    "name": "Apfel Haus (Horia)",
-    "category": "cazare",
-    "description": "Pensiuni în Horia.",
-    "address": "Sat Horia, DJ 709, Km 5 500m, Horia",
-    "lat": 46.199145,
-    "lng": 21.428579,
     "verified": true
   },
   {
@@ -1692,15 +1620,6 @@
     "verified": true
   },
   {
-    "name": "Pensiune Adriana",
-    "category": "cazare",
-    "description": "Hostel în Arad, zona UTA.",
-    "address": "Strada Frații Neumann Vila 7, Arad",
-    "lat": 46.192565,
-    "lng": 21.309885,
-    "verified": true
-  },
-  {
     "name": "Pensiunea Raluca",
     "category": "cazare",
     "description": "Hostel în Arad, zona Vladimirescu Via Carmina.",
@@ -2220,15 +2139,6 @@
     "address": "Strada Petru Rareș 20, Arad",
     "lat": 46.190251,
     "lng": 21.330091,
-    "verified": true
-  },
-  {
-    "name": "Venoli Impex · Strada Fragilor",
-    "category": "supermarket",
-    "description": "Supermarket Venoli Impex, Strada Fragilor.",
-    "address": "Strada Fragilor 2/A, Arad",
-    "lat": 46.198726,
-    "lng": 21.297089,
     "verified": true
   },
   {
@@ -2760,6 +2670,15 @@
     "address": "Arad",
     "lat": 46.168911,
     "lng": 21.292125,
+    "verified": true
+  },
+  {
+    "name": "Sinagoga Neologă",
+    "category": "biserica",
+    "description": "Sinagoga neologă din 1834, monument istoric.",
+    "address": "Strada Tribunul Dobra 10, Arad",
+    "lat": 46.1686446,
+    "lng": 21.3176433,
     "verified": true
   }
 ]

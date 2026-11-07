@@ -1,5 +1,6 @@
 package ro.hack4arad.topul.ui.place
 
+import ro.hack4arad.topul.ui.theme.t
 import ro.hack4arad.topul.ui.theme.Scrim
 import ro.hack4arad.topul.ui.theme.Ink
 import ro.hack4arad.topul.ui.theme.Mint
@@ -157,7 +158,7 @@ fun PlaceScreen(onBack: () -> Unit, onTour3D: (Int) -> Unit = {}, vm: PlaceViewM
             val bytes = photo?.let { compressPhoto(context, it) }
             val fix = currentFix(context)
             vm.markBusy(false)
-            if (fix == null) vm.actionError = "Nu am putut afla locația. Pornește GPS-ul și încearcă din nou."
+            if (fix == null) vm.actionError = t("Nu am putut afla locația. Pornește GPS-ul și încearcă din nou.")
             else vm.checkIn(fix, bytes)
         }
     }
@@ -210,14 +211,14 @@ fun PlaceScreen(onBack: () -> Unit, onTour3D: (Int) -> Unit = {}, vm: PlaceViewM
                             Spacer(Modifier.width(12.dp))
                             Column {
                                 if (place.mayorName == null) {
-                                    Text("Tron liber", color = Gold, fontWeight = FontWeight.Black, fontSize = 18.sp)
-                                    Text("Primul check-in te face Primar.", color = Lilac)
+                                    Text(t("Tron liber"), color = Gold, fontWeight = FontWeight.Black, fontSize = 18.sp)
+                                    Text(t("Primul check-in te face Primar."), color = Lilac)
                                 } else if (place.mayorId == Network.session.userId) {
-                                    Text("Tu ești Primarul aici", color = Gold, fontWeight = FontWeight.Black, fontSize = 18.sp)
-                                    Text("Revino des ca să nu-ți ia nimeni tronul.", color = Lilac)
+                                    Text(t("Tu ești Primarul aici"), color = Gold, fontWeight = FontWeight.Black, fontSize = 18.sp)
+                                    Text(t("Revino des ca să nu-ți ia nimeni tronul."), color = Lilac)
                                 } else {
                                     Text("Primar: @${place.mayorName}", color = Ink, fontWeight = FontWeight.Black, fontSize = 18.sp)
-                                    Text("Fă mai multe check-in-uri ca să-i iei tronul.", color = Lilac)
+                                    Text(t("Fă mai multe check-in-uri ca să-i iei tronul."), color = Lilac)
                                 }
                             }
                         }
@@ -232,7 +233,7 @@ fun PlaceScreen(onBack: () -> Unit, onTour3D: (Int) -> Unit = {}, vm: PlaceViewM
 
                     // trecut vs prezent: poza veche peste cea de azi
                     place.oldPhoto?.let { old ->
-                        SectionTitle("Trecut vs prezent")
+                        SectionTitle(t("Trecut vs prezent"))
                         ThenAndNow(place, old)
                     }
 
@@ -269,7 +270,7 @@ fun PlaceScreen(onBack: () -> Unit, onTour3D: (Int) -> Unit = {}, vm: PlaceViewM
                         modifier = Modifier.fillMaxWidth().height(56.dp),
                     ) {
                         if (vm.busy) CircularProgressIndicator(Modifier.size(22.dp), strokeWidth = 2.dp, color = GoldDark)
-                        else Text(if (place.mayorId == null) "Cucerește tronul" else "Fac check-in aici", fontSize = 17.sp)
+                        else Text(if (place.mayorId == null) t("Cucerește tronul") else t("Fac check-in aici"), fontSize = 17.sp)
                     }
                     OutlinedButton(
                         onClick = {
@@ -283,7 +284,7 @@ fun PlaceScreen(onBack: () -> Unit, onTour3D: (Int) -> Unit = {}, vm: PlaceViewM
                         },
                         enabled = !vm.busy,
                         modifier = Modifier.fillMaxWidth().padding(top = 8.dp).height(52.dp),
-                    ) { Icon(Icons.Rounded.PhotoCamera, null, tint = Ink); Text("  Check-in cu poză · +5 XP bonus", color = Ink) }
+                    ) { Icon(Icons.Rounded.PhotoCamera, null, tint = Ink); Text(t("  Check-in cu poză · +5 XP bonus"), color = Ink) }
 
                     // navigare până la loc, ca în Google Maps
                     val navContext = LocalContext.current
@@ -291,7 +292,7 @@ fun PlaceScreen(onBack: () -> Unit, onTour3D: (Int) -> Unit = {}, vm: PlaceViewM
                         onClick = { navigateTo(navContext, place.lat, place.lng) },
                         colors = ButtonDefaults.buttonColors(containerColor = Mint, contentColor = Night),
                         modifier = Modifier.fillMaxWidth().padding(top = 8.dp).height(52.dp),
-                    ) { Icon(Icons.Rounded.Directions, null); Text("  Du-mă acolo", fontWeight = FontWeight.Bold) }
+                    ) { Icon(Icons.Rounded.Directions, null); Text(t("  Du-mă acolo"), fontWeight = FontWeight.Bold) }
 
                     // ești Primar aici? arată-le prietenilor (card pentru Instagram Story)
                     if (place.mayorId != null && place.mayorId == Network.session.userId) {
@@ -300,11 +301,11 @@ fun PlaceScreen(onBack: () -> Unit, onTour3D: (Int) -> Unit = {}, vm: PlaceViewM
                         OutlinedButton(
                             onClick = { shareScope.launch { ShareCard.share(shareContext, place.id, mayor = true) } },
                             modifier = Modifier.fillMaxWidth().padding(top = 8.dp).height(52.dp),
-                        ) { Icon(Icons.Rounded.Share, null, tint = Gold); Text("  Distribuie: sunt Primarul aici", color = Gold) }
+                        ) { Icon(Icons.Rounded.Share, null, tint = Gold); Text(t("  Distribuie: sunt Primarul aici"), color = Gold) }
                     }
 
                     if (place.recentPhotos.isNotEmpty()) {
-                        SectionTitle("Poze de la comunitate")
+                        SectionTitle(t("Poze de la comunitate"))
                         LazyRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                             items(place.recentPhotos) { photo ->
                                 Column(Modifier.width(140.dp)) {
@@ -334,7 +335,7 @@ fun PlaceScreen(onBack: () -> Unit, onTour3D: (Int) -> Unit = {}, vm: PlaceViewM
         if (confirm3D && p3d != null) {
             AlertDialog(
                 onDismissRequest = { confirm3D = false },
-                title = { Text("Tur 3D pe date mobile") },
+                title = { Text(t("Tur 3D pe date mobile")) },
                 text = {
                     Text(
                         "Ești pe date mobile. Scena 3D are " +
@@ -342,8 +343,8 @@ fun PlaceScreen(onBack: () -> Unit, onTour3D: (Int) -> Unit = {}, vm: PlaceViewM
                             ". O descarci acum?",
                     )
                 },
-                confirmButton = { Button(onClick = { confirm3D = false; onTour3D(p3d.id) }) { Text("Descarcă") } },
-                dismissButton = { TextButton(onClick = { confirm3D = false }) { Text("Mai târziu", color = TextMuted) } },
+                confirmButton = { Button(onClick = { confirm3D = false; onTour3D(p3d.id) }) { Text(t("Descarcă")) } },
+                dismissButton = { TextButton(onClick = { confirm3D = false }) { Text(t("Mai târziu"), color = TextMuted) } },
             )
         }
 

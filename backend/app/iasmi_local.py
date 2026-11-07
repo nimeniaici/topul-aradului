@@ -215,6 +215,29 @@ def answer(db: Session, text: str, near: tuple[float, float] | None) -> tuple[st
                 "inundație, iluminat, vandalism și altele –, adaugă o poză și trimite. Ajunge la Primărie, iar statusul "
                 "îl vezi în „Sesizările mele”. Primești +10 XP, plus 20 când e rezolvată."), []
 
+    # servicii: farmacii, spitale, poliție, poștă, bancomate (OpenStreetMap)
+    service = next((k for k, roots in (("farmacie", ("farmac", "medicament")), ("spital", ("spital", "urgent", "upu", "clinic")),
+                                       ("politie", ("politi", "pompier")), ("posta", ("posta", "colet")),
+                                       ("banca", ("bancomat", "atm", "banca", "numerar")), ("medic", ("dentist", "stomatolog", "doctor", "medic")))
+                    if _has(t, *roots)), None)
+    if service and not _has(t, "ajung"):
+        from .routers.servicii import nearest
+        where = near or (46.1745, 21.3185)
+        rows = nearest(service, where[0], where[1], 3)
+        if rows:
+            first = rows[0]
+            parts = [f"{first['name']}" + (f", pe {first['address']}" if first['address'] else "") +
+                     (f", la {_fmt_dist(first['distance_m'])} de tine ({_walk(first['distance_m'])})" if near else "")]
+            extra = "; ".join(f"{r['name']} ({_fmt_dist(r['distance_m'])})" for r in rows[1:]) if near else ""
+            msg = f"Cel mai aproape: {parts[0]}."
+            if first.get("hours"):
+                msg += f" Program: {first['hours']}."
+            if extra:
+                msg += f" Mai sunt: {extra}."
+            if service == "spital":
+                msg = "Dacă e o urgență, sună la 112. " + msg
+            return msg + " Toate le găsești în Acasă → Servicii locale.", []
+
     # calendarul gunoiului pe stradă (date RETIM)
     if _has(t, "gunoi", "deseu", "pubel", "reciclab", "ridica", "hartie", "plastic", "menajer"):
         from .routers.gunoi import answer_for

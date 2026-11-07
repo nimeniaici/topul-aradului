@@ -1,5 +1,7 @@
 package ro.hack4arad.topul.ui.home
 
+import androidx.compose.material.icons.rounded.HowToVote
+import androidx.compose.material.icons.rounded.LocalPharmacy
 import androidx.compose.material.icons.rounded.Landscape
 import androidx.compose.material.icons.rounded.Recycling
 import androidx.compose.material.icons.rounded.Group
@@ -126,6 +128,8 @@ fun HomeScreen(onOpen: (HomeTarget) -> Unit) {
             Tile(tr("Semnalează o problemă", "Report a problem", "Hiba bejelentése"), tr("Groapă, furtună, vandalism…", "Pothole, storm, vandalism…", "Kátyú, vihar, rongálás…"), Icons.Rounded.ReportProblem, Pink, HomeTarget.Map(MapRequest(report = true))),
             Tile(tr("Transport CTP", "CTP transport", "CTP közlekedés"), tr("Tramvaie și autobuze live", "Live trams and buses", "Élő villamos, busz"),
                 Icons.Rounded.Tram, Electric, HomeTarget.Screen("transit")),
+            Tile(tr("Servicii locale", "Local services", "Helyi szolgáltatások"), tr("Farmacii, spitale, școli, poștă", "Pharmacies, hospitals, schools", "Gyógyszertár, kórház"),
+                Icons.Rounded.LocalPharmacy, Pink, HomeTarget.Screen("servicii")),
             Tile(tr("Calendar gunoi", "Waste calendar", "Hulladéknaptár"), tr("Când vine mașina pe strada ta", "Pickup days on your street", "Szállítási napok"),
                 Icons.Rounded.Recycling, Mint, HomeTarget.Screen("gunoi")),
             Tile(tr("Sesizările mele", "My reports", "Bejelentéseim"), tr("Ce a răspuns Primăria", "City Hall replies", "A városháza válaszai"), Icons.Rounded.Assignment, Lilac, HomeTarget.Screen("reports")),
@@ -134,6 +138,8 @@ fun HomeScreen(onOpen: (HomeTarget) -> Unit) {
         tr("Comunitate", "Community", "Közösség") to listOf(
             Tile(tr("Comunitatea Aradului", "Arad community", "Aradi közösség"), tr("Chat, anunțuri, evenimente", "Chat, news, events", "Chat, események"),
                 Icons.Rounded.Forum, Violet, HomeTarget.Screen("community")),
+            Tile(tr("Sondaje", "Polls", "Szavazások"), tr("Spune ce crezi despre oraș", "Have your say", "Mondd el a véleményed"),
+                Icons.Rounded.HowToVote, Gold, HomeTarget.Screen("polls")),
             Tile(tr("Prieteni", "Friends", "Barátok"), tr("Pe hartă, chat, tronurile lor", "On the map, chat, thrones", "Térkép, chat"),
                 Icons.Rounded.Group, Mint, HomeTarget.Screen("friends")),
         ),

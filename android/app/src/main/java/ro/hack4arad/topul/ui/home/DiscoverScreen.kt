@@ -1,5 +1,6 @@
 package ro.hack4arad.topul.ui.home
 
+import ro.hack4arad.topul.ui.theme.t
 import ro.hack4arad.topul.ui.theme.Scrim
 import ro.hack4arad.topul.ui.theme.Ink
 import androidx.compose.foundation.background
@@ -68,8 +69,8 @@ fun DiscoverScreen(onBack: () -> Unit, onPlace: (Int) -> Unit) {
         Row(Modifier.fillMaxWidth().padding(8.dp), verticalAlignment = Alignment.CenterVertically) {
             IconButton(onClick = onBack) { Icon(Icons.AutoMirrored.Rounded.ArrowBack, "Înapoi", tint = Ink) }
             Column {
-                Text("Descoperă Aradul", color = Ink, fontSize = 22.sp, fontWeight = FontWeight.Black)
-                Text("Trecut vs prezent · ghid audio · tur 3D", color = TextMuted, fontSize = 13.sp)
+                Text(t("Descoperă Aradul"), color = Ink, fontSize = 22.sp, fontWeight = FontWeight.Black)
+                Text(t("Trecut vs prezent · ghid audio · tur 3D"), color = TextMuted, fontSize = 13.sp)
             }
         }
         val list = items
@@ -100,8 +101,8 @@ private fun DiscoverCard(p: DiscoverPlace, onClick: () -> Unit) {
             Text(p.name, color = Color.White, fontWeight = FontWeight.Black, fontSize = 19.sp)
             Row(horizontalArrangement = Arrangement.spacedBy(6.dp), modifier = Modifier.padding(top = 6.dp)) {
                 if (old != null) Badge(Icons.Rounded.HistoryEdu, "${old.year} vs azi", Gold)
-                if (p.hasStory) Badge(Icons.Rounded.Headphones, "Ghid audio", Mint)
-                if (p.has3d) Badge(Icons.Rounded.ViewInAr, "Tur 3D", Electric)
+                if (p.hasStory) Badge(Icons.Rounded.Headphones, t("Ghid audio"), Mint)
+                if (p.has3d) Badge(Icons.Rounded.ViewInAr, t("Tur 3D"), Electric)
             }
         }
     }

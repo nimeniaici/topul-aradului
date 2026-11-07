@@ -1,5 +1,6 @@
 package ro.hack4arad.topul.ui.components
 
+import ro.hack4arad.topul.ui.theme.t
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.text.KeyboardActions
@@ -56,13 +57,13 @@ fun UsernameField(
             value.length < 3 -> { status = "Minim 3 caractere"; ok = false }
             else -> {
                 ok = false
-                status = "Verific…"
+                status = t("Verific…")
                 onValid(false)
                 delay(400) // așteptăm să termini de scris
                 runCatching { Network.api.usernameAvailable(value) }
                     .onSuccess { r ->
                         ok = r.available
-                        status = if (r.available) "Liber, e al tău!" else (r.reason ?: "Indisponibil")
+                        status = if (r.available) t("Liber, e al tău!") else (r.reason ?: t("Indisponibil"))
                         suggestion = r.suggestion
                     }
                     .onFailure { status = "Nu am putut verifica acum"; ok = false }
@@ -74,21 +75,21 @@ fun UsernameField(
     OutlinedTextField(
         value = value,
         onValueChange = { onChange(cleanUsername(it)) },
-        label = { Text("Username (unic)") },
+        label = { Text(t("Username (unic)")) },
         prefix = { Text("@", color = Gold, fontWeight = FontWeight.Bold) },
         placeholder = { Text("ex. diana.arad", color = TextMuted) },
         singleLine = true,
         supportingText = {
             val s = status
             if (s != null) {
-                val color = if (ok) Mint else if (s == "Verific…") TextMuted else Pink
+                val color = if (ok) Mint else if (s == t("Verific…")) TextMuted else Pink
                 Text(
                     if (suggestion != null) "$s Încearcă @$suggestion" else s,
                     color = color,
                     modifier = if (suggestion != null) Modifier.clickable { onChange(suggestion!!) } else Modifier,
                 )
             } else {
-                Text("Litere mici, cifre, „.” sau „_”. Așa te văd ceilalți în joc.", color = TextMuted)
+                Text(t("Litere mici, cifre, „.” sau „_”. Așa te văd ceilalți în joc."), color = TextMuted)
             }
         },
         keyboardOptions = KeyboardOptions(

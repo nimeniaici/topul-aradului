@@ -86,6 +86,16 @@ _PAGE = r"""<!doctype html>
     <div id="detail"></div>
   </aside>
 </main>
+<section class="stat" style="margin:16px">
+  <h3 style="margin:0 0 8px">Sondaje oficiale – întreabă orașul</h3>
+  <form onsubmit="newPoll(event)" style="display:grid;gap:8px;max-width:640px">
+    <input id="pq" placeholder="Întrebarea (ex.: Ce parc renovăm în 2027?)" required minlength="5" maxlength="200">
+    <input id="po" placeholder="Variante, separate prin virgulă (ex.: Eminescu, Copiilor, Europa)" required>
+    <label>Deschis <select id="pd"><option>3</option><option selected>7</option><option>14</option><option>30</option></select> zile</label>
+    <button>Publică sondajul în aplicație</button>
+  </form>
+  <div id="polls" style="margin-top:12px"></div>
+</section>
 <div id="toast"></div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
@@ -122,6 +132,26 @@ async function load() {
   sTotal.textContent = stats.total; sNou.textContent = stats.by_status.nou; sLucru.textContent = stats.by_status.in_lucru;
   sRez.textContent = stats.by_status.rezolvat; sWeek.textContent = stats.last_7_days;
   render();
+  loadPolls();
+}
+async function loadPolls() {
+  const ps = await api('/admin/polls');
+  document.getElementById('polls').innerHTML = ps.map(p => {
+    const tot = p.options_results.reduce((a, o) => a + o.votes, 0) || 1;
+    return `<div style="margin:10px 0"><b>${p.official ? '🏛 ' : ''}${esc(p.question)}</b> <small>(${p.closed ? 'închis' : 'deschis'}, ${p.total_votes} voturi, de ${esc(p.author)})</small>` +
+      p.options_results.map(o => `<div style="display:flex;gap:8px;align-items:center"><span style="width:180px">${esc(o.text)}</span>` +
+        `<div style="flex:1;background:#0002;border-radius:6px"><div style="width:${Math.round(100*o.votes/tot)}%;background:var(--mint);height:10px;border-radius:6px"></div></div>` +
+        `<span>${o.votes}</span></div>`).join('') + `</div>`;
+  }).join('') || '<small>Niciun sondaj încă.</small>';
+}
+async function newPoll(e) {
+  e.preventDefault();
+  const options = document.getElementById('po').value.split(',').map(s => s.trim()).filter(Boolean);
+  try {
+    await api('/admin/polls', { method: 'POST', body: JSON.stringify({ question: document.getElementById('pq').value.trim(), options,
+      days: +document.getElementById('pd').value }) });
+    e.target.reset(); toast('Sondaj publicat în aplicație'); loadPolls();
+  } catch (err) { toast('Nu s-a putut publica: ' + err.message); }
 }
 function render() {
   tabs.innerHTML = TABS.map(([k, l]) => `<button class="${k === filter ? 'on' : ''}" onclick="filter='${k}';render()">${l}</button>`).join('');
@@ -131,7 +161,7 @@ function render() {
   list.innerHTML = shown.length ? shown.map(r => `
     <div class="item ${r.id === selected ? 'sel' : ''}" onclick="select(${r.id})">
       <div class="thumb" style="${r.photo_url ? `background-image:url('${esc(r.photo_url)}')` : ''}">${r.photo_url ? '' : 'fără poză'}</div>
-      <div><h3>${r.emergency ? '<span class="pill s-nou" style="background:#b00020;color:#fff">ALERTĂ MAJORĂ</span> ' : r.urgent ? '<span class="pill s-nou">URGENT</span> ' : ''}${esc(r.category_label)}</h3>
+      <div><h3>${r.emergency ? '<span class="pill s-nou" style="background:#b00020;color:#fff">ALERTĂ MAJORĂ</span> ' : r.urgent ? '<span class="pill s-nou">URGENT</span> ' : ''}${r.confirmed ? '<span class="pill" style="background:#2e7d32;color:#fff">CONFIRMATĂ</span> ' : `<span class="pill" style="background:#888;color:#fff">în așteptare ${r.confirmations}/${r.confirms_needed}</span> `}${esc(r.category_label)}</h3>
         <p>${esc(r.description || 'Fără descriere')}</p>
         <p><span class="pill s-${r.status}">${LABELS[r.status]}</span> · @${esc(r.user_name)} · ${when(r.created_at)}</p></div>
     </div>`).join('') : '<p style="padding:16px;color:var(--muted)">Nicio sesizare aici.</p>';

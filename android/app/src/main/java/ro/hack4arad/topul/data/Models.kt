@@ -157,7 +157,12 @@ data class Report(
     val adminNote: String? = null,
     val urgent: Boolean = false,
     val updatedAt: String? = null,
+    val emergency: Boolean = false,
+    val confirmations: Int = 1,
+    val confirmsNeeded: Int = 3,
+    val confirmed: Boolean = false,
 )
+data class ConfirmIn(val lat: Double, val lng: Double, val isMock: Boolean = false)
 
 /** Un loc din „Descoperă Aradul”: are ghid audio, poză veche sau tur 3D. */
 data class DiscoverPlace(
@@ -173,7 +178,7 @@ data class DiscoverPlace(
     val oldPhoto: OldPhoto?,
 )
 
-data class ReportCreated(val report: Report, val xpGained: Int, val totalXp: Int, val level: Int)
+data class ReportCreated(val report: Report, val xpGained: Int, val totalXp: Int, val level: Int, val confirmedExisting: Boolean = false)
 
 /** O vizită din jurnalul meu (check-in). */
 data class MyCheckin(val id: Int, val placeId: Int, val placeName: String, val photoUrl: String?, val createdAt: String)
@@ -257,6 +262,20 @@ data class StopCheckinOut(val detail: String, val total: Int)
 data class Reward(val code: String, val kind: String, val title: String, val description: String, val progress: Int, val goal: Int,
                   val unlocked: Boolean, val voucher: String?, val placeId: Int?, val placeName: String?)
 data class RewardsOut(val rewards: List<Reward>, val stopCheckins: Int, val note: String)
+
+// ---------- sondaje ----------
+data class PollOption(val id: Int, val text: String, val votes: Int?, val percent: Int?)
+data class Poll(val id: Int, val question: String, val official: Boolean, val author: String, val mine: Boolean, val closesAt: String,
+                val closed: Boolean, val totalVotes: Int, val myVote: Int?, val resultsVisible: Boolean, val options: List<PollOption>)
+data class PollIn(val question: String, val options: List<String>, val days: Int)
+data class PollVoteIn(val optionId: Int)
+
+// ---------- servicii locale ----------
+data class ServiceItem(val id: String, val type: String, val kind: String, val name: String, val lat: Double, val lng: Double,
+                       val address: String, val phone: String, val hours: String, val website: String, val emergency: Boolean,
+                       @com.google.gson.annotations.SerializedName("open_24_7") val open247: Boolean, val distanceM: Int?)
+data class ServiceType(val code: String, val label: String, val count: Int)
+data class ServiciiOut(val items: List<ServiceItem>, val types: List<ServiceType>, val source: String)
 
 // ---------- comunitate ----------
 data class RoomTag(val code: String, val label: String)
