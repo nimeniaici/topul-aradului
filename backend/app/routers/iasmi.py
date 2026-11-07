@@ -16,6 +16,7 @@ from pydantic import BaseModel, Field
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
+from .. import iasmi_local
 from ..categories import CATEGORIES
 from ..db import SessionLocal, get_db
 from ..geo import distance_m
@@ -49,7 +50,6 @@ Funcțiile aplicației, pe care le poți recomanda:
 - Descoperă Aradul: poze vechi „trecut vs prezent” și ghid audio la obiective.
 - Setări: cont, scoruri, limbă, paleta de culori, raportează o problemă a aplicației."""
 
-FALLBACK_NOTE = ("(Iasmi rulează acum în modul simplu, fără AI: pe server nu e setată cheia ANTHROPIC_API_KEY.)")
 
 
 class ChatMessage(BaseModel):
@@ -141,24 +141,9 @@ def _make_tools(near: tuple[float, float] | None, found: list[dict]):
 
 
 def _fallback(db: Session, text: str, near: tuple[float, float] | None) -> ChatOut:
-    """Mod simplu, fără AI: câteva răspunsuri utile + căutare de locuri."""
-    t = _plain(text)
-    if any(w in t for w in ("plates", "plata", "taxa", "taxe", "impozit", "amenda")):
-        reply = ("Taxele locale și amenzile se pot plăti online pe ghiseul.ro sau la ghișeele Primăriei Arad. "
-                 "Facturile la utilități se plătesc pe site-ul sau aplicația furnizorului ori la casieriile lor.")
-    elif any(w in t for w in ("urgent", "pericol", "accident", "foc", "incendiu")):
-        reply = "Dacă e cineva în pericol chiar acum, sună imediat la 112."
-    elif any(w in t for w in ("groapa", "sesizare", "semnalez", "copac", "inundatie")):
-        reply = "Apasă „Semnalează o problemă” în meniul Acasă sau pe hartă: alegi tipul, adaugi o poză și ajunge la Primărie."
-    elif any(w in t for w in ("ajung", "drum", "traseu", "navig")):
-        reply = "Deschide locul în aplicație și apasă „Du-mă acolo”: pornește navigarea în Google Maps, pe jos."
-    else:
-        places = [_place_dict(p, near) for p in _find_places(db, text, "", near, 3)]
-        if places:
-            reply = "Uite ce am găsit în Arad:\n" + "\n".join(f"- {p['name']} ({p['category']}), {p['address']}" for p in places)
-            return ChatOut(reply=reply + "\n\n" + FALLBACK_NOTE, ai=False, places=places)
-        reply = "Te pot ajuta cu locuri din Arad, sesizări către Primărie, plăți și cum ajungi undeva."
-    return ChatOut(reply=reply + "\n\n" + FALLBACK_NOTE, ai=False)
+    """Iasmi gratuit (fără AI plătit): vezi app/iasmi_local.py."""
+    reply, places = iasmi_local.answer(db, text, near)
+    return ChatOut(reply=reply, ai=False, places=places)
 
 
 @router.post("", response_model=ChatOut)
