@@ -142,6 +142,36 @@ NOUNS = {"fastfood": "localuri de fast food", "restaurant": "restaurante", "cafe
          "gelaterie": "gelaterii", "terasa": "terase", "bar": "baruri", "obiectiv": "obiective", "manastire": "mănăstiri",
          "natura": "parcuri și locuri în natură", "mall": "centre comerciale", "eveniment": "evenimente"}
 
+ARTICLE = {"restaurant": "Restaurantul", "cafenea": "Cafeneaua", "cofetarie": "Cofetăria", "gelaterie": "Gelateria",
+           "bar": "Barul", "terasa": "Terasa", "fastfood": "Localul"}
+OWN_TYPE = ("pizz", "rest", "cafe", "coffee", "cofet", "gelat", "bar", "teras", "bistro", "kfc", "mcdonald", "burger",
+            "parcul", "manastir", "palatul", "cetatea", "muzeul", "teatrul", "catedral", "statui")
+
+
+def _where(p: Place, d: dict) -> str:
+    """„pe Strada Cloșca 12, la 580 m de tine” – fără „, Arad” la final."""
+    addr = re.sub(r",?\s*Arad$", "", (p.address or "").strip())
+    parts = []
+    if addr and plain(addr) != "arad":
+        parts.append(("pe " if re.match(r"(?i)(strada|str\.|bulevardul|calea|piata|piața|aleea|splaiul)", addr) else "la ") + addr)
+    else:
+        parts.append("în Arad")
+    if "distance_m" in d:
+        parts.append(f"la {_fmt_dist(d['distance_m'])} de tine ({_walk(d['distance_m'])})")
+    return ", ".join(parts)
+
+
+def _say(p: Place, d: dict, first: bool) -> str:
+    art = ARTICLE.get(p.category) if not any(k in plain(p.name) for k in OWN_TYPE) else None
+    if first:
+        who = f"{art} {p.name}" if art else p.name
+        return f"{who} e {_where(p, d)}."
+    addr = re.sub(r",?\s*Arad$", "", (p.address or "").strip())
+    on = (" pe " if re.match(r"(?i)(strada|bulevardul|calea|pia)", addr) else " la ") + addr if addr and plain(addr) != "arad" else ""
+    dist_txt = f" ({_fmt_dist(d['distance_m'])})" if "distance_m" in d else ""
+    return f"{p.name},{on}{dist_txt}" if on else f"{p.name}{dist_txt}"
+
+
 GREETINGS = ("salut", "buna", "hello", "hei", "hey", "neata", "servus", "szia", "hi")
 THANKS = ("mersi", "multumesc", "thanks", "multam", "mersii")
 
@@ -221,15 +251,14 @@ def answer(db: Session, text: str, near: tuple[float, float] | None) -> tuple[st
         else:
             places.sort(key=lambda p: (-hits(p), -p.rating))
         top = [_place_dict(p, near) for p in places[:3]]
-        what = NOUNS.get(category, "locuri")
-        intro = random.choice([f"Iată câteva {what} pe care ți le recomand", f"Uite ce {what} am găsit pentru tine"])
-        lines = []
-        for d, p in zip(top, places[:3]):
-            extra = f", la {_fmt_dist(d['distance_m'])}" if "distance_m" in d else ""
-            mayor = f" · Primar: @{p.mayor.name}" if p.mayor else ""
-            lines.append(f"- {p.name} ({p.address}{extra}){mayor}")
-        tail = " Cele mai apropiate sunt primele." if near else " Ordinea e după voturile din Topul Aradului."
-        return intro + ":\n" + "\n".join(lines) + "\n" + tail.strip(), top
+        sentences = [_say(places[0], top[0], first=True)]
+        others = [_say(p, d, first=False) for p, d in zip(places[1:3], top[1:3])]
+        if others:
+            sentences.append(("Mai poți încerca " + " sau ".join(others) + ".") if len(others) == 1
+                             else "Mai poți încerca " + ", ".join(others[:-1]) + " sau " + others[-1] + ".")
+        if places[0].mayor:
+            sentences.append(f"Primarul de acolo e @{places[0].mayor.name}; îi poți lua tronul cu un check-in.")
+        return " ".join(sentences), top
 
     return ("Nu sunt sigură că am înțeles. Mă poți întreba, de exemplu: „Unde beau o cafea bună?”, „Cum ajung la Cetate?”, "
             "„Cum plătesc impozitul?” sau „Ce probleme s-au semnalat azi?”."), []

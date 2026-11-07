@@ -19,8 +19,8 @@ android {
         applicationId = "ro.hack4arad.topul"
         minSdk = 26
         targetSdk = 35
-        versionCode = 12
-        versionName = "1.2"
+        versionCode = 13
+        versionName = "1.3"
 
         // Client ID OAuth de tip „Web application” (același ca GOOGLE_CLIENT_IDS pe server)
         buildConfigField("String", "GOOGLE_WEB_CLIENT_ID", "\"${localProps.getProperty("GOOGLE_WEB_CLIENT_ID", "").trim()}\"")
@@ -38,6 +38,9 @@ android {
 
     buildTypes {
         release {
+            // versiunea rapidă pentru telefoane (fără verificările de depanare); semnată cu aceeași cheie
+            // ca versiunea de test, ca să se instaleze peste ea și ca Google Sign-In să meargă (același SHA-1)
+            signingConfig = signingConfigs.getByName("debug")
             isMinifyEnabled = false
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
         }
@@ -70,6 +73,7 @@ dependencies {
     implementation(libs.androidx.navigation.compose)
 
     implementation(libs.maps.compose)
+    implementation(libs.zxing.core) // codul QR al biletului digital (demo)
     implementation(libs.maps.compose.utils)
     implementation(libs.maps.utils)
     implementation(libs.play.services.location)

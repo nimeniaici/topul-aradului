@@ -1,5 +1,8 @@
 package ro.hack4arad.topul.ui.map
 
+import androidx.compose.material.icons.rounded.Tram
+import com.google.maps.android.compose.Circle
+import com.google.maps.android.compose.Polyline
 import ro.hack4arad.topul.ui.theme.Ink
 import ro.hack4arad.topul.ui.reports.reportKind
 import ro.hack4arad.topul.ui.reports.REPORT_KINDS
@@ -270,6 +273,14 @@ class MapViewModel : ViewModel() {
         }
     }
 
+    var tramLines by mutableStateOf<List<ro.hack4arad.topul.data.TransitLine>>(emptyList())
+        private set
+
+    fun loadTram() {
+        if (tramLines.isNotEmpty()) return
+        viewModelScope.launch { runCatching { Network.api.transitLines() }.onSuccess { tramLines = it } }
+    }
+
     fun loadHeat() {
         viewModelScope.launch {
             runCatching { Network.api.recentCheckins(minutes = 60) }
@@ -345,6 +356,9 @@ fun MapScreen(onPlace: (Int) -> Unit, onOpenReports: () -> Unit = {}, vm: MapVie
     var look by rememberSaveable { mutableStateOf(MapLook.LIGHT) }
     var listMode by rememberSaveable { mutableStateOf(false) }
     var showHeat by rememberSaveable { mutableStateOf(false) }
+    var showTram by rememberSaveable { mutableStateOf(false) }
+    var showReports by rememberSaveable { mutableStateOf(true) }
+    LaunchedEffect(showTram) { if (showTram) vm.loadTram() }
     var reporting by remember { mutableStateOf(false) }
     var query by rememberSaveable { mutableStateOf("") }
     val shown = remember(vm.places, query) { searchPlaces(vm.places, query) }
@@ -389,6 +403,7 @@ fun MapScreen(onPlace: (Int) -> Unit, onOpenReports: () -> Unit = {}, vm: MapVie
         } else {
             PlacesMap(
                 vm = vm, places = shown, camera = camera, look = look, hasPermission = hasPermission, showHeat = showHeat,
+                showTram = showTram, showReports = showReports,
                 highlightedId = if (selecting) carouselPlace?.id else null,
                 bottomPadding = if (selecting) 270.dp else 16.dp,
                 onPlaceTap = { p ->
@@ -469,6 +484,9 @@ fun MapScreen(onPlace: (Int) -> Unit, onOpenReports: () -> Unit = {}, vm: MapVie
         ) {
             MapMenu(
                 vm = vm, listMode = listMode, look = look, showHeat = showHeat, hasPermission = hasPermission,
+                showTram = showTram, showReports = showReports,
+                onTram = { showTram = !showTram; menuOpen = false; listMode = false },
+                onReports = { showReports = !showReports },
                 onList = { listMode = !listMode; menuOpen = false },
                 onLook = { look = it },
                 onHeat = { showHeat = !showHeat; if (showHeat) vm.loadHeat() },
@@ -506,6 +524,7 @@ fun MapScreen(onPlace: (Int) -> Unit, onOpenReports: () -> Unit = {}, vm: MapVie
 @Composable
 private fun MapMenu(
     vm: MapViewModel, listMode: Boolean, look: MapLook, showHeat: Boolean, hasPermission: Boolean,
+    showTram: Boolean, showReports: Boolean, onTram: () -> Unit, onReports: () -> Unit,
     onList: () -> Unit, onLook: (MapLook) -> Unit, onHeat: () -> Unit, onMe: () -> Unit,
     onCategory: (String?) -> Unit, onReport: () -> Unit, onMyReports: () -> Unit,
 ) {
@@ -520,6 +539,11 @@ private fun MapMenu(
             Electric, onClick = onMe)
         MenuRow(Icons.Rounded.LocalFireDepartment, "Agitație acum",
             if (showHeat) "Pornită: unde sunt oamenii acum" else "Unde sunt oamenii acum", Gold, active = showHeat, onClick = onHeat)
+        Text("Straturi pe hartă", color = TextMuted, fontSize = 13.sp, modifier = Modifier.padding(top = 14.dp, bottom = 4.dp, start = 4.dp))
+        MenuRow(Icons.Rounded.Tram, "Liniile de tramvai", if (showTram) "Pornit: traseele și stațiile CTP" else "Traseele și stațiile CTP",
+            Electric, active = showTram, onClick = onTram)
+        MenuRow(Icons.Rounded.ReportProblem, "Sesizări din oraș", if (showReports) "Pornit: gropi, furtună, iluminat…" else "Oprit",
+            Pink, active = showReports, onClick = onReports)
 
         Text("Stil hartă", color = TextMuted, fontSize = 13.sp, modifier = Modifier.padding(top = 14.dp, bottom = 8.dp, start = 4.dp))
         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -716,6 +740,8 @@ private fun PlacesMap(
     look: MapLook,
     hasPermission: Boolean,
     showHeat: Boolean,
+    showTram: Boolean = false,
+    showReports: Boolean = true,
     highlightedId: Int?,
     bottomPadding: androidx.compose.ui.unit.Dp = 16.dp,
     onPlaceTap: (Place) -> Unit,
@@ -758,7 +784,20 @@ private fun PlacesMap(
 
         // sesizările (gropi etc.) - markere roșii separate
         // roșu = nouă, portocaliu = Primăria lucrează, verde = rezolvată (cele respinse nu le arătăm)
-        vm.reports.filter { it.status != "respins" }.forEach { r ->
+        // stratul de tramvaie: traseele colorate pe linii + stațiile
+        if (showTram) vm.tramLines.forEach { l ->
+            key("tram-${l.ref}") {
+                Polyline(
+                    points = l.shape.map { LatLng(it[0], it[1]) },
+                    color = runCatching { Color(android.graphics.Color.parseColor(l.color)) }.getOrDefault(Electric),
+                    width = 10f,
+                )
+                l.stops.forEach { st ->
+                    Circle(center = LatLng(st.lat, st.lng), radius = 16.0, fillColor = Color.White, strokeColor = Color(0xFF263238), strokeWidth = 4f)
+                }
+            }
+        }
+        if (showReports) vm.reports.filter { it.status != "respins" }.forEach { r ->
             key("r${r.id}-${r.status}") {
                 Marker(
                     state = remember { MarkerState(LatLng(r.lat, r.lng)) },

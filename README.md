@@ -135,3 +135,4 @@ Lista se regenerează cu `backend/tools/build_seed_from_osm.py`.
 ## Logo
 Silueta Primăriei Arad din logo e desenată după fotografia „Arad, urbodomo 15” (Aisano, domeniu public, Wikimedia Commons).
 Fotografiile vechi din „Trecut vs prezent” sunt de pe Wikimedia Commons (Fortepan și altele); autorii și licențele apar în aplicație.
+Traseele și stațiile de tramvai CTP Arad: © contribuitorii OpenStreetMap (ODbL). Orele de sosire din aplicație sunt estimate.

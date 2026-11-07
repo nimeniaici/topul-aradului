@@ -54,11 +54,13 @@ object ThemeState {
     fun init(context: Context) {
         val id = context.getSharedPreferences("settings", Context.MODE_PRIVATE).getInt("palette_v2", DEFAULT_PALETTE)
         palette = PALETTES.firstOrNull { it.id == id } ?: palette
+        ro.hack4arad.topul.util.AppIcon.apply(context, palette.id) // iconița de pe telefon = paleta salvată
     }
 
     fun select(context: Context, id: Int) {
         context.getSharedPreferences("settings", Context.MODE_PRIVATE).edit().putInt("palette_v2", id).apply()
         palette = PALETTES.firstOrNull { it.id == id } ?: palette
+        ro.hack4arad.topul.util.AppIcon.apply(context, palette.id) // și iconița de pe telefon
     }
 }
 
@@ -111,7 +113,7 @@ fun TopulTheme(content: @Composable () -> Unit) {
         surfaceContainerLowest = Color.White, surfaceContainerLow = Color.White,
         surfaceContainer = Color.White, surfaceContainerHigh = Color.White, surfaceContainerHighest = p.a4,
         inverseSurface = p.deep, inverseOnSurface = Color.White, inversePrimary = p.a4,
-        outline = p.a4, outlineVariant = p.a4,
+        outline = p.deep.copy(alpha = 0.55f), outlineVariant = p.a4,
         error = Color(0xFFB3261E),
     )
     MaterialTheme(colorScheme = colors, typography = AppType) {

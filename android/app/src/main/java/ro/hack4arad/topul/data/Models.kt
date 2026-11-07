@@ -187,3 +187,21 @@ data class IasmiMessage(val role: String, val content: String)
 data class IasmiIn(val messages: List<IasmiMessage>, val lat: Double? = null, val lng: Double? = null)
 data class IasmiPlace(val id: Int, val name: String, val category: String, val address: String, val distanceM: Double? = null)
 data class IasmiOut(val reply: String, val ai: Boolean, val places: List<IasmiPlace> = emptyList())
+
+// ---------- Transport CTP ----------
+data class TransitStopRef(val id: String, val name: String, val lat: Double, val lng: Double, val minFromStart: Int = 0)
+data class TransitLine(
+    val ref: String, val name: String, val from: String, val to: String, val color: String,
+    val stops: List<TransitStopRef>, val shape: List<List<Double>>,
+    val headwayPeak: Int, val headwayOffpeak: Int, val headwayWeekend: Int, val first: String, val last: String,
+)
+data class TicketType(val code: String, val label: String, val price: Double, val minutes: Int)
+data class TransitInfo(val tickets: List<TicketType>, val dispatchPhone: String, val source: String, val note: String)
+data class TransitStop(val id: String, val name: String, val lat: Double, val lng: Double, val lines: List<String>, val distanceM: Int? = null)
+data class Departure(val line: String, val color: String, val towards: String, val minutes: List<Int>, val crowded: Int, val delayed: Int)
+data class NextTrams(val stop: TransitStop, val departures: List<Departure>)
+data class TransitReportIn(val line: String, val kind: String, val stopId: String? = null, val note: String = "")
+data class TransitReportOut(val line: String, val kind: String, val label: String, val stopName: String?, val note: String, val createdAt: String)
+data class TicketIn(val type: String)
+data class Ticket(val id: Int, val type: String, val label: String, val price: Double, val code: String,
+                  val validFrom: String, val validUntil: String, val active: Boolean, val demo: Boolean)

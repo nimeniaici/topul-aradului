@@ -1,5 +1,6 @@
 package ro.hack4arad.topul.ui.home
 
+import androidx.compose.material.icons.rounded.Tram
 import ro.hack4arad.topul.ui.components.AppLogo
 import ro.hack4arad.topul.ui.iasmi.IasmiOrb
 import androidx.compose.material.icons.rounded.Settings
@@ -119,6 +120,8 @@ fun HomeScreen(onOpen: (HomeTarget) -> Unit) {
     val sections = listOf(
         tr("Orașul tău", "Your city", "A városod") to listOf(
             Tile(tr("Semnalează o problemă", "Report a problem", "Hiba bejelentése"), tr("Groapă, furtună, vandalism…", "Pothole, storm, vandalism…", "Kátyú, vihar, rongálás…"), Icons.Rounded.ReportProblem, Pink, HomeTarget.Map(MapRequest(report = true))),
+            Tile(tr("Transport CTP", "CTP transport", "CTP közlekedés"), tr("Următorul tramvai, bilete", "Next tram, tickets", "Következő villamos"),
+                Icons.Rounded.Tram, Electric, HomeTarget.Screen("transit")),
             Tile(tr("Sesizările mele", "My reports", "Bejelentéseim"), tr("Ce a răspuns Primăria", "City Hall replies", "A városháza válaszai"), Icons.Rounded.Assignment, Lilac, HomeTarget.Screen("reports")),
             Tile(tr("Alerte urgente", "Urgent alerts", "Sürgős riasztás"), tr("Furtună, inundație, canal", "Storm, flood, manhole", "Vihar, árvíz, csatorna"), Icons.Rounded.Thunderstorm, Pink, HomeTarget.Map(MapRequest(report = true))),
         ),

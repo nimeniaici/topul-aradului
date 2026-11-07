@@ -282,7 +282,7 @@ fun ProfileScreen(onPlace: (Int) -> Unit, vm: ProfileViewModel = viewModel()) {
             if (p.missions.isNotEmpty()) {
                 SectionTitle("Misiuni")
                 p.missions.take(3).forEach { m ->
-                    Column(Modifier.fillMaxWidth().padding(bottom = 8.dp).clip(RoundedCornerShape(16.dp)).background(VioletDeep).padding(12.dp)) {
+                    Column(Modifier.fillMaxWidth().padding(bottom = 8.dp).clip(RoundedCornerShape(16.dp)).background(Panel).border(1.dp, Track, RoundedCornerShape(16.dp)).padding(12.dp)) {
                         Row(verticalAlignment = Alignment.CenterVertically) {
                             Icon(badgeIcon(m.code), null, tint = Lilac, modifier = Modifier.size(22.dp))
                             Spacer(Modifier.width(10.dp))

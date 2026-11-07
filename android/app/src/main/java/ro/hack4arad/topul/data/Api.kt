@@ -129,4 +129,28 @@ interface Api {
 
     @POST("iasmi")
     suspend fun iasmi(@Body body: IasmiIn): IasmiOut
+
+    @GET("transit/lines")
+    suspend fun transitLines(): List<TransitLine>
+
+    @GET("transit/info")
+    suspend fun transitInfo(): TransitInfo
+
+    @GET("transit/stops/near")
+    suspend fun nearStops(@Query("lat") lat: Double, @Query("lng") lng: Double, @Query("limit") limit: Int = 6): List<TransitStop>
+
+    @GET("transit/stops/{id}/next")
+    suspend fun nextTrams(@Path("id") stopId: String): NextTrams
+
+    @POST("transit/reports")
+    suspend fun transitReport(@Body body: TransitReportIn): MessageOut
+
+    @GET("transit/reports")
+    suspend fun transitReports(@Query("minutes") minutes: Int = 60): List<TransitReportOut>
+
+    @POST("transit/tickets")
+    suspend fun buyTicket(@Body body: TicketIn): Ticket
+
+    @GET("transit/tickets/mine")
+    suspend fun myTickets(): List<Ticket>
 }

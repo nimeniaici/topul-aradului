@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Iconița pentru paleta 5 (se activează din Setări → Interfața) -->
+<adaptive-icon xmlns:android="http://schemas.android.com/apk/res/android">
+    <background android:drawable="@color/icon_bg_p5" />
+    <foreground android:drawable="@mipmap/ic_launcher_fg_p5" />
+</adaptive-icon>

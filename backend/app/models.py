@@ -139,3 +139,29 @@ class Feedback(Base):
     app_version: Mapped[str] = mapped_column(String(40), default="")
     device: Mapped[str] = mapped_column(String(120), default="")
     created_at: Mapped[datetime] = mapped_column(DateTime, default=utcnow, index=True)
+
+
+class TransitReport(Base):
+    """Semnalare de la cetățeni despre transportul public: aglomerat, întârziere, tramvai defect."""
+    __tablename__ = "transit_reports"
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    user_id: Mapped[int] = mapped_column(ForeignKey("users.id"), index=True)
+    line: Mapped[str] = mapped_column(String(10), index=True)
+    kind: Mapped[str] = mapped_column(String(20))
+    stop_id: Mapped[str | None] = mapped_column(String(40), nullable=True)
+    stop_name: Mapped[str | None] = mapped_column(String(120), nullable=True)
+    note: Mapped[str] = mapped_column(Text, default="")
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=utcnow, index=True)
+
+
+class TransitTicket(Base):
+    """Bilet digital DEMONSTRATIV (fără plată reală)."""
+    __tablename__ = "transit_tickets"
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    user_id: Mapped[int] = mapped_column(ForeignKey("users.id"), index=True)
+    type: Mapped[str] = mapped_column(String(20))
+    code: Mapped[str] = mapped_column(String(20))
+    valid_until: Mapped[datetime] = mapped_column(DateTime)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=utcnow)
