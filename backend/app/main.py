@@ -39,6 +39,8 @@ config.UPLOAD_DIR.mkdir(parents=True, exist_ok=True)
 app.mount("/uploads", StaticFiles(directory=config.UPLOAD_DIR), name="uploads")
 # poze vechi (libere de drepturi) pentru „Trecut vs prezent”
 app.mount("/static", StaticFiles(directory=Path(__file__).parent / "static"), name="static")
+# versiunea web (pentru iPhone și orice browser); sursa e în ../web, copiată aici la deploy
+app.mount("/web", StaticFiles(directory=Path(__file__).parent / "webapp", html=True), name="web")
 
 app.include_router(reports.admin_router)
 app.include_router(polls.admin_router)
