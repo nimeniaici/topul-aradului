@@ -167,10 +167,18 @@ private fun MainScaffold() {
                 FriendsScreen(onBack = { nav.popBackStack() }, onChat = { id -> nav.navigate("chat/$id") }, onPlace = openPlace)
             }
             composable("community") {
-                CommunityScreen(onBack = { nav.popBackStack() }, onRoom = { id, _ -> nav.navigate("chat/$id") })
+                CommunityScreen(onBack = { nav.popBackStack() }, onRoom = { id, _ -> nav.navigate("chat/$id") }, onPeople = { nav.navigate("people") })
             }
             composable("chat/{id}", arguments = listOf(navArgument("id") { type = NavType.IntType })) { entry ->
-                ChatScreen(roomId = entry.arguments?.getInt("id") ?: 0, title = "", onBack = { nav.popBackStack() })
+                val rid = entry.arguments?.getInt("id") ?: 0
+                ChatScreen(roomId = rid, title = "", onBack = { nav.popBackStack() }, onUser = { nav.navigate("user/$it") },
+                    onMembers = { nav.navigate("members/$rid") })
+            }
+            composable("people") {
+                ro.hack4arad.topul.ui.social.PeopleScreen(roomId = null, onBack = { nav.popBackStack() }, onUser = { nav.navigate("user/$it") })
+            }
+            composable("members/{id}", arguments = listOf(navArgument("id") { type = NavType.IntType })) { e ->
+                ro.hack4arad.topul.ui.social.PeopleScreen(roomId = e.arguments?.getInt("id"), onBack = { nav.popBackStack() }, onUser = { nav.navigate("user/$it") })
             }
             composable("polls") { ro.hack4arad.topul.ui.social.PollsScreen(onBack = { nav.popBackStack() }) }
             composable("servicii") { ro.hack4arad.topul.ui.city.ServiciiScreen(onBack = { nav.popBackStack() }) }

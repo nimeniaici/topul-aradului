@@ -277,6 +277,10 @@ data class ServiceItem(val id: String, val type: String, val kind: String, val n
 data class ServiceType(val code: String, val label: String, val count: Int)
 data class ServiciiOut(val items: List<ServiceItem>, val types: List<ServiceType>, val source: String)
 
+data class Person(val id: Int, val name: String, val level: Int, val xp: Int, val avatarEmoji: String?, val avatarColor: String?,
+                  val avatarUrl: String?, val thrones: Int, val active: Boolean = false, val friend: Boolean = false, val new: Boolean = false,
+                  val isMe: Boolean = false, val isOwner: Boolean = false)
+
 // ---------- comunitate ----------
 data class RoomTag(val code: String, val label: String)
 data class Room(val id: Int, val kind: String, val tag: String, val tagLabel: String, val name: String, val description: String,

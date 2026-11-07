@@ -249,3 +249,36 @@ def _place_by_name(db: Session, text: str):
         if pn and (pn in t or t in pn) and (not best or len(pn) > len(n(best.name))):
             best = p
     return best
+
+
+@router.get("/rooms/{room_id}/members")
+def room_members(room_id: int, me: User = Depends(get_current_user), db: Session = Depends(get_db)):
+    """Cine e în conversație. La comunitatea generală: cei care au scris în ultimele 30 de zile."""
+    from .friends import _user_card
+    room = _room_or_404(db, room_id, me)
+    if room.kind == "general":
+        ids = db.scalars(select(ChatMessage.user_id).where(ChatMessage.room_id == room.id,
+                                                           ChatMessage.created_at >= utcnow() - timedelta(days=30)).distinct()).all()
+    else:
+        ids = db.scalars(select(ChatMember.user_id).where(ChatMember.room_id == room.id)).all()
+    users = [u for u in (db.get(User, i) for i in ids) if u and not is_blocked(db, me.id, u.id)]
+    users.sort(key=lambda u: (u.id != me.id, -u.xp))
+    return [{**_user_card(db, u), "is_me": u.id == me.id, "is_owner": room.owner_id == u.id} for u in users]
+
+
+@router.get("/people")
+def people(q: str = Query("", max_length=30), me: User = Depends(get_current_user), db: Session = Depends(get_db)):
+    """Arădenii din aplicație: întâi cei activi recent (check-in sau mesaj), cu căutare după username."""
+    from ..models import Checkin
+    from .friends import _user_card
+    since = utcnow() - timedelta(days=14)
+    active = set(db.scalars(select(Checkin.user_id).where(Checkin.created_at >= since).distinct()).all()) | \
+        set(db.scalars(select(ChatMessage.user_id).where(ChatMessage.created_at >= since).distinct()).all())
+    stmt = select(User).where(User.id != me.id)
+    if q.strip():
+        stmt = stmt.where(func.lower(User.name).contains(q.strip().lstrip("@").lower()))
+    users = [u for u in db.scalars(stmt.order_by(User.xp.desc()).limit(200)) if not is_blocked(db, me.id, u.id)]
+    users.sort(key=lambda u: (u.id not in active, -u.xp))
+    friends = {u for u in (u.id for u in users) if are_friends(db, me.id, u)}
+    return [{**_user_card(db, u), "active": u.id in active, "friend": u.id in friends,
+             "new": bool(u.created_at and u.created_at >= since)} for u in users[:100]]

@@ -74,3 +74,18 @@ def test_sesizare_confirmata_de_trei_oameni(client):
     # o alertă majoră e considerată confirmată imediat
     g = client.post("/reports", data={"category": "gaze", "lat": "46.2", "lng": "21.3"}, headers=a).json()
     assert g["report"]["confirmed"] is True
+
+
+def test_arădeni_și_membri(client, auth):
+    other = _user(client, 9)
+    rooms = client.get("/community/rooms", headers=auth).json()["rooms"]
+    gen = next(r for r in rooms if r["kind"] == "general")
+    client.post(f"/community/rooms/{gen['id']}/messages", json={"text": "salut"}, headers=other)
+    mem = client.get(f"/community/rooms/{gen['id']}/members", headers=auth).json()
+    assert mem and all("name" in m and "level" in m for m in mem)
+    ppl = client.get("/community/people", headers=auth).json()
+    assert ppl and any(p["active"] for p in ppl)
+    me_id = client.get("/users/me", headers=auth).json()["id"]
+    assert all(p["id"] != me_id for p in ppl)
+    name = ppl[0]["name"]
+    assert client.get("/community/people", params={"q": name}, headers=auth).json()[0]["name"] == name

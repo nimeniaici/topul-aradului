@@ -1,5 +1,6 @@
 package ro.hack4arad.topul.ui.social
 
+import androidx.compose.material.icons.rounded.Group
 import ro.hack4arad.topul.ui.theme.OnInk
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -76,7 +77,7 @@ import java.time.LocalDate
 
 /** O conversație: comunitatea generală, un grup sau un prieten. Mesajele noi apar live. */
 @Composable
-fun ChatScreen(roomId: Int, title: String, onBack: () -> Unit) {
+fun ChatScreen(roomId: Int, title: String, onBack: () -> Unit, onUser: (Int) -> Unit = {}, onMembers: () -> Unit = {}) {
     val scope = rememberCoroutineScope()
     val msgs = remember { mutableStateListOf<ChatMsg>() }
     var room by remember { mutableStateOf<Room?>(null) }
@@ -116,6 +117,7 @@ fun ChatScreen(roomId: Int, title: String, onBack: () -> Unit) {
                         color = TextMuted, fontSize = 12.sp)
                 }
             }
+            IconButton(onClick = onMembers) { Icon(Icons.Rounded.Group, tr("Membri", "Members", "Tagok"), tint = Ink) }
             if (room?.kind == "group") {
                 IconButton(onClick = { menu = true }) { Icon(Icons.Rounded.MoreVert, null, tint = Ink) }
                 DropdownMenu(expanded = menu, onDismissRequest = { menu = false }) {
@@ -135,7 +137,7 @@ fun ChatScreen(roomId: Int, title: String, onBack: () -> Unit) {
             if (msgs.isEmpty()) item {
                 Text(tr("Scrie primul mesaj.", "Write the first message.", "Írd az első üzenetet."), color = TextMuted, modifier = Modifier.padding(16.dp))
             }
-            items(msgs, key = { it.id }) { m -> MessageRow(m) }
+            items(msgs, key = { it.id }) { m -> MessageRow(m, onUser) }
         }
 
         Row(Modifier.fillMaxWidth().padding(10.dp), verticalAlignment = Alignment.CenterVertically) {
@@ -244,18 +246,19 @@ fun ChatScreen(roomId: Int, title: String, onBack: () -> Unit) {
 }
 
 @Composable
-private fun MessageRow(m: ChatMsg) {
+private fun MessageRow(m: ChatMsg, onUser: (Int) -> Unit = {}) {
     val special = m.kind != "text"
     Row(Modifier.fillMaxWidth(), horizontalArrangement = if (m.mine && !special) Arrangement.End else Arrangement.Start, verticalAlignment = Alignment.Top) {
         if (!m.mine || special) {
-            Avatar(m.userName, 34.dp, colorKey = m.avatarColor, photoUrl = m.avatarUrl)
+            androidx.compose.foundation.layout.Box(Modifier.clickable { onUser(m.userId) }) { Avatar(m.userName, 34.dp, colorKey = m.avatarColor, photoUrl = m.avatarUrl) }
             Spacer(Modifier.width(8.dp))
         }
         Column(
             Modifier.widthIn(max = if (special) 320.dp else 280.dp).clip(RoundedCornerShape(18.dp))
                 .background(when { special -> PanelHigh; m.mine -> NightDeep; else -> Panel }).padding(horizontal = 12.dp, vertical = 9.dp),
         ) {
-            if (!m.mine || special) Text("@${m.userName}", color = if (m.mine && !special) Color.White else TextMuted, fontSize = 11.sp, fontWeight = FontWeight.Bold)
+            if (!m.mine || special) Text("@${m.userName}", color = if (m.mine && !special) Color.White else TextMuted, fontSize = 11.sp, fontWeight = FontWeight.Bold,
+                modifier = Modifier.clickable { onUser(m.userId) })
             if (m.kind == "eveniment") {
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Icon(Icons.Rounded.Event, null, tint = Gold, modifier = Modifier.size(18.dp))

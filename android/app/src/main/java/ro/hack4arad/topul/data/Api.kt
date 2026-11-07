@@ -253,6 +253,12 @@ interface Api {
     @GET("community/events")
     suspend fun events(): List<CityEvent>
 
+    @GET("community/people")
+    suspend fun people(@Query("q") q: String = ""): List<Person>
+
+    @GET("community/rooms/{id}/members")
+    suspend fun roomMembers(@Path("id") id: Int): List<Person>
+
     @GET("polls")
     suspend fun polls(): List<Poll>
 

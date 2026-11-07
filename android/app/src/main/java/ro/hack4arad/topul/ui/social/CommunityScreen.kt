@@ -83,7 +83,7 @@ fun tagIcon(tag: String, kind: String): ImageVector = when {
 
 /** Comunitate: chatul general al Aradului (anunțuri, evenimente), grupurile mele (vecini, bloc, școală…), conversațiile private. */
 @Composable
-fun CommunityScreen(onBack: () -> Unit, onRoom: (Int, String) -> Unit) {
+fun CommunityScreen(onBack: () -> Unit, onRoom: (Int, String) -> Unit, onPeople: () -> Unit = {}) {
     val scope = rememberCoroutineScope()
     var rooms by remember { mutableStateOf<List<Room>>(emptyList()) }
     var tags by remember { mutableStateOf<List<RoomTag>>(emptyList()) }
@@ -99,7 +99,11 @@ fun CommunityScreen(onBack: () -> Unit, onRoom: (Int, String) -> Unit) {
     Column(Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(bottom = 24.dp)) {
         Row(Modifier.fillMaxWidth().padding(8.dp), verticalAlignment = Alignment.CenterVertically) {
             IconButton(onClick = onBack) { Icon(Icons.AutoMirrored.Rounded.ArrowBack, tr("Înapoi", "Back", "Vissza"), tint = Ink) }
-            Text(tr("Comunitate", "Community", "Közösség"), color = Ink, fontSize = 24.sp, fontWeight = FontWeight.Black)
+            Text(tr("Comunitate", "Community", "Közösség"), color = Ink, fontSize = 24.sp, fontWeight = FontWeight.Black, modifier = Modifier.weight(1f))
+            androidx.compose.material3.TextButton(onClick = onPeople) {
+                Icon(androidx.compose.material.icons.Icons.Rounded.Groups, null, tint = Ink)
+                Text(" " + tr("Arădenii", "People", "Aradiak"), color = Ink, fontWeight = FontWeight.Bold)
+            }
         }
         toast?.let { Text(it, color = OnInk, modifier = Modifier.padding(horizontal = 16.dp).fillMaxWidth().clip(RoundedCornerShape(14.dp)).background(Ink).padding(12.dp)) }
 

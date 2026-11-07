@@ -302,7 +302,7 @@ const routes = {
   async community() {
     if (!need()) return;
     const d = await api('/community/rooms');
-    setView(`<h1>Comunitate</h1>${d.rooms.map(r => `<a class="item" href="#chat/${r.id}"><div class="grow"><b>${esc(r.name)}</b><span class="muted">${esc(r.last_text || r.description || '')}</span></div>${r.invite_code && r.is_owner ? `<span class="muted">cod ${esc(r.invite_code)}</span>` : ''}</a>`).join('')}
+    setView(`<div class="row"><h1>Comunitate</h1><a class="btn ghost" style="flex:0" href="#people"><span class="ms">groups</span>Arădenii</a></div>${d.rooms.map(r => `<a class="item" href="#chat/${r.id}"><div class="grow"><b>${esc(r.name)}</b><span class="muted">${esc(r.last_text || r.description || '')}</span></div>${r.invite_code && r.is_owner ? `<span class="muted">cod ${esc(r.invite_code)}</span>` : ''}</a>`).join('')}
     <div class="sec">Grup nou sau intră cu un cod</div><div class="card"><div class="row"><input id="gn" placeholder="Numele grupului (ex. Bloc 12, Micălaca)"><select id="gt">${d.tags.map(t => `<option value="${t.code}">${esc(t.label)}</option>`).join('')}</select></div><button class="btn" id="mk">Creează grupul</button>
     <div class="row"><input id="code" placeholder="Cod de invitație"><button class="btn ghost" id="jn" style="flex:0">Intră</button></div></div>`);
     $('#mk').onclick = () => api('/community/rooms', { body: { name: $('#gn').value, tag: $('#gt').value } }).then(r => location.hash = '#chat/' + r.id).catch(fail);
@@ -311,12 +311,12 @@ const routes = {
 
   async chat(id) {
     if (!need()) return;
-    setView(`<a href="#community" class="back"><span class="ms">arrow_back</span>Comunitate</a><div id="ms" class="card" style="min-height:320px;max-height:60vh;overflow:auto"></div>
+    setView(`<div class="row"><a href="#community" class="back"><span class="ms">arrow_back</span>Comunitate</a><a class="btn ghost" style="flex:0" href="#people/${id}"><span class="ms">group</span>Membri</a></div><div id="ms" class="card" style="min-height:320px;max-height:60vh;overflow:auto"></div>
     <form id="f" class="row"><select id="k" style="flex:0 0 120px"><option value="text">Mesaj</option><option value="anunt">Anunț</option><option value="eveniment">Eveniment</option></select><input id="t" placeholder="Scrie un mesaj" autocomplete="off"><button class="btn" style="flex:0">→</button></form>
     <div id="ev" style="display:none" class="row"><input id="et" placeholder="Titlul evenimentului"><input id="ea" type="datetime-local"><input id="ep" placeholder="Unde (ex. Parcul Europa)"></div>`);
     let last = 0;
     const pull = () => api(`/community/rooms/${id}/messages?after_id=${last}`).then(ms => { ms.forEach(m => { last = m.id;
-      $('#ms').insertAdjacentHTML('beforeend', `<div class="msg ${m.mine ? 'me' : 'them'}"><small>@${esc(m.user_name)}${m.kind !== 'text' ? ' · ' + m.kind : ''}</small><br>${m.event_title ? `<b>🎉 ${esc(m.event_title)}</b> · ${esc((m.event_at || '').slice(0, 16).replace('T', ' '))} · ${esc(m.event_place || '')}<br>` : ''}${esc(m.text)}</div>`); });
+      $('#ms').insertAdjacentHTML('beforeend', `<div class="msg ${m.mine ? 'me' : 'them'}"><small><a href="#user/${m.user_id}"><u>@${esc(m.user_name)}</u></a>${m.kind !== 'text' ? ' · ' + m.kind : ''}</small><br>${m.event_title ? `<b>🎉 ${esc(m.event_title)}</b> · ${esc((m.event_at || '').slice(0, 16).replace('T', ' '))} · ${esc(m.event_place || '')}<br>` : ''}${esc(m.text)}</div>`); });
       if (ms.length) $('#ms').scrollTop = 1e9; }).catch(() => {});
     every(4000, pull);
     $('#k').onchange = e => $('#ev').style.display = e.target.value === 'eveniment' ? 'flex' : 'none';
@@ -325,6 +325,19 @@ const routes = {
       if (k === 'eveniment') Object.assign(body, { event_title: $('#et').value, event_at: $('#ea').value ? new Date($('#ea').value).toISOString() : null, event_place: $('#ep').value });
       try { await api(`/community/rooms/${id}/messages`, { body }); $('#t').value = ''; pull(); } catch (er) { fail(er); }
     };
+  },
+
+  async people(roomId) {
+    if (!need()) return;
+    setView(`<a class="back" href="${roomId ? '#chat/' + roomId : '#community'}"><span class="ms">arrow_back</span>Înapoi</a><h1>${roomId ? 'Membri' : 'Arădenii'}</h1>
+    <p class="muted">${roomId ? 'Cine e în conversație' : 'Activi recent primii · atinge pentru profil'}</p><input id="q" placeholder="Caută după username"><div id="l"></div>`);
+    let all = [];
+    const show = () => { const q = $('#q').value.trim().replace(/^@/, '').toLowerCase();
+      $('#l').innerHTML = all.filter(p => !q || p.name.toLowerCase().includes(q)).map(p => `<a class="item" href="#user/${p.id}"><div class="avatar" style="width:44px;height:44px;font-size:18px;box-shadow:none">${p.avatar_url ? `<img src="${img(p.avatar_url)}">` : esc(p.name[0].toUpperCase())}</div>
+      <div class="grow"><b>@${esc(p.name)}${p.is_me ? ' (tu)' : ''}</b><span class="muted">Nivel ${p.level} · ${p.thrones} tronuri${p.is_owner ? ' · creatorul grupului' : ''}</span></div>
+      ${p.friend ? '<span class="muted">prieten</span>' : p.active ? '<span style="color:#2e7d32;font-weight:800;font-size:13px">● activ</span>' : p.new ? '<span class="muted">nou</span>' : ''}</a>`).join('') || '<p class="muted">Nimeni încă.</p>'; };
+    all = await api(roomId ? `/community/rooms/${roomId}/members` : '/community/people'); show();
+    let t; $('#q').oninput = () => { clearTimeout(t); t = setTimeout(async () => { if (!roomId) all = await api('/community/people?q=' + encodeURIComponent($('#q').value.trim())); show(); }, 250); };
   },
 
   async friends() {
