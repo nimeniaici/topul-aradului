@@ -71,62 +71,105 @@ const routes = {
 
   async home() {
     if (token && !me) me = await api('/users/me').catch(() => null);
-    const t = (h, b, s) => `<a class="tile" href="${h}"><b>${b}</b><span>${s}</span></a>`;
-    setView(`${me ? `<h1>Salut, @${esc(me.name)}</h1><p class="muted">Nivel ${me.level} · ${me.xp} XP</p>` : `<h1>CityConnect Arad</h1><p class="muted"><a href="#login">Intră în cont</a> ca să joci și să semnalezi.</p>`}
-    <a class="hero" href="#map" style="display:block;text-decoration:none"><b style="font-size:24px">Harta live a Aradului</b><br>Check-in, tronuri, ce e agitat acum</a>
-    <h2>Orașul tău</h2><div class="grid">
-    ${t('#report', 'Semnalează o problemă', 'Groapă, iluminat, gunoi…')}${t('#report/urgent', 'Alerte urgente', 'Gaze, inundații, cutremur')}
-    ${t('#transit', 'Transport CTP', 'Tramvaie și autobuze live')}${t('#gunoi', 'Calendar gunoi', 'Când vine mașina pe strada ta')}
-    ${t('#servicii', 'Servicii locale', 'Farmacii, spitale, școli')}${t('#reports', 'Sesizările mele', 'Ce a răspuns Primăria')}</div>
-    <h2>Comunitate</h2><div class="grid">
-    ${t('#community', 'Comunitatea Aradului', 'Chat, anunțuri, evenimente')}${t('#polls', 'Sondaje', 'Spune ce crezi despre oraș')}
-    ${t('#friends', 'Prieteni', 'Cereri, chat, tronurile lor')}${t('#top', 'Topul Aradului', 'Clasamente locuri și arădeni')}</div>
-    <h2>Descoperă</h2><div class="grid">
-    ${t('#turism', 'Turism în județ', '325 de locuri, 30 de trasee')}${t('#duels', 'Dueluri', 'Care loc e mai tare?')}
-    ${t('#iasmi', 'Întreab-o pe Iasmi', '„Cum ajung la Cetate?”')}${t('#profile', 'Profil și recompense', 'Insigne, transport gratuit')}</div>`);
+    const C = { pink: ['#A8407A', 'rgba(168,64,122,.14)'], deep: ['#3A1230', 'rgba(58,18,48,.10)'], violet: ['#7A2457', 'rgba(122,36,87,.14)'], mint: ['#5DB7A4', 'rgba(93,183,164,.18)'], gold: ['#D9A21B', 'rgba(217,162,27,.16)'] };
+    const t = (h, icon, col, b, s) => `<a class="tile" href="${h}"><div class="ic" style="background:${C[col][1]}"><span class="ms" style="color:${C[col][0]}">${icon}</span></div><b>${b}</b><span>${s}</span></a>`;
+    const lvl = me ? 100 * me.xp_into_level / me.xp_per_level : 0;
+    setView(`${me ? `<div class="hello"><div class="avatar">${me.avatar_url ? `<img src="${img(me.avatar_url)}">` : esc(me.name[0].toUpperCase())}</div>
+      <div style="flex:1"><b>Salut, @${esc(me.name)}</b><span class="muted">Nivel ${me.level} · ${me.xp} XP</span><div class="bar"><i style="width:${lvl}%"></i></div></div></div>`
+      : `<div class="hello"><div class="avatar"><span class="ms">person</span></div><div style="flex:1"><b>Bun venit!</b><a class="muted" href="#login"><u>Intră în cont</u> ca să joci și să semnalezi</a></div></div>`}
+    <a class="ask" href="#iasmi"><div class="orb"><span class="ms">auto_awesome</span></div><div class="grow"><b>Întreab-o pe Iasmi</b><span class="muted">„Cum plătesc?” · „Unde mănânc?”</span></div><span class="ms" style="color:var(--muted)">chevron_right</span></a>
+    <a class="hero" href="#map"><b>Harta live a Aradului</b><p>Check-in, cucerește tronuri, vezi ce e agitat</p><span class="pill">Deschide harta <span class="ms">chevron_right</span></span><span class="ms big">map</span></a>
+    <div class="sec">Orașul tău</div><div class="grid">
+    ${t('#report', 'warning', 'deep', 'Semnalează o problemă', 'Groapă, furtună, vandalism…')}${t('#transit', 'tram', 'mint', 'Transport CTP', 'Tramvaie și autobuze live')}
+    ${t('#servicii', 'local_pharmacy', 'pink', 'Servicii locale', 'Farmacii, spitale, școli, poștă')}${t('#gunoi', 'recycling', 'mint', 'Calendar gunoi', 'Când vine mașina pe strada ta')}
+    ${t('#reports', 'assignment', 'violet', 'Sesizările mele', 'Ce a răspuns Primăria')}${t('#report/urgent', 'thunderstorm', 'pink', 'Alerte urgente', 'Inundații, gaze, cutremur')}</div>
+    <div class="sec">Comunitate</div><div class="grid">
+    ${t('#community', 'forum', 'violet', 'Comunitatea Aradului', 'Chat, anunțuri, evenimente')}${t('#polls', 'how_to_vote', 'gold', 'Sondaje', 'Spune ce crezi despre oraș')}
+    ${t('#friends', 'group', 'mint', 'Prieteni', 'Pe hartă, chat, tronurile lor')}</div>
+    <div class="sec">Joacă</div><div class="grid">
+    ${t('#duels', 'sports_mma', 'pink', 'Dueluri', 'Care loc e mai tare?')}${t('#top', 'emoji_events', 'gold', 'Topul Aradului', 'Clasamente locuri și arădeni')}
+    ${t('#profile', 'military_tech', 'violet', 'Misiuni și insigne', 'Ce ai de cucerit')}${t('#map', 'view_list', 'mint', 'Lista locurilor', 'Toate locurile, cu poze')}</div>
+    <div class="sec">Descoperă Aradul</div><div class="grid">
+    ${t('#turism', 'landscape', 'gold', 'Turism în județ', '325 de locuri și 30 de trasee')}${t('#place/discover', 'headphones', 'mint', 'Ghid audio', 'Povestea locurilor, în română')}</div>`);
+    document.querySelector('[href="#place/discover"]').href = '#discover';
+  },
+
+  async discover() {
+    const ds = await api('/places/discover');
+    setView(`<a class="back" href="#home"><span class="ms">arrow_back</span>Acasă</a><h1>Descoperă Aradul</h1><p class="muted">Trecut vs prezent · ghid audio</p>` +
+      ds.map(p => `<a class="item" href="#place/${p.id}">${p.photo_url ? `<img src="${img(p.photo_url)}">` : ''}<div class="grow"><b>${esc(p.name)}</b><span class="muted">${p.has_story ? '🎧 Ghid audio ' : ''}${p.old_photo ? '· 🕰 Trecut vs prezent' : ''}</span></div><span class="ms">chevron_right</span></a>`).join(''));
   },
 
   async map() {
-    setView(`<div class="chips" id="ch"></div><div id="map"></div><p class="muted">Straturi: <label><input type="checkbox" id="lv" style="width:auto"> tramvaie și autobuze live</label> · <label><input type="checkbox" id="lr" checked style="width:auto"> sesizări</label> · <label><input type="checkbox" id="le" checked style="width:auto"> evenimente</label></p>`, true);
-    const m = newMap('map'); const places = L.layerGroup().addTo(m), veh = L.layerGroup(), reps = L.layerGroup().addTo(m), evs = L.layerGroup().addTo(m);
-    let cat = null;
-    const cats = await api('/places/categories').catch(() => []);
-    const ch = $('#ch');
-    ch.innerHTML = `<button class="chip on" data-c="">Toate</button>` + cats.map(c => `<button class="chip" data-c="${c.code}">${esc(c.label)}</button>`).join('');
-    ch.onclick = e => { const b = e.target.closest('[data-c]'); if (!b) return; cat = b.dataset.c || null; ch.querySelectorAll('.chip').forEach(x => x.classList.toggle('on', x === b)); load(); };
-    async function load() {
-      const ps = await api('/places?limit=500' + (cat ? '&category=' + cat : '')).catch(() => []);
+    setView(`<div class="mapbar"><div class="search"><span class="ms" style="color:var(--muted)">search</span><input id="sq" placeholder="Caută un loc, ex. pizza, cafenea, KFC"></div><button class="fab" id="mb"><span class="ms">menu</span></button></div>
+    <div id="map"></div><button class="fab light" id="me" style="position:fixed;right:16px;bottom:92px;z-index:1100"><span class="ms">my_location</span></button><div id="sh"></div>`, true);
+    const m = newMap('map', ARAD, 15); m.zoomControl.remove();
+    const places = L.markerClusterGroup({ maxClusterRadius: 60, showCoverageOnHover: false, iconCreateFunction: c => {
+      const ms = c.getAllChildMarkers(), p = ms.find(x => x.options.place?.photo_url)?.options.place || ms[0].options.place;
+      return L.divIcon({ className: '', iconSize: [52, 52], html: `<div class="cl" ${face(p)}>${p.photo_url ? '' : `<span class="ms">${CI[p.category] || 'place'}</span>`}<em>+${ms.length - 1}</em></div>` });
+    } }).addTo(m), veh = L.layerGroup(), reps = L.layerGroup().addTo(m), evs = L.layerGroup().addTo(m);
+    let all = [], cat = null, cats = [], vt = null;
+    const CI = { fastfood: 'takeout_dining', restaurant: 'restaurant', cafenea: 'local_cafe', cofetarie: 'cake', gelaterie: 'icecream', terasa: 'deck', bar: 'sports_bar',
+      obiectiv: 'account_balance', manastire: 'church', biserica: 'church', natura: 'park', mall: 'local_mall', supermarket: 'shopping_cart', benzinarie: 'local_gas_station', cazare: 'hotel', eveniment: 'celebration' };
+    const face = p => p.photo_url ? `style="background-image:url('${img(p.photo_url)}')"` : '';
+    const pIcon = p => L.divIcon({ className: '', iconSize: [46, 46], iconAnchor: [23, 23],
+      html: `<div class="pmark ${p.mayor_id ? '' : 'free'}" ${face(p)}>${p.photo_url ? '' : `<span class="ms">${CI[p.category] || 'place'}</span>`}</div>` });
+    const norm = s => s.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase();
+    function draw() {
+      const q = norm($('#sq').value.trim());
       places.clearLayers();
-      ps.forEach(p => L.marker([p.lat, p.lng], { icon: dot(p.mayor_id ? '#A8407A' : '#E0A100') }).addTo(places)
-        .bindPopup(`<b>${esc(p.name)}</b><br>${esc(p.category_label)}<br>${p.mayor_name ? 'Primar: @' + esc(p.mayor_name) : 'Tron liber'}<br><a href="#place/${p.id}">Detalii și check-in →</a>`));
+      all.filter(p => (!cat || p.category === cat) && (!q || norm(p.name + ' ' + p.category_label).includes(q)))
+        .forEach(p => L.marker([p.lat, p.lng], { icon: pIcon(p), place: p }).addTo(places).on('click', () => sheet(p)));
     }
-    load();
+    function sheet(p) {
+      $('#sh').innerHTML = `<div class="sheet">${p.photo_url ? `<div class="ph" style="background-image:url('${img(p.photo_url)}')"></div>` : ''}<div class="in">
+      <span class="muted">${esc(p.category_label)}</span><b style="display:block;font-size:20px;font-weight:900">${esc(p.name)}</b>
+      <span class="muted">${p.mayor_name ? '👑 Primar: @' + esc(p.mayor_name) : 'Tron liber'}${p.distance_m != null ? ' · ' + dist(p.distance_m) : ''}</span>
+      <div class="row" style="margin-top:12px"><a class="btn" href="#place/${p.id}">${p.mayor_id ? 'Fă check-in' : 'Cucerește tronul'}</a><a class="btn ghost" href="#place/${p.id}" style="flex:0">Detalii</a>
+      <a class="btn ghost" style="flex:0" target="_blank" href="https://www.google.com/maps/dir/?api=1&destination=${p.lat},${p.lng}"><span class="ms">directions</span></a></div></div></div>`;
+    }
+    m.on('click', () => $('#sh').innerHTML = '');
+    $('#sq').oninput = draw;
+    const [ps, cs] = await Promise.all([api('/places?limit=500').catch(() => []), api('/places/categories').catch(() => [])]);
+    all = ps; cats = cs; draw();
     api('/reports?days=30').then(rs => rs.filter(r => r.status !== 'respins').forEach(r => L.marker([r.lat, r.lng], { icon: dot(r.status === 'rezolvat' ? '#2e7d32' : r.status === 'in_lucru' ? '#ef6c00' : '#c62828') })
       .addTo(reps).bindPopup(`<b>${esc(r.category_label)}</b> · ${esc(r.status_label)}<br>${r.confirmed ? 'confirmată' : `confirmări ${r.confirmations}/${r.confirms_needed}`}<br>${esc(r.description)}<br>${r.status === 'nou' && !r.confirmed ? `<a href="#" onclick="confirmReport(${r.id});return false">O văd și eu – confirm</a>` : ''}`))).catch(() => {});
     api('/community/events').then(es => es.filter(e => e.lat).forEach(e => L.marker([e.lat, e.lng], { icon: dot('#8e24aa') }).addTo(evs)
       .bindPopup(`<b>🎉 ${esc(e.title)}</b><br>${esc(e.at.slice(0, 16).replace('T', ' '))} · ${esc(e.place || '')}`))).catch(() => {});
-    const tog = (id, layer) => $(id).onchange = e => e.target.checked ? layer.addTo(m) : m.removeLayer(layer);
-    tog('#lr', reps); tog('#le', evs);
-    let vt = null;
-    $('#lv').onchange = e => {
-      if (e.target.checked) { veh.addTo(m); const f = () => api('/transit/vehicles').then(d => { veh.clearLayers(); d.vehicles.forEach(v => L.marker([v.lat, v.lng], { icon: vehIcon(v) }).addTo(veh).bindPopup(`<b>${esc(v.line)} → ${esc(v.towards)}</b><br>${v.next_stop ? 'Urmează: ' + esc(v.next_stop) : ''}`)); }).catch(() => {}); f(); vt = setInterval(f, 15000); timers.push(vt); }
-      else { m.removeLayer(veh); clearInterval(vt); }
+    locate().then(p => { if (p) L.circleMarker(p, { radius: 8, color: '#fff', weight: 3, fillColor: '#1e88e5', fillOpacity: 1 }).addTo(m); });
+    $('#me').onclick = async () => { const p = await locate(); p ? m.setView(p, 16) : toast('Permite locația în browser.'); };
+    const layers = { live: false, reps: true, evs: true };
+    const setLayer = (k, on) => {
+      layers[k] = on; const L2 = { live: veh, reps, evs }[k];
+      on ? L2.addTo(m) : m.removeLayer(L2);
+      if (k === 'live') { clearInterval(vt); if (on) { const f = () => api('/transit/vehicles').then(d => { veh.clearLayers(); d.vehicles.forEach(v => L.marker([v.lat, v.lng], { icon: vehIcon(v) }).addTo(veh).bindPopup(`<b>${esc(v.line)} → ${esc(v.towards)}</b><br>${v.next_stop ? 'Urmează: ' + esc(v.next_stop) : ''}`)); }).catch(() => {}); f(); vt = setInterval(f, 15000); timers.push(vt); } }
     };
-    locate().then(p => { if (p) L.circleMarker(p, { radius: 8, color: '#fff', fillColor: '#1e88e5', fillOpacity: 1 }).addTo(m); });
-    L.Control.Me = L.Control.extend({ onAdd() { const b = L.DomUtil.create('button', 'btn'); b.textContent = '◎'; b.title = 'Unde sunt eu'; b.onclick = async ev => { L.DomEvent.stop(ev); const p = await locate(); p ? m.setView(p, 16) : toast('Permite locația în browser.'); }; return b; } });
-    new L.Control.Me({ position: 'bottomright' }).addTo(m);
+    $('#mb').onclick = () => {
+      const row = (k, icon, col, title, sub) => `<div class="mrow ${layers[k] ? 'on' : ''}" data-k="${k}"><div class="ic" style="background:${col}22;color:${col}"><span class="ms">${icon}</span></div><div style="flex:1"><b>${title}</b><br><span class="muted">${sub}</span></div>${layers[k] ? '<span class="ms">check</span>' : ''}</div>`;
+      const act = (h, icon, col, title, sub) => `<a class="mrow" href="${h}"><div class="ic" style="background:${col}22;color:${col}"><span class="ms">${icon}</span></div><div style="flex:1"><b>${title}</b><br><span class="muted">${sub}</span></div></a>`;
+      document.body.insertAdjacentHTML('beforeend', `<div class="menu" id="mn"><div class="box"><h1>Meniu hartă</h1>
+      ${act('#report', 'report', '#A8407A', 'Semnalează o problemă', 'Groapă, furtună, inundație, vandalism…')}${act('#reports', 'assignment', '#7A2457', 'Sesizările mele', 'Vezi ce a răspuns Primăria')}
+      <div class="sec">Straturi pe hartă</div>${row('live', 'tram', '#5DB7A4', 'Tramvaie și autobuze live', 'Unde sunt acum, pe toate liniile CTP')}${row('evs', 'celebration', '#7A2457', 'Evenimente în oraș', 'Ce anunță comunitatea')}${row('reps', 'report', '#A8407A', 'Sesizări din oraș', 'Gropi, furtună, iluminat…')}
+      <div class="sec">Ce vrei să vezi</div><div class="chips" style="flex-wrap:wrap"><button class="chip ${cat ? '' : 'on'}" data-c="">Toate</button>${cats.map(c => `<button class="chip ${cat === c.code ? 'on' : ''}" data-c="${c.code}">${esc(c.label)}</button>`).join('')}</div></div></div>`);
+      $('#mn').onclick = e => {
+        if (e.target.id === 'mn') return $('#mn').remove();
+        const r = e.target.closest('[data-k]'); if (r) { setLayer(r.dataset.k, !layers[r.dataset.k]); $('#mn').remove(); }
+        const c = e.target.closest('[data-c]'); if (c) { cat = c.dataset.c || null; draw(); $('#mn').remove(); }
+        if (e.target.closest('a')) $('#mn').remove();
+      };
+    };
   },
 
   async place(id) {
     const p = await api('/places/' + id);
-    setView(`<a href="#map" class="muted">← Hartă</a><h1>${esc(p.name)}</h1><p class="muted">${esc(p.category_label)} · ${esc(p.address)}</p>
+    setView(`<a href="#map" class="back"><span class="ms">arrow_back</span>Hartă</a><h1>${esc(p.name)}</h1><p class="muted">${esc(p.category_label)} · ${esc(p.address)}</p>
     ${p.photo_url ? `<img src="${img(p.photo_url)}" style="width:100%;max-height:280px;object-fit:cover;border-radius:18px">` : ''}
     <div class="card"><b>${p.mayor_name ? 'Primar: @' + esc(p.mayor_name) : 'Tron liber – primul check-in te face Primar!'}</b><p class="muted">${p.checkin_count} check-in-uri · scor ${Math.round(p.rating)}</p>
     <label class="muted">Poză (opțional, doar cu camera – +5 XP)</label><input type="file" id="ph" accept="image/*" capture="environment">
     <div class="row"><button class="btn" id="ci">${p.mayor_id ? 'Fac check-in aici' : 'Cucerește tronul'}</button><a class="btn ghost" target="_blank" href="https://www.google.com/maps/dir/?api=1&destination=${p.lat},${p.lng}">Du-mă acolo</a></div></div>
-    ${p.story ? `<h2>Povestea locului</h2><div class="card"><button class="btn ghost" id="say">▶ Ascultă</button><p>${esc(p.story)}</p></div>` : ''}
-    ${p.old_photo ? `<h2>Trecut vs prezent</h2><img src="${img(p.old_photo.url)}" style="width:100%;border-radius:18px"><p class="muted">${esc(p.old_photo.caption || '')}</p>` : ''}
-    ${p.recent_photos?.length ? `<h2>Poze de la comunitate</h2><div class="chips">${p.recent_photos.map(f => `<img src="${img(f.url || f.photo_url)}" style="height:110px;border-radius:12px">`).join('')}</div>` : ''}`);
+    ${p.story ? `<div class="sec">Povestea locului</div><div class="card"><button class="btn ghost" id="say">▶ Ascultă</button><p>${esc(p.story)}</p></div>` : ''}
+    ${p.old_photo ? `<div class="sec">Trecut vs prezent</div><img src="${img(p.old_photo.url)}" style="width:100%;border-radius:18px"><p class="muted">${esc(p.old_photo.caption || '')}</p>` : ''}
+    ${p.recent_photos?.length ? `<div class="sec">Poze de la comunitate</div><div class="chips">${p.recent_photos.map(f => `<img src="${img(f.url || f.photo_url)}" style="height:110px;border-radius:12px">`).join('')}</div>` : ''}`);
     $('#ci').onclick = async () => {
       if (!need()) return;
       const pos = await locate(); if (!pos) return toast('Permite locația ca să faci check-in.');
@@ -168,7 +211,7 @@ const routes = {
 
   async transit() {
     setView(`<h1>Transport CTP</h1><p class="muted" id="cnt">Tramvaie și autobuze · timp real</p><div id="map" style="height:300px"></div>
-    <div class="chips" id="lines"></div><h2>Stații lângă tine</h2><div class="chips" id="stops"></div><div id="next"></div><h2>Orarul stației</h2><div id="tt" class="card muted">Alege o stație.</div>
+    <div class="chips" id="lines"></div><div class="sec">Stații lângă tine</div><div class="chips" id="stops"></div><div id="next"></div><div class="sec">Orarul stației</div><div id="tt" class="card muted">Alege o stație.</div>
     <button class="btn" id="sci" style="width:100%;margin-top:10px">Sunt în stație · check-in (+3 XP)</button>`);
     const m = newMap('map', ARAD, 13), shapes = L.layerGroup().addTo(m), veh = L.layerGroup().addTo(m);
     let lines = await api('/transit/lines').catch(() => []), hl = null, stop = null;
@@ -260,7 +303,7 @@ const routes = {
     if (!need()) return;
     const d = await api('/community/rooms');
     setView(`<h1>Comunitate</h1>${d.rooms.map(r => `<a class="item" href="#chat/${r.id}"><div class="grow"><b>${esc(r.name)}</b><span class="muted">${esc(r.last_text || r.description || '')}</span></div>${r.invite_code && r.is_owner ? `<span class="muted">cod ${esc(r.invite_code)}</span>` : ''}</a>`).join('')}
-    <h2>Grup nou sau intră cu un cod</h2><div class="card"><div class="row"><input id="gn" placeholder="Numele grupului (ex. Bloc 12, Micălaca)"><select id="gt">${d.tags.map(t => `<option value="${t.code}">${esc(t.label)}</option>`).join('')}</select></div><button class="btn" id="mk">Creează grupul</button>
+    <div class="sec">Grup nou sau intră cu un cod</div><div class="card"><div class="row"><input id="gn" placeholder="Numele grupului (ex. Bloc 12, Micălaca)"><select id="gt">${d.tags.map(t => `<option value="${t.code}">${esc(t.label)}</option>`).join('')}</select></div><button class="btn" id="mk">Creează grupul</button>
     <div class="row"><input id="code" placeholder="Cod de invitație"><button class="btn ghost" id="jn" style="flex:0">Intră</button></div></div>`);
     $('#mk').onclick = () => api('/community/rooms', { body: { name: $('#gn').value, tag: $('#gt').value } }).then(r => location.hash = '#chat/' + r.id).catch(fail);
     $('#jn').onclick = () => api('/community/rooms/join', { body: { code: $('#code').value } }).then(r => location.hash = '#chat/' + r.id).catch(fail);
@@ -268,7 +311,7 @@ const routes = {
 
   async chat(id) {
     if (!need()) return;
-    setView(`<a href="#community" class="muted">← Comunitate</a><div id="ms" class="card" style="min-height:320px;max-height:60vh;overflow:auto"></div>
+    setView(`<a href="#community" class="back"><span class="ms">arrow_back</span>Comunitate</a><div id="ms" class="card" style="min-height:320px;max-height:60vh;overflow:auto"></div>
     <form id="f" class="row"><select id="k" style="flex:0 0 120px"><option value="text">Mesaj</option><option value="anunt">Anunț</option><option value="eveniment">Eveniment</option></select><input id="t" placeholder="Scrie un mesaj" autocomplete="off"><button class="btn" style="flex:0">→</button></form>
     <div id="ev" style="display:none" class="row"><input id="et" placeholder="Titlul evenimentului"><input id="ea" type="datetime-local"><input id="ep" placeholder="Unde (ex. Parcul Europa)"></div>`);
     let last = 0;
@@ -289,9 +332,9 @@ const routes = {
     const d = await api('/friends');
     const row = (u, extra) => `<div class="item"><div class="grow"><a href="#user/${u.id}"><b>@${esc(u.name)}</b></a><span class="muted">Nivel ${u.level} · ${u.thrones} tronuri</span></div>${extra}</div>`;
     setView(`<h1>Prieteni</h1><div class="card"><form id="f" class="row"><input id="u" placeholder="Username (ex. diana.arad)"><button class="btn" style="flex:0">Adaugă</button></form></div>
-    ${d.incoming?.length ? `<h2>Cereri primite</h2>${d.incoming.map(u => row(u, `<button class="btn" onclick="api('/friends/${u.id}/accept',{method:'POST'}).then(()=>routes.friends()).catch(fail)">Acceptă</button>`)).join('')}` : ''}
-    <h2>Prietenii tăi (${d.friends.length})</h2>${d.friends.map(u => row(u, `<button class="btn ghost" onclick="api('/community/direct/${u.id}',{method:'POST'}).then(r=>location.hash='#chat/'+r.id).catch(fail)">Chat</button>`)).join('') || '<p class="muted">Încă niciun prieten.</p>'}
-    ${d.outgoing?.length ? `<h2>Cereri trimise</h2>${d.outgoing.map(u => row(u, '')).join('')}` : ''}`);
+    ${d.incoming?.length ? `<div class="sec">Cereri primite</div>${d.incoming.map(u => row(u, `<button class="btn" onclick="api('/friends/${u.id}/accept',{method:'POST'}).then(()=>routes.friends()).catch(fail)">Acceptă</button>`)).join('')}` : ''}
+    <div class="sec">Prietenii tăi (${d.friends.length})</div>${d.friends.map(u => row(u, `<button class="btn ghost" onclick="api('/community/direct/${u.id}',{method:'POST'}).then(r=>location.hash='#chat/'+r.id).catch(fail)">Chat</button>`)).join('') || '<p class="muted">Încă niciun prieten.</p>'}
+    ${d.outgoing?.length ? `<div class="sec">Cereri trimise</div>${d.outgoing.map(u => row(u, '')).join('')}` : ''}`);
     $('#f').onsubmit = e => { e.preventDefault(); api('/friends/request', { body: { username: $('#u').value.replace(/^@/, '') } }).then(r => { toast(r.detail); routes.friends(); }).catch(fail); };
   },
 
@@ -319,8 +362,8 @@ const routes = {
     setView(`<h1>@${esc(u.name)}</h1><p class="muted">Nivel ${u.level} · ${u.xp} XP · #${u.rank} în Arad</p>
     ${u.friendship === 'none' ? `<button class="btn" onclick="api('/friends/request',{body:{username:'${esc(u.name)}'}}).then(r=>toast(r.detail)).catch(fail)">Adaugă prieten</button>` : `<p class="muted">${{ friends: 'Sunteți prieteni', outgoing: 'Cerere trimisă', incoming: 'Ți-a trimis o cerere', me: 'Acesta ești tu' }[u.friendship] || ''}</p>`}
     <div class="grid"><div class="card"><b>${u.thrones}</b> tronuri</div><div class="card"><b>${u.checkins}</b> check-in-uri</div></div>
-    <h2>Tronuri</h2>${u.conquered.map(c => `<a class="item" href="#place/${c.id}"><b>👑 ${esc(c.name)}</b></a>`).join('') || '<p class="muted">Încă niciun tron.</p>'}
-    <h2>Insigne</h2>${u.badges.map(b => `<div class="item"><div class="grow"><b>${esc(b.title)}</b><span class="muted">${esc(b.description)}</span></div></div>`).join('') || '<p class="muted">Încă nicio insignă.</p>'}`);
+    <div class="sec">Tronuri</div>${u.conquered.map(c => `<a class="item" href="#place/${c.id}"><b>👑 ${esc(c.name)}</b></a>`).join('') || '<p class="muted">Încă niciun tron.</p>'}
+    <div class="sec">Insigne</div>${u.badges.map(b => `<div class="item"><div class="grow"><b>${esc(b.title)}</b><span class="muted">${esc(b.description)}</span></div></div>`).join('') || '<p class="muted">Încă nicio insignă.</p>'}`);
   },
 
   async duels() {
@@ -336,10 +379,10 @@ const routes = {
     const [p, rw] = await Promise.all([api('/users/me'), api('/me/rewards').catch(() => null)]); me = p;
     setView(`<h1>@${esc(p.name)}</h1><p class="muted">Nivel ${p.level} · ${p.xp} XP</p><div class="bar"><i style="width:${100 * p.xp_into_level / p.xp_per_level}%"></i></div>
     <div class="grid" style="margin-top:12px"><div class="card"><b>${p.checkins}</b> check-in-uri</div><div class="card"><b>${p.mayor_of.length}</b> tronuri</div></div>
-    ${rw ? `<h2>Recompense (demo)</h2>${rw.rewards.map(r => `<div class="card"><b>${esc(r.title)}</b><p class="muted">${esc(r.description)}</p><div class="bar"><i style="width:${100 * r.progress / r.goal}%"></i></div><p class="muted">${r.progress}/${r.goal}${r.voucher ? ' · codul tău: <b>' + esc(r.voucher) + '</b>' : ''}</p></div>`).join('')}` : ''}
-    <h2>Misiuni</h2>${p.missions.slice(0, 4).map(m => `<div class="card"><b>${esc(m.title)}</b> <span class="muted">${m.progress}/${m.target}</span><div class="bar"><i style="width:${100 * m.progress / m.target}%"></i></div></div>`).join('')}
-    <h2>Insigne</h2>${p.badges.map(b => `<span class="chip">${esc(b.title)}</span>`).join(' ') || '<p class="muted">Încă nicio insignă.</p>'}
-    <h2>Cont</h2><a class="btn ghost" href="#reports">Sesizările mele</a> <button class="btn ghost" onclick="logout()">Ieși din cont</button>`);
+    ${rw ? `<div class="sec">Recompense (demo)</div>${rw.rewards.map(r => `<div class="card"><b>${esc(r.title)}</b><p class="muted">${esc(r.description)}</p><div class="bar"><i style="width:${100 * r.progress / r.goal}%"></i></div><p class="muted">${r.progress}/${r.goal}${r.voucher ? ' · codul tău: <b>' + esc(r.voucher) + '</b>' : ''}</p></div>`).join('')}` : ''}
+    <div class="sec">Misiuni</div>${p.missions.slice(0, 4).map(m => `<div class="card"><b>${esc(m.title)}</b> <span class="muted">${m.progress}/${m.target}</span><div class="bar"><i style="width:${100 * m.progress / m.target}%"></i></div></div>`).join('')}
+    <div class="sec">Insigne</div>${p.badges.map(b => `<span class="chip">${esc(b.title)}</span>`).join(' ') || '<p class="muted">Încă nicio insignă.</p>'}
+    <div class="sec">Cont</div><a class="btn ghost" href="#reports">Sesizările mele</a> <button class="btn ghost" onclick="logout()">Ieși din cont</button>`);
   },
 };
 
@@ -356,12 +399,13 @@ function shrink(file) {
 }
 
 async function router() {
-  timers.forEach(clearInterval); timers = []; speechSynthesis?.cancel();
+  timers.forEach(clearInterval); timers = []; speechSynthesis?.cancel(); document.getElementById('mn')?.remove();
   const [name, arg] = (location.hash.slice(1) || 'home').split('/');
   document.querySelectorAll('#tabs a').forEach(a => a.classList.toggle('on', a.getAttribute('href') === '#' + name));
   try { await (routes[name] || routes.home)(arg); } catch (e) { setView(`<p>${esc(e.message)}</p><a class="btn" href="#home">Acasă</a>`); }
 }
 if (localStorage.getItem('cc_dark') === '1') document.documentElement.classList.add('dark');
 $('#themeBtn').onclick = () => localStorage.setItem('cc_dark', document.documentElement.classList.toggle('dark') ? '1' : '0');
+document.querySelectorAll('h2').forEach(() => {});
 addEventListener('hashchange', router);
 router();
