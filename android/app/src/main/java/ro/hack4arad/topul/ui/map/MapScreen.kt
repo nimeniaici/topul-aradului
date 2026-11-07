@@ -1,5 +1,6 @@
 package ro.hack4arad.topul.ui.map
 
+import androidx.compose.material.icons.rounded.Landscape
 import androidx.compose.material.icons.rounded.Group
 import androidx.compose.material.icons.rounded.Tram
 import com.google.maps.android.compose.Circle
@@ -284,6 +285,20 @@ class MapViewModel : ViewModel() {
         runCatching { Network.api.friendLocations() }.onSuccess { friendLocs = it }
     }
 
+    var vehicles by mutableStateOf<List<ro.hack4arad.topul.data.Vehicle>>(emptyList())
+        private set
+    var turism by mutableStateOf<List<ro.hack4arad.topul.data.TurismLoc>>(emptyList())
+        private set
+
+    suspend fun refreshVehicles() {
+        runCatching { Network.api.vehicles() }.onSuccess { vehicles = it.vehicles }
+    }
+
+    fun loadTurism() {
+        if (turism.isNotEmpty()) return
+        viewModelScope.launch { runCatching { Network.api.turism(type = null) }.onSuccess { turism = it.locations.filter { l -> l.type != "Cazare" } } }
+    }
+
     fun loadTram() {
         if (tramLines.isNotEmpty()) return
         viewModelScope.launch { runCatching { Network.api.transitLines() }.onSuccess { tramLines = it } }
@@ -368,7 +383,12 @@ fun MapScreen(onPlace: (Int) -> Unit, onOpenReports: () -> Unit = {}, vm: MapVie
     var showReports by rememberSaveable { mutableStateOf(true) }
     var showFriends by rememberSaveable { mutableStateOf(false) }
     LaunchedEffect(showFriends) { while (showFriends) { vm.refreshFriends(); kotlinx.coroutines.delay(30_000) } }
-    LaunchedEffect(showTram) { if (showTram) vm.loadTram() }
+    var showTurism by rememberSaveable { mutableStateOf(false) }
+    LaunchedEffect(showTram) {
+        if (showTram) vm.loadTram()
+        while (showTram) { vm.refreshVehicles(); kotlinx.coroutines.delay(15_000) }
+    }
+    LaunchedEffect(showTurism) { if (showTurism) vm.loadTurism() }
     var reporting by remember { mutableStateOf(false) }
     var query by rememberSaveable { mutableStateOf("") }
     val shown = remember(vm.places, query) { searchPlaces(vm.places, query) }
@@ -413,7 +433,7 @@ fun MapScreen(onPlace: (Int) -> Unit, onOpenReports: () -> Unit = {}, vm: MapVie
         } else {
             PlacesMap(
                 vm = vm, places = shown, camera = camera, look = look, hasPermission = hasPermission, showHeat = showHeat,
-                showTram = showTram, showReports = showReports, showFriends = showFriends,
+                showTram = showTram, showReports = showReports, showFriends = showFriends, showTurism = showTurism,
                 highlightedId = if (selecting) carouselPlace?.id else null,
                 bottomPadding = if (selecting) 270.dp else 16.dp,
                 onPlaceTap = { p ->
@@ -494,9 +514,10 @@ fun MapScreen(onPlace: (Int) -> Unit, onOpenReports: () -> Unit = {}, vm: MapVie
         ) {
             MapMenu(
                 vm = vm, listMode = listMode, look = look, showHeat = showHeat, hasPermission = hasPermission,
-                showTram = showTram, showReports = showReports, showFriends = showFriends,
+                showTram = showTram, showReports = showReports, showFriends = showFriends, showTurism = showTurism,
                 onFriends = { showFriends = !showFriends; menuOpen = false; listMode = false },
                 onTram = { showTram = !showTram; menuOpen = false; listMode = false },
+                onTurism = { showTurism = !showTurism; menuOpen = false; listMode = false },
                 onReports = { showReports = !showReports },
                 onList = { listMode = !listMode; menuOpen = false },
                 onLook = { look = it },
@@ -537,6 +558,7 @@ private fun MapMenu(
     vm: MapViewModel, listMode: Boolean, look: MapLook, showHeat: Boolean, hasPermission: Boolean,
     showTram: Boolean, showReports: Boolean, onTram: () -> Unit, onReports: () -> Unit,
     showFriends: Boolean = false, onFriends: () -> Unit = {},
+    showTurism: Boolean = false, onTurism: () -> Unit = {},
     onList: () -> Unit, onLook: (MapLook) -> Unit, onHeat: () -> Unit, onMe: () -> Unit,
     onCategory: (String?) -> Unit, onReport: () -> Unit, onMyReports: () -> Unit,
 ) {
@@ -554,8 +576,10 @@ private fun MapMenu(
         Text("Straturi pe hartă", color = TextMuted, fontSize = 13.sp, modifier = Modifier.padding(top = 14.dp, bottom = 4.dp, start = 4.dp))
         MenuRow(Icons.Rounded.Group, "Prietenii mei", if (showFriends) "Pornit: prietenii care se arată pe hartă" else "Cine dintre prieteni e prin oraș",
             Mint, active = showFriends, onClick = onFriends)
-        MenuRow(Icons.Rounded.Tram, "Liniile de tramvai", if (showTram) "Pornit: traseele și stațiile CTP" else "Traseele și stațiile CTP",
+        MenuRow(Icons.Rounded.Tram, "Tramvaie și autobuze live", if (showTram) "Pornit: unde sunt acum + traseele CTP" else "Unde sunt acum, pe toate liniile CTP",
             Electric, active = showTram, onClick = onTram)
+        MenuRow(Icons.Rounded.Landscape, "Obiective turistice", if (showTurism) "Pornit: obiective și agrement (CNIPT)" else "Monumente, muzee, agrement din județ",
+            Gold, active = showTurism, onClick = onTurism)
         MenuRow(Icons.Rounded.ReportProblem, "Sesizări din oraș", if (showReports) "Pornit: gropi, furtună, iluminat…" else "Oprit",
             Pink, active = showReports, onClick = onReports)
 
@@ -757,6 +781,7 @@ private fun PlacesMap(
     showTram: Boolean = false,
     showReports: Boolean = true,
     showFriends: Boolean = false,
+    showTurism: Boolean = false,
     highlightedId: Int?,
     bottomPadding: androidx.compose.ui.unit.Dp = 16.dp,
     onPlaceTap: (Place) -> Unit,
@@ -802,14 +827,34 @@ private fun PlacesMap(
         // stratul de tramvaie: traseele colorate pe linii + stațiile
         if (showTram) vm.tramLines.forEach { l ->
             key("tram-${l.ref}") {
-                Polyline(
-                    points = l.shape.map { LatLng(it[0], it[1]) },
-                    color = runCatching { Color(android.graphics.Color.parseColor(l.color)) }.getOrDefault(Electric),
-                    width = 10f,
-                )
-                l.stops.forEach { st ->
-                    Circle(center = LatLng(st.lat, st.lng), radius = 16.0, fillColor = Color.White, strokeColor = Color(0xFF263238), strokeWidth = 4f)
+                val c = runCatching { Color(android.graphics.Color.parseColor(l.color)) }.getOrDefault(Electric)
+                (l.shapes?.takeIf { it.isNotEmpty() } ?: listOf(l.shape)).forEach { sh ->
+                    Polyline(points = sh.map { LatLng(it[0], it[1]) }, color = c.copy(alpha = 0.7f), width = if (l.mode == "tram") 9f else 6f)
                 }
+            }
+        }
+        // vehiculele CTP în timp real (Telelink), cu numărul liniei pe ele
+        if (showTram) vm.vehicles.forEach { v ->
+            key("veh-${v.id}") {
+                val st = remember { MarkerState(LatLng(v.lat, v.lng)) }
+                LaunchedEffect(v.lat, v.lng) { st.position = LatLng(v.lat, v.lng) }
+                Marker(
+                    state = st, icon = ro.hack4arad.topul.util.lineBadge(v.line, v.color, v.mode == "tram"),
+                    title = (if (v.mode == "tram") "Tramvaiul " else "Autobuzul ") + v.line + " → " + v.towards,
+                    snippet = listOfNotNull(v.nextStop?.let { "Urmează: $it" },
+                        when { v.delayMin > 1 -> "întârziere ${v.delayMin} min"; v.delayMin < -1 -> "în avans ${-v.delayMin} min"; else -> "la timp" }).joinToString(" · "),
+                    anchor = androidx.compose.ui.geometry.Offset(0.5f, 0.5f), zIndex = 3f,
+                )
+            }
+        }
+        // obiective turistice (CNIPT Arad)
+        if (showTurism) vm.turism.forEach { t ->
+            key("tur-${t.id}") {
+                Marker(
+                    state = remember { MarkerState(LatLng(t.lat, t.lng)) }, title = t.name,
+                    snippet = listOf(t.category, t.locality).filter { it.isNotBlank() }.joinToString(" · "),
+                    icon = BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_ORANGE),
+                )
             }
         }
         // prietenii care au ales să se arate (doar prietenii acceptați îi văd)

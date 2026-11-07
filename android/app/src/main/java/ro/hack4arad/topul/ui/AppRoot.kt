@@ -1,5 +1,7 @@
 package ro.hack4arad.topul.ui
 
+import ro.hack4arad.topul.ui.city.TurismScreen
+import ro.hack4arad.topul.ui.city.GunoiScreen
 import ro.hack4arad.topul.ui.social.ChatScreen
 import ro.hack4arad.topul.ui.social.CommunityScreen
 import ro.hack4arad.topul.ui.social.FriendsScreen
@@ -170,6 +172,8 @@ private fun MainScaffold() {
             composable("chat/{id}", arguments = listOf(navArgument("id") { type = NavType.IntType })) { entry ->
                 ChatScreen(roomId = entry.arguments?.getInt("id") ?: 0, title = "", onBack = { nav.popBackStack() })
             }
+            composable("gunoi") { GunoiScreen(onBack = { nav.popBackStack() }) }
+            composable("turism") { TurismScreen(onBack = { nav.popBackStack() }) }
             composable("transit") { TransitScreen(onBack = { nav.popBackStack() }) }
             composable("iasmi") { IasmiScreen(onBack = { nav.popBackStack() }, onPlace = openPlace) }
             composable("settings") { SettingsScreen(onBack = { nav.popBackStack() }) }

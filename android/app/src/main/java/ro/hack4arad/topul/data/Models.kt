@@ -195,12 +195,37 @@ data class TransitLine(
     val ref: String, val name: String, val from: String, val to: String, val color: String,
     val stops: List<TransitStopRef>, val shape: List<List<Double>>,
     val headwayPeak: Int, val headwayOffpeak: Int, val headwayWeekend: Int, val first: String, val last: String,
+    val id: Int = 0, val mode: String = "tram", val shapes: List<List<List<Double>>>? = null,
 )
 data class TicketType(val code: String, val label: String, val price: Double, val minutes: Int)
 data class TransitInfo(val tickets: List<TicketType>, val dispatchPhone: String, val source: String, val note: String)
 data class TransitStop(val id: String, val name: String, val lat: Double, val lng: Double, val lines: List<String>, val distanceM: Int? = null)
-data class Departure(val line: String, val color: String, val towards: String, val minutes: List<Int>, val crowded: Int, val delayed: Int)
-data class NextTrams(val stop: TransitStop, val departures: List<Departure>)
+data class Departure(val line: String, val color: String, val towards: String, val minutes: List<Int>, val crowded: Int, val delayed: Int,
+                     val mode: String = "tram", val live: Boolean = false)
+data class NextTrams(val stop: TransitStop, val departures: List<Departure>, val available: Boolean = true)
+data class Vehicle(val id: String, val line: String, val mode: String, val color: String, val lat: Double, val lng: Double,
+                   val heading: Double?, val towards: String, val nextStop: String?, val delayMin: Int, val updated: String)
+data class VehiclesOut(val vehicles: List<Vehicle>, val available: Boolean, val source: String)
+
+// ---------- calendar gunoi (RETIM) ----------
+data class GunoiPlace(val id: Int, val street: String, val cartier: String)
+data class GunoiFraction(val type: String, val label: String, val hint: String, val color: String, val next: String,
+                         val nextLabel: String, val inDays: Int, val dates: List<String>, val weekday: String?)
+data class GunoiUpcoming(val date: String, val label: String, val type: String, val typeLabel: String, val color: String)
+data class GunoiSchedule(val place: GunoiPlace, val fractions: List<GunoiFraction>, val upcoming: List<GunoiUpcoming>,
+                         val validUntil: String, val source: String, val note: String)
+
+// ---------- turism (CNIPT Arad) ----------
+data class TurismType(val code: String, val label: String)
+data class TurismLoc(val id: Int, val name: String, val type: String, val category: String, val locality: String, val address: String,
+                     val lat: Double, val lng: Double, val photo: String?, val summary: String, val distanceM: Int?)
+data class TurismList(val locations: List<TurismLoc>, val types: List<TurismType>, val source: String)
+data class TurismDetail(val id: Int, val name: String, val type: String, val category: String, val locality: String, val address: String,
+                        val lat: Double, val lng: Double, val description: String, val website: String, val facebook: String,
+                        val photos: List<String>, val sourceUrl: String, val source: String)
+data class Trail(val id: Int, val name: String, val category: String, val description: String, val mapImageUrl: String,
+                 val photos: List<String>, val sourceUrl: String)
+data class TrailsOut(val trails: List<Trail>, val source: String)
 data class TransitReportIn(val line: String, val kind: String, val stopId: String? = null, val note: String = "")
 data class TransitReportOut(val line: String, val kind: String, val label: String, val stopName: String?, val note: String, val createdAt: String)
 data class TicketIn(val type: String)

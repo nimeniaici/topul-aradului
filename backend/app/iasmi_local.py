@@ -118,7 +118,7 @@ KNOWLEDGE = [
      "Pentru acte (buletin, certificate de stare civilă, documente de la Primărie) găsești programul și programările pe "
      "site-ul Primăriei Arad, la serviciul de evidență a persoanelor sau de stare civilă. Ia cu tine actul de identitate."),
     (("gunoi", "salubr", "deseu", "reciclar"),
-     "Pentru ridicarea gunoiului și reciclare, informațiile sunt la operatorul de salubritate al Aradului. Gunoiul aruncat "
+     "Zilele de ridicare a gunoiului pe strada ta le găsești în Acasă → Calendar gunoi (date RETIM). Gunoiul aruncat "
      "unde nu trebuie îl poți semnala din „Semnalează o problemă” → „Gunoi / mizerie”."),
     (("primari", "primar", "program", "contact"),
      "Primăria Arad e în Palatul Administrativ, Bulevardul Revoluției 75 (clădirea cu turnul cu ceas). Programul și "
@@ -207,6 +207,16 @@ def answer(db: Session, text: str, near: tuple[float, float] | None) -> tuple[st
         return ("Apasă „Semnalează o problemă” (în Acasă sau în meniul hărții), alege tipul – groapă, copac căzut, "
                 "inundație, iluminat, vandalism și altele –, adaugă o poză și trimite. Ajunge la Primărie, iar statusul "
                 "îl vezi în „Sesizările mele”. Primești +10 XP, plus 20 când e rezolvată."), []
+
+    # calendarul gunoiului pe stradă (date RETIM)
+    if _has(t, "gunoi", "deseu", "pubel", "reciclab", "ridica", "hartie", "plastic", "menajer"):
+        from .routers.gunoi import answer_for
+        ans = answer_for(text)
+        if ans:
+            return ans, []
+        if _has(t, "cand", "ce zi", "vine", "trece", "ridica"):
+            return ("Spune-mi strada ta, de exemplu „când vine gunoiul pe strada Ady Endre?”, sau caută-o în "
+                    "Acasă → Calendar gunoi: îți arăt zilele pentru menajer, bio, hârtie și plastic."), []
 
     # „cum devin Primar / iau tronul” = jocul din aplicație, nu Primăria orașului
     if _has(t, "devin", "tron", "cucer", "check"):

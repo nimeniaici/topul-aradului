@@ -143,6 +143,27 @@ interface Api {
     @GET("transit/stops/{id}/next")
     suspend fun nextTrams(@Path("id") stopId: String): NextTrams
 
+    @GET("transit/vehicles")
+    suspend fun vehicles(): VehiclesOut
+
+    @GET("gunoi/search")
+    suspend fun gunoiSearch(@Query("q") q: String): List<GunoiPlace>
+
+    @GET("gunoi/{id}")
+    suspend fun gunoi(@Path("id") id: Int): GunoiSchedule
+
+    @GET("turism")
+    suspend fun turism(
+        @Query("type") type: String? = null, @Query("q") q: String? = null, @Query("only_arad") onlyArad: Boolean = false,
+        @Query("lat") lat: Double? = null, @Query("lng") lng: Double? = null,
+    ): TurismList
+
+    @GET("turism/{id}")
+    suspend fun turismDetail(@Path("id") id: Int): TurismDetail
+
+    @GET("turism/trasee")
+    suspend fun trails(): TrailsOut
+
     @POST("transit/reports")
     suspend fun transitReport(@Body body: TransitReportIn): MessageOut
 

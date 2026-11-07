@@ -1,5 +1,7 @@
 package ro.hack4arad.topul.ui.home
 
+import androidx.compose.material.icons.rounded.Landscape
+import androidx.compose.material.icons.rounded.Recycling
 import androidx.compose.material.icons.rounded.Group
 import androidx.compose.material.icons.rounded.Forum
 import androidx.compose.material.icons.rounded.Tram
@@ -122,8 +124,10 @@ fun HomeScreen(onOpen: (HomeTarget) -> Unit) {
     val sections = listOf(
         tr("Orașul tău", "Your city", "A városod") to listOf(
             Tile(tr("Semnalează o problemă", "Report a problem", "Hiba bejelentése"), tr("Groapă, furtună, vandalism…", "Pothole, storm, vandalism…", "Kátyú, vihar, rongálás…"), Icons.Rounded.ReportProblem, Pink, HomeTarget.Map(MapRequest(report = true))),
-            Tile(tr("Transport CTP", "CTP transport", "CTP közlekedés"), tr("Următorul tramvai, bilete", "Next tram, tickets", "Következő villamos"),
+            Tile(tr("Transport CTP", "CTP transport", "CTP közlekedés"), tr("Tramvaie și autobuze live", "Live trams and buses", "Élő villamos, busz"),
                 Icons.Rounded.Tram, Electric, HomeTarget.Screen("transit")),
+            Tile(tr("Calendar gunoi", "Waste calendar", "Hulladéknaptár"), tr("Când vine mașina pe strada ta", "Pickup days on your street", "Szállítási napok"),
+                Icons.Rounded.Recycling, Mint, HomeTarget.Screen("gunoi")),
             Tile(tr("Sesizările mele", "My reports", "Bejelentéseim"), tr("Ce a răspuns Primăria", "City Hall replies", "A városháza válaszai"), Icons.Rounded.Assignment, Lilac, HomeTarget.Screen("reports")),
             Tile(tr("Alerte urgente", "Urgent alerts", "Sürgős riasztás"), tr("Furtună, inundație, canal", "Storm, flood, manhole", "Vihar, árvíz, csatorna"), Icons.Rounded.Thunderstorm, Pink, HomeTarget.Map(MapRequest(report = true))),
         ),
@@ -142,6 +146,8 @@ fun HomeScreen(onOpen: (HomeTarget) -> Unit) {
         tr("Descoperă Aradul", "Discover Arad", "Fedezd fel Aradot") to listOf(
             Tile(tr("Trecut vs prezent", "Then and now", "Akkor és most"), tr("Arad 1874–1931 vs azi", "Arad 1874–1931 vs today", "Arad 1874–1931 és ma"), Icons.Rounded.HistoryEdu, Gold, HomeTarget.Screen("discover")),
             Tile(tr("Ghid audio", "Audio guide", "Audio idegenvezető"), tr("Povestea locurilor, în română", "Stories of places (Romanian)", "Helyek története (románul)"), Icons.Rounded.Headphones, Mint, HomeTarget.Screen("discover")),
+            Tile(tr("Turism în județ", "Tourism in Arad county", "Turizmus"), tr("325 de locuri și 30 de trasee", "325 places, 30 trails", "325 hely, 30 túra"),
+                Icons.Rounded.Landscape, Gold, HomeTarget.Screen("turism")),
             Tile(tr("Obiective turistice", "Landmarks", "Látnivalók"), tr("Cetăți, palate, mănăstiri", "Fortresses, palaces, monasteries", "Várak, paloták, kolostorok"), Icons.Rounded.AccountBalance, Electric,
                 HomeTarget.Map(MapRequest(list = true, category = "obiectiv"))),
         ),

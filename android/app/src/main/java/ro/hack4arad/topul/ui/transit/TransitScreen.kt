@@ -112,6 +112,15 @@ fun TransitScreen(onBack: () -> Unit) {
     var reportFor by remember { mutableStateOf<String?>(null) } // linia pentru care semnalăm
     var showTicket by remember { mutableStateOf<Ticket?>(null) }
     var error by remember { mutableStateOf<String?>(null) }
+    var vehicles by remember { mutableStateOf<List<ro.hack4arad.topul.data.Vehicle>>(emptyList()) }
+    var mode by remember { mutableStateOf<String?>(null) }   // null = toate, "tram", "bus"
+    val shownLines = remember(lines, mode) { lines.filter { mode == null || it.mode == mode } }
+    LaunchedEffect(Unit) {
+        while (true) {
+            runCatching { Network.api.vehicles() }.onSuccess { vehicles = it.vehicles }
+            kotlinx.coroutines.delay(15_000)
+        }
+    }
 
     LaunchedEffect(Unit) {
         runCatching { Network.api.transitLines() }.onSuccess { lines = it }.onFailure { error = it.userMessage() }
@@ -137,7 +146,8 @@ fun TransitScreen(onBack: () -> Unit) {
             IconButton(onClick = onBack) { Icon(Icons.AutoMirrored.Rounded.ArrowBack, tr("Înapoi", "Back", "Vissza"), tint = Ink) }
             Column(Modifier.weight(1f)) {
                 Text(tr("Transport CTP", "CTP transport", "CTP közlekedés"), color = Ink, fontWeight = FontWeight.Black, fontSize = 22.sp)
-                Text(tr("Tramvaiele Aradului", "Arad trams", "Aradi villamosok"), color = TextMuted, fontSize = 13.sp)
+                Text(tr("Tramvaie și autobuze · timp real", "Trams and buses · live", "Villamos és busz · élő") +
+                    (if (vehicles.isNotEmpty()) " · ${vehicles.size} " + tr("în mers", "running", "úton") else ""), color = TextMuted, fontSize = 13.sp)
             }
         }
         toast?.let {
@@ -155,13 +165,29 @@ fun TransitScreen(onBack: () -> Unit) {
                     properties = MapProperties(isMyLocationEnabled = hasLocationPermission(context)),
                     uiSettings = MapUiSettings(zoomControlsEnabled = false, mapToolbarEnabled = false, myLocationButtonEnabled = false),
                 ) {
-                    lines.forEach { l ->
+                    shownLines.forEach { l ->
                         val on = highlight == null || highlight == l.ref
-                        Polyline(
-                            points = l.shape.map { LatLng(it[0], it[1]) },
-                            color = lineColor(l.color).copy(alpha = if (on) 0.95f else 0.15f),
-                            width = if (highlight == l.ref) 14f else 8f,
-                        )
+                        (l.shapes?.takeIf { it.isNotEmpty() } ?: listOf(l.shape)).forEach { sh ->
+                            Polyline(
+                                points = sh.map { LatLng(it[0], it[1]) },
+                                color = lineColor(l.color).copy(alpha = if (on) 0.85f else 0.12f),
+                                width = if (highlight == l.ref) 14f else if (l.mode == "tram") 8f else 5f,
+                            )
+                        }
+                    }
+                    vehicles.filter { (mode == null || it.mode == mode) && (highlight == null || it.line == highlight) }.forEach { v ->
+                        androidx.compose.runtime.key(v.id) {
+                            val st = remember { MarkerState(LatLng(v.lat, v.lng)) }
+                            LaunchedEffect(v.lat, v.lng) { st.position = LatLng(v.lat, v.lng) }
+                            Marker(
+                                state = st, icon = ro.hack4arad.topul.util.lineBadge(v.line, v.color, v.mode == "tram"),
+                                title = v.line + " → " + v.towards, anchor = androidx.compose.ui.geometry.Offset(0.5f, 0.5f), zIndex = 3f,
+                                snippet = listOfNotNull(v.nextStop?.let { tr("Urmează: ", "Next: ", "Következő: ") + it },
+                                    when { v.delayMin > 1 -> tr("întârziere ", "late ", "késés ") + "${v.delayMin} min"
+                                        v.delayMin < -1 -> tr("în avans ", "early ", "korán ") + "${-v.delayMin} min"
+                                        else -> tr("la timp", "on time", "időben") }).joinToString(" · "),
+                            )
+                        }
                     }
                     stops.forEach { s ->
                         Circle(center = LatLng(s.lat, s.lng), radius = 28.0, fillColor = Ink.copy(alpha = 0.85f), strokeColor = Color.White, strokeWidth = 3f)
@@ -176,8 +202,16 @@ fun TransitScreen(onBack: () -> Unit) {
             }
         }
         // ---- liniile (atingi ca să evidențiezi pe hartă)
+        Row(Modifier.padding(start = 16.dp, top = 10.dp), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            listOf(null to tr("Toate", "All", "Mind"), "tram" to tr("Tramvai", "Tram", "Villamos"), "bus" to tr("Autobuz", "Bus", "Busz")).forEach { (code, label) ->
+                val on = mode == code
+                Text(label, color = if (on) Color.White else Ink, fontWeight = FontWeight.Bold, fontSize = 13.sp,
+                    modifier = Modifier.clip(RoundedCornerShape(50)).background(if (on) Ink else Panel).border(1.dp, Track, RoundedCornerShape(50))
+                        .clickable { mode = code; highlight = null }.padding(horizontal = 14.dp, vertical = 7.dp))
+            }
+        }
         Row(Modifier.horizontalScroll(rememberScrollState()).padding(horizontal = 16.dp, vertical = 10.dp), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-            lines.forEach { l ->
+            shownLines.forEach { l ->
                 val on = highlight == l.ref
                 Row(
                     Modifier.clip(RoundedCornerShape(50)).background(if (on) lineColor(l.color) else Panel)
@@ -192,7 +226,7 @@ fun TransitScreen(onBack: () -> Unit) {
         }
 
         // ---- următorul tramvai
-        Section(tr("Următorul tramvai", "Next tram", "Következő villamos"))
+        Section(tr("Următoarele plecări", "Next departures", "Következő indulások"))
         Row(Modifier.horizontalScroll(rememberScrollState()).padding(horizontal = 16.dp), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
             stops.forEach { s ->
                 val on = selectedStop == s.id
@@ -206,7 +240,10 @@ fun TransitScreen(onBack: () -> Unit) {
         Card {
             val n = next
             if (n == null) Text(tr("Se încarcă…", "Loading…", "Betöltés…"), color = TextMuted)
-            else if (n.departures.isEmpty()) Text(tr("Niciun tramvai în perioada asta.", "No trams right now.", "Most nincs villamos."), color = TextMuted)
+            else if (n.departures.isEmpty()) Text(
+                if (n.available) tr("Nicio plecare în următoarele 3 ore.", "No departures in the next 3 hours.", "Nincs indulás.")
+                else tr("Nu am putut lua orarul acum. Încearcă din nou peste un minut.", "Couldn't load the timetable. Try again soon.", "Nem sikerült betölteni."),
+                color = TextMuted)
             else n.departures.forEach { d ->
                 Row(Modifier.fillMaxWidth().padding(vertical = 6.dp), verticalAlignment = Alignment.CenterVertically) {
                     Box(Modifier.size(38.dp).clip(RoundedCornerShape(10.dp)).background(lineColor(d.color)), contentAlignment = Alignment.Center) {
@@ -218,6 +255,7 @@ fun TransitScreen(onBack: () -> Unit) {
                         Row(verticalAlignment = Alignment.CenterVertically) {
                             Icon(Icons.Rounded.Schedule, null, tint = TextMuted, modifier = Modifier.size(14.dp))
                             Text(" " + d.minutes.joinToString(" · ") { if (it == 0) tr("acum", "now", "most") else "$it min" }, color = TextMuted, fontSize = 13.sp)
+                            if (d.live) Text("  ● " + tr("live", "live", "élő"), color = Color(0xFF2E7D32), fontSize = 12.sp, fontWeight = FontWeight.Bold)
                         }
                         if (d.crowded > 0 || d.delayed > 0) {
                             Text(
@@ -234,8 +272,8 @@ fun TransitScreen(onBack: () -> Unit) {
             }
             Row(Modifier.padding(top = 6.dp), verticalAlignment = Alignment.CenterVertically) {
                 Icon(Icons.Rounded.Info, null, tint = TextMuted, modifier = Modifier.size(14.dp))
-                Text(" " + tr("Ore estimate după frecvența liniilor. Orarul exact e afișat în stație.",
-                    "Estimated from line frequency. Exact timetable is posted at the stop.", "Becsült idők."), color = TextMuted, fontSize = 11.sp)
+                Text(" " + tr("Orarul CTP, cu întârzierile în timp real unde scrie „live”. Date: CTP Arad / Telelink.",
+                    "CTP timetable with real-time delays where marked live. Data: CTP Arad / Telelink.", "CTP menetrend, élő késésekkel."), color = TextMuted, fontSize = 11.sp)
             }
         }
 
@@ -291,7 +329,7 @@ fun TransitScreen(onBack: () -> Unit) {
                 .padding(14.dp), verticalAlignment = Alignment.CenterVertically) {
                 Icon(Icons.Rounded.Call, null, tint = Ink)
                 Column(Modifier.padding(start = 10.dp)) {
-                    Text(tr("Dispecerat tramvaie CTP", "CTP tram dispatch", "CTP diszpécser") + ": " + i.dispatchPhone, color = Ink, fontWeight = FontWeight.Bold)
+                    Text(tr("Dispecerat CTP", "CTP dispatch", "CTP diszpécser") + ": " + i.dispatchPhone, color = Ink, fontWeight = FontWeight.Bold)
                     Text(i.source, color = TextMuted, fontSize = 11.sp)
                 }
             }
@@ -302,7 +340,7 @@ fun TransitScreen(onBack: () -> Unit) {
         val kinds = listOf(
             "aglomerat" to tr("Foarte aglomerat", "Very crowded", "Zsúfolt"),
             "intarziere" to tr("Întârziere", "Delay", "Késés"),
-            "defect" to tr("Tramvai defect / oprit", "Broken down", "Elromlott"),
+            "defect" to tr("Vehicul defect / oprit", "Broken down", "Elromlott"),
             "curat" to tr("Murdar", "Dirty", "Piszkos"),
         )
         AlertDialog(

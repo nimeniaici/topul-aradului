@@ -10,6 +10,7 @@ os.environ["DATABASE_URL"] = f"sqlite:///{_tmp / 'test.db'}"
 os.environ["UPLOAD_DIR"] = str(_tmp / "uploads")
 os.environ["SKIP_DISTANCE_CHECK"] = "false"
 os.environ["CHECKIN_COOLDOWN_MIN"] = "30"
+os.environ["CTP_LIVE"] = "0"
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 from fastapi.testclient import TestClient  # noqa: E402
