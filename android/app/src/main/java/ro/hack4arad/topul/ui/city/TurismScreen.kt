@@ -157,13 +157,13 @@ fun TurismScreen(onBack: () -> Unit) {
                     if (d.address.isNotBlank()) Text(d.address, color = TextMuted, fontSize = 13.sp)
                     Text(d.description.ifBlank { tr("Fără descriere încă.", "No description yet.", "Nincs leírás.") }, color = Ink, fontSize = 14.sp,
                         modifier = Modifier.padding(top = 8.dp))
-                    Row(Modifier.padding(top = 10.dp), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                        Button(onClick = {
+                    Column(Modifier.padding(top = 10.dp).fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(6.dp)) {
+                        Button(modifier = Modifier.fillMaxWidth(), onClick = {
                             context.startActivity(Intent(Intent.ACTION_VIEW,
                                 Uri.parse("https://www.google.com/maps/dir/?api=1&destination=${d.lat},${d.lng}")))
                         }) { Icon(Icons.Rounded.Directions, null); Text(" " + tr("Cum ajung", "Directions", "Útvonal")) }
                         val site = d.website.ifBlank { d.sourceUrl }
-                        if (site.isNotBlank()) OutlinedButton(onClick = { context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(site))) }) {
+                        if (site.isNotBlank()) OutlinedButton(modifier = Modifier.fillMaxWidth(), onClick = { context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(site))) }) {
                             Icon(Icons.Rounded.Language, null, tint = Ink); Text(" " + tr("Site", "Website", "Weboldal"), color = Ink)
                         }
                     }
