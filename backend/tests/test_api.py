@@ -18,7 +18,7 @@ def test_health_and_seed(client):
 
 
 def test_public_pages(client):
-    for path, text in [("/despre", "Topul Aradului"), ("/confidentialitate", "Politica de confidențialitate"),
+    for path, text in [("/despre", "CityConnect Arad"), ("/confidentialitate", "Politica de confidențialitate"),
                        ("/termeni", "Termeni de utilizare")]:
         r = client.get(path)
         assert r.status_code == 200 and "text/html" in r.headers["content-type"] and text in r.text

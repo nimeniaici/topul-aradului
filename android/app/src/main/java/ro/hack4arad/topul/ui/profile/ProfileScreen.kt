@@ -1,5 +1,6 @@
 package ro.hack4arad.topul.ui.profile
 
+import ro.hack4arad.topul.ui.theme.Ink
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
@@ -225,7 +226,7 @@ fun ProfileScreen(onPlace: (Int) -> Unit, vm: ProfileViewModel = viewModel()) {
                 Avatar(p.name, 64.dp, emoji = p.avatarEmoji, colorKey = p.avatarColor, photoUrl = p.avatarUrl)
                 Spacer(Modifier.width(14.dp))
                 Column(Modifier.weight(1f)) {
-                    Text(p.name, color = Color.White, fontSize = 24.sp, fontWeight = FontWeight.Black, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                    Text(p.name, color = Ink, fontSize = 24.sp, fontWeight = FontWeight.Black, maxLines = 1, overflow = TextOverflow.Ellipsis)
                     Text("Nivel ${p.level} · ${levelTitle(p.level)} · ${p.xp} XP", color = Gold, fontWeight = FontWeight.Bold, fontSize = 13.sp)
                 }
                 TextButton(onClick = { editing = true }) {
@@ -269,7 +270,7 @@ fun ProfileScreen(onPlace: (Int) -> Unit, vm: ProfileViewModel = viewModel()) {
                         else Box(Modifier.size(46.dp).clip(RoundedCornerShape(12.dp)).background(Panel))
                         Spacer(Modifier.width(12.dp))
                         Column(Modifier.weight(1f)) {
-                            Text(v.placeName, color = Color.White, fontWeight = FontWeight.Bold, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                            Text(v.placeName, color = Ink, fontWeight = FontWeight.Bold, maxLines = 1, overflow = TextOverflow.Ellipsis)
                             Text(listOfNotNull(place?.categoryLabel, relativeTime(v.createdAt)).joinToString(" · "), color = TextMuted, fontSize = 12.sp)
                         }
                         if (place?.mayorId == p.id) Icon(Icons.Rounded.WorkspacePremium, "Primar", tint = Gold)
@@ -286,7 +287,7 @@ fun ProfileScreen(onPlace: (Int) -> Unit, vm: ProfileViewModel = viewModel()) {
                             Icon(badgeIcon(m.code), null, tint = Lilac, modifier = Modifier.size(22.dp))
                             Spacer(Modifier.width(10.dp))
                             Column(Modifier.weight(1f)) {
-                                Text(m.title, color = Color.White, fontWeight = FontWeight.Bold)
+                                Text(m.title, color = Ink, fontWeight = FontWeight.Bold)
                                 Text("Recompensă: insigna „${m.reward}”", color = Lilac, fontSize = 12.sp)
                             }
                             Text("${m.progress}/${m.target}", color = Gold, fontWeight = FontWeight.Black)
@@ -310,7 +311,7 @@ fun ProfileScreen(onPlace: (Int) -> Unit, vm: ProfileViewModel = viewModel()) {
             SectionTitle("Cont")
             GamePanel(Modifier.fillMaxWidth()) {
                 Column {
-                    Text(p.email, color = Color.White, fontWeight = FontWeight.Bold)
+                    Text(p.email, color = Ink, fontWeight = FontWeight.Bold)
                     Text(
                         listOfNotNull("conectat cu Google".takeIf { p.googleLinked }, "parolă setată".takeIf { p.hasPassword }).joinToString(" · "),
                         color = TextMuted, fontSize = 13.sp,
@@ -376,8 +377,8 @@ private fun BadgeTile(badge: Badge, modifier: Modifier = Modifier) {
         Icon(if (badge.earned) badgeIcon(badge.code) else Icons.Rounded.Lock, null,
             tint = if (badge.earned) Gold else TextMuted, modifier = Modifier.size(30.dp))
         Spacer(Modifier.height(4.dp))
-        Text(badge.title, color = Color.White, fontWeight = FontWeight.Bold, textAlign = TextAlign.Center, fontSize = 13.sp)
-        Text(badge.description, color = Lilac, textAlign = TextAlign.Center, fontSize = 11.sp)
+        Text(badge.title, color = if (badge.earned) Color.White else Ink, fontWeight = FontWeight.Bold, textAlign = TextAlign.Center, fontSize = 13.sp)
+        Text(badge.description, color = if (badge.earned) Color.White.copy(alpha = 0.85f) else Lilac, textAlign = TextAlign.Center, fontSize = 11.sp)
     }
 }
 

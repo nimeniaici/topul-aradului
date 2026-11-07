@@ -1,5 +1,8 @@
 package ro.hack4arad.topul.ui.duels
 
+import ro.hack4arad.topul.ui.theme.Pink
+import ro.hack4arad.topul.ui.theme.Scrim
+import ro.hack4arad.topul.ui.theme.Ink
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.animateFloatAsState
@@ -140,15 +143,15 @@ fun DuelScreen(vm: DuelViewModel = viewModel()) {
                 Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
                     Column(Modifier.weight(1f)) {
                         Text("DUEL · ${duel.categoryLabel.uppercase()}", color = Gold, fontWeight = FontWeight.Black, fontSize = 12.sp, letterSpacing = 2.sp)
-                        Text("Care e mai tare?", color = Color.White, fontSize = 24.sp, fontWeight = FontWeight.Black)
+                        Text("Care e mai tare?", color = Ink, fontSize = 24.sp, fontWeight = FontWeight.Black)
                     }
                     if (vm.streak > 0) {
                         Row(
-                            Modifier.clip(RoundedCornerShape(50)).background(Color(0x33FF8A3D)).padding(horizontal = 10.dp, vertical = 5.dp),
+                            Modifier.clip(RoundedCornerShape(50)).background(Pink.copy(alpha = 0.15f)).padding(horizontal = 10.dp, vertical = 5.dp),
                             verticalAlignment = Alignment.CenterVertically,
                         ) {
-                            Icon(Icons.Rounded.LocalFireDepartment, null, tint = Color(0xFFFF8A3D), modifier = Modifier.size(16.dp))
-                            Text(" ${vm.streak}", color = Color.White, fontWeight = FontWeight.Black)
+                            Icon(Icons.Rounded.LocalFireDepartment, null, tint = Pink, modifier = Modifier.size(16.dp))
+                            Text(" ${vm.streak}", color = Ink, fontWeight = FontWeight.Black)
                         }
                     }
                 }
@@ -213,7 +216,7 @@ private fun RowScope.DuelHalf(place: Place, winnerId: Int?, fromLeft: Boolean, o
             .clickable(enabled = winnerId == null, onClick = onClick),
     ) {
         PlacePhoto(place, Modifier.fillMaxSize(), iconSize = 56.dp)
-        Box(Modifier.fillMaxSize().background(Brush.verticalGradient(0.45f to Color.Transparent, 1f to Night.copy(alpha = 0.97f))))
+        Box(Modifier.fillMaxSize().background(Brush.verticalGradient(0.45f to Color.Transparent, 1f to Scrim.copy(alpha = 0.92f))))
         Column(Modifier.align(Alignment.BottomStart).fillMaxWidth().padding(12.dp)) {
             Text(place.name, color = Color.White, fontSize = 18.sp, fontWeight = FontWeight.Black, maxLines = 3, overflow = TextOverflow.Ellipsis)
             Row(verticalAlignment = Alignment.CenterVertically) {

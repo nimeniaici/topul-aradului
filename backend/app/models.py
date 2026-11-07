@@ -126,3 +126,16 @@ class Badge(Base):
     earned_at: Mapped[datetime] = mapped_column(DateTime, default=utcnow)
 
     user: Mapped[User] = relationship(back_populates="badges")
+
+
+class Feedback(Base):
+    """Probleme ale aplicației (bug-uri, idei) raportate din Setări."""
+    __tablename__ = "feedback"
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    user_id: Mapped[int | None] = mapped_column(ForeignKey("users.id"), nullable=True, index=True)
+    kind: Mapped[str] = mapped_column(String(20), default="bug")
+    message: Mapped[str] = mapped_column(Text)
+    app_version: Mapped[str] = mapped_column(String(40), default="")
+    device: Mapped[str] = mapped_column(String(120), default="")
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=utcnow, index=True)

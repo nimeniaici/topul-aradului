@@ -1,5 +1,6 @@
 package ro.hack4arad.topul.ui.reports
 
+import ro.hack4arad.topul.ui.theme.Ink
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -69,8 +70,8 @@ fun MyReportsScreen(onBack: () -> Unit, onNew: () -> Unit) {
 
     Column(Modifier.fillMaxSize()) {
         Row(Modifier.fillMaxWidth().padding(8.dp), verticalAlignment = Alignment.CenterVertically) {
-            IconButton(onClick = onBack) { Icon(Icons.AutoMirrored.Rounded.ArrowBack, "Înapoi", tint = Color.White) }
-            Text("Sesizările mele", color = Color.White, fontSize = 22.sp, fontWeight = FontWeight.Black, modifier = Modifier.weight(1f))
+            IconButton(onClick = onBack) { Icon(Icons.AutoMirrored.Rounded.ArrowBack, "Înapoi", tint = Ink) }
+            Text("Sesizările mele", color = Ink, fontSize = 22.sp, fontWeight = FontWeight.Black, modifier = Modifier.weight(1f))
         }
         val list = items
         when {
@@ -78,7 +79,7 @@ fun MyReportsScreen(onBack: () -> Unit, onNew: () -> Unit) {
             list == null -> Loading()
             list.isEmpty() -> Column(Modifier.fillMaxSize().padding(24.dp), horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.Center) {
-                Text("Încă n-ai semnalat nimic.", color = Color.White, fontWeight = FontWeight.Bold, fontSize = 18.sp)
+                Text("Încă n-ai semnalat nimic.", color = Ink, fontWeight = FontWeight.Bold, fontSize = 18.sp)
                 Text("Ai văzut o groapă, un copac căzut sau un semafor stricat? Spune-i Primăriei.", color = TextMuted)
                 Spacer(Modifier.height(16.dp))
                 NewButton(onNew)
@@ -110,7 +111,7 @@ private fun ReportCard(r: Report) {
             }
             Spacer(Modifier.width(12.dp))
             Column(Modifier.weight(1f)) {
-                Text(r.categoryLabel, color = Color.White, fontWeight = FontWeight.Black, fontSize = 16.sp)
+                Text(r.categoryLabel, color = Ink, fontWeight = FontWeight.Black, fontSize = 16.sp)
                 Text(r.createdAt.take(10), color = TextMuted, fontSize = 12.sp)
             }
             Text(
@@ -129,7 +130,7 @@ private fun ReportCard(r: Report) {
             listOf("Trimisă", "Preluată", "Rezolvată").forEachIndexed { i, label ->
                 val done = step > i
                 Box(Modifier.size(10.dp).clip(CircleShape).background(if (done) color else TextMuted.copy(alpha = 0.4f)))
-                Text(" $label", color = if (done) Color.White else TextMuted, fontSize = 12.sp)
+                Text(" $label", color = if (done) Ink else TextMuted, fontSize = 12.sp)
                 if (i < 2) Box(Modifier.padding(horizontal = 6.dp).width(18.dp).height(2.dp).background(if (step > i + 1) color else TextMuted.copy(alpha = 0.3f)))
             }
         }

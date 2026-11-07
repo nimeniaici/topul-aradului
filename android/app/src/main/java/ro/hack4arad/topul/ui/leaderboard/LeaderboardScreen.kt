@@ -1,5 +1,8 @@
 package ro.hack4arad.topul.ui.leaderboard
 
+import ro.hack4arad.topul.ui.theme.NightDeep
+import ro.hack4arad.topul.ui.theme.Scrim
+import ro.hack4arad.topul.ui.theme.Ink
 import android.content.Context
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -166,7 +169,7 @@ fun LeaderboardScreen(onPlace: (Int) -> Unit, vm: LeaderboardViewModel = viewMod
         TabRow(
             selectedTabIndex = tab,
             containerColor = Night,
-            contentColor = Color.White,
+            contentColor = Ink,
             indicator = { pos -> TabRowDefaults.SecondaryIndicator(Modifier.tabIndicatorOffset(pos[tab]), color = Gold, height = 3.dp) },
             divider = {},
         ) {
@@ -232,7 +235,7 @@ private fun ChampionPlace(p: Place, mixed: Boolean, onClick: () -> Unit) {
             .border(2.dp, Gold, RoundedCornerShape(24.dp)).clickable(onClick = onClick),
     ) {
         PlacePhoto(p, Modifier.fillMaxSize(), iconSize = 64.dp)
-        Box(Modifier.fillMaxSize().background(Brush.verticalGradient(0.35f to Color.Transparent, 1f to Night.copy(alpha = 0.97f))))
+        Box(Modifier.fillMaxSize().background(Brush.verticalGradient(0.35f to Color.Transparent, 1f to Scrim.copy(alpha = 0.92f))))
         Row(
             Modifier.align(Alignment.TopStart).padding(12.dp).clip(RoundedCornerShape(50)).background(Gold)
                 .padding(horizontal = 10.dp, vertical = 4.dp),
@@ -260,7 +263,7 @@ private fun ChampionPlace(p: Place, mixed: Boolean, onClick: () -> Unit) {
 private fun ChampionUser(u: UserRank, isMe: Boolean) {
     Row(
         Modifier.fillMaxWidth().padding(bottom = 10.dp).clip(RoundedCornerShape(24.dp))
-            .background(Brush.linearGradient(listOf(Violet, PanelHigh))).border(2.dp, Gold, RoundedCornerShape(24.dp))
+            .background(Brush.linearGradient(listOf(Violet, NightDeep))).border(2.dp, Gold, RoundedCornerShape(24.dp))
             .padding(16.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
@@ -291,7 +294,7 @@ private fun RankRow(
         visual()
         Spacer(Modifier.width(12.dp))
         Column(Modifier.weight(1f)) {
-            Text(title, color = Color.White, fontWeight = FontWeight.Bold, maxLines = 1, overflow = TextOverflow.Ellipsis)
+            Text(title, color = Ink, fontWeight = FontWeight.Bold, maxLines = 1, overflow = TextOverflow.Ellipsis)
             Text(subtitle, color = TextMuted, fontSize = 12.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
         }
         when {

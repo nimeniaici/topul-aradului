@@ -1,5 +1,9 @@
 package ro.hack4arad.topul.ui.home
 
+import androidx.compose.material.icons.rounded.Settings
+import ro.hack4arad.topul.ui.theme.tr
+import ro.hack4arad.topul.ui.theme.NightDeep
+import ro.hack4arad.topul.ui.theme.Ink
 import android.content.Intent
 import android.net.Uri
 import androidx.compose.animation.core.Animatable
@@ -105,32 +109,34 @@ fun HomeScreen(onOpen: (HomeTarget) -> Unit) {
     val share = {
         val link = Network.baseUrl + "app"
         val send = Intent(Intent.ACTION_SEND).setType("text/plain")
-            .putExtra(Intent.EXTRA_TEXT, "Hai în Topul Aradului: cucerește locurile din oraș și devino Primar! $link")
+            .putExtra(Intent.EXTRA_TEXT, "Hai în CityConnect Arad: semnalezi probleme, vezi transportul și evenimentele, iar în Topul Aradului devii Primar! $link")
         context.startActivity(Intent.createChooser(send, "Invită prieteni"))
     }
     val about = { context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(Network.baseUrl + "despre"))) }
 
     val sections = listOf(
-        "Orașul tău" to listOf(
-            Tile("Semnalează o problemă", "Groapă, furtună, vandalism…", Icons.Rounded.ReportProblem, Pink, HomeTarget.Map(MapRequest(report = true))),
-            Tile("Sesizările mele", "Ce a răspuns Primăria", Icons.Rounded.Assignment, Lilac, HomeTarget.Screen("reports")),
-            Tile("Alerte urgente", "Furtună, inundație, canal", Icons.Rounded.Thunderstorm, Pink, HomeTarget.Map(MapRequest(report = true))),
+        tr("Orașul tău", "Your city", "A városod") to listOf(
+            Tile(tr("Semnalează o problemă", "Report a problem", "Hiba bejelentése"), tr("Groapă, furtună, vandalism…", "Pothole, storm, vandalism…", "Kátyú, vihar, rongálás…"), Icons.Rounded.ReportProblem, Pink, HomeTarget.Map(MapRequest(report = true))),
+            Tile(tr("Sesizările mele", "My reports", "Bejelentéseim"), tr("Ce a răspuns Primăria", "City Hall replies", "A városháza válaszai"), Icons.Rounded.Assignment, Lilac, HomeTarget.Screen("reports")),
+            Tile(tr("Alerte urgente", "Urgent alerts", "Sürgős riasztás"), tr("Furtună, inundație, canal", "Storm, flood, manhole", "Vihar, árvíz, csatorna"), Icons.Rounded.Thunderstorm, Pink, HomeTarget.Map(MapRequest(report = true))),
         ),
-        "Joacă" to listOf(
-            Tile("Dueluri", "Care loc e mai tare?", Icons.Rounded.SportsMma, Electric, HomeTarget.Tab("duels")),
-            Tile("Topul Aradului", "Clasamente locuri și arădeni", Icons.Rounded.EmojiEvents, Gold, HomeTarget.Tab("top")),
-            Tile("Misiuni și insigne", "Ce ai de cucerit", Icons.Rounded.MilitaryTech, Violet, HomeTarget.Tab("profile")),
-            Tile("Lista locurilor", "Toate locurile, cu poze", Icons.AutoMirrored.Rounded.ViewList, Mint, HomeTarget.Map(MapRequest(list = true))),
+        tr("Joacă", "Play", "Játék") to listOf(
+            Tile(tr("Dueluri", "Duels", "Párbaj"), tr("Care loc e mai tare?", "Which place is better?", "Melyik hely jobb?"), Icons.Rounded.SportsMma, Electric, HomeTarget.Tab("duels")),
+            Tile("Topul Aradului", tr("Clasamente locuri și arădeni", "Places and players ranking", "Helyek és játékosok"), Icons.Rounded.EmojiEvents, Gold, HomeTarget.Tab("top")),
+            Tile(tr("Misiuni și insigne", "Missions and badges", "Küldetések"), tr("Ce ai de cucerit", "What to conquer", "Mit kell meghódítani"), Icons.Rounded.MilitaryTech, Violet, HomeTarget.Tab("profile")),
+            Tile(tr("Lista locurilor", "All places", "Helyek listája"), tr("Toate locurile, cu poze", "Every place, with photos", "Minden hely fotóval"), Icons.AutoMirrored.Rounded.ViewList, Mint, HomeTarget.Map(MapRequest(list = true))),
         ),
-        "Descoperă Aradul" to listOf(
-            Tile("Trecut vs prezent", "Arad 1874–1931 vs azi", Icons.Rounded.HistoryEdu, Gold, HomeTarget.Screen("discover")),
-            Tile("Ghid audio", "Povestea locurilor, în română", Icons.Rounded.Headphones, Mint, HomeTarget.Screen("discover")),
-            Tile("Obiective turistice", "Cetăți, palate, mănăstiri", Icons.Rounded.AccountBalance, Electric,
+        tr("Descoperă Aradul", "Discover Arad", "Fedezd fel Aradot") to listOf(
+            Tile(tr("Trecut vs prezent", "Then and now", "Akkor és most"), tr("Arad 1874–1931 vs azi", "Arad 1874–1931 vs today", "Arad 1874–1931 és ma"), Icons.Rounded.HistoryEdu, Gold, HomeTarget.Screen("discover")),
+            Tile(tr("Ghid audio", "Audio guide", "Audio idegenvezető"), tr("Povestea locurilor, în română", "Stories of places (Romanian)", "Helyek története (románul)"), Icons.Rounded.Headphones, Mint, HomeTarget.Screen("discover")),
+            Tile(tr("Obiective turistice", "Landmarks", "Látnivalók"), tr("Cetăți, palate, mănăstiri", "Fortresses, palaces, monasteries", "Várak, paloták, kolostorok"), Icons.Rounded.AccountBalance, Electric,
                 HomeTarget.Map(MapRequest(list = true, category = "obiectiv"))),
         ),
-        "Mai mult" to listOf(
-            Tile("Invită prieteni", "Trimite-le aplicația", Icons.Rounded.PersonAdd, Mint, null, onClick = share),
-            Tile("Despre aplicație", "Hack4Arad 2026", Icons.Rounded.Info, TextMuted, null, onClick = about),
+        tr("Mai mult", "More", "Továbbiak") to listOf(
+            Tile(tr("Invită prieteni", "Invite friends", "Barátok meghívása"), tr("Trimite-le aplicația", "Send them the app", "Küldd el nekik"), Icons.Rounded.PersonAdd, Mint, null, onClick = share),
+            Tile(tr("Setări", "Settings", "Beállítások"), tr("Cont, limbă, temă, ajutor", "Account, language, theme", "Fiók, nyelv, téma"),
+                Icons.Rounded.Settings, Ink, HomeTarget.Screen("settings")),
+            Tile(tr("Despre aplicație", "About", "Névjegy"), "Hack4Arad 2026", Icons.Rounded.Info, TextMuted, null, onClick = about),
         ),
     )
 
@@ -165,7 +171,7 @@ private fun Header(p: Profile?) {
         Avatar(p?.name ?: "?", 56.dp, emoji = p?.avatarEmoji, colorKey = p?.avatarColor, photoUrl = p?.avatarUrl)
         Spacer(Modifier.width(12.dp))
         Column(Modifier.weight(1f)) {
-            Text(if (p != null) "Salut, @${p.name}" else "Salut!", color = Color.White, fontWeight = FontWeight.Black,
+            Text(if (p != null) tr("Salut, ", "Hi, ", "Szia, ") + "@${p.name}" else tr("Salut!", "Hi!", "Szia!"), color = Ink, fontWeight = FontWeight.Black,
                 fontSize = 22.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
             if (p != null) {
                 val lvl = p.level
@@ -182,18 +188,18 @@ private fun MapHero(onClick: () -> Unit) {
     val shape = RoundedCornerShape(26.dp)
     Box(
         Modifier.fillMaxWidth().height(150.dp).clip(shape)
-            .background(Brush.linearGradient(listOf(Violet, Electric, Pink)))
+            .background(Brush.linearGradient(listOf(NightDeep, Violet, Electric)))
             .clickable(onClick = onClick).padding(20.dp),
     ) {
         Column(Modifier.align(Alignment.CenterStart)) {
-            Text("Harta live a Aradului", color = Color.White, fontWeight = FontWeight.Black, fontSize = 24.sp)
-            Text("Fă check-in, cucerește tronuri, vezi unde e agitație", color = Color.White.copy(alpha = 0.85f), fontSize = 14.sp)
+            Text(tr("Harta live a Aradului", "Live map of Arad", "Arad élő térképe"), color = Color.White, fontWeight = FontWeight.Black, fontSize = 24.sp)
+            Text(tr("Fă check-in, cucerește tronuri, vezi unde e agitație", "Check in, conquer thrones, see what is busy", "Jelentkezz be, hódíts trónokat"), color = Color.White.copy(alpha = 0.85f), fontSize = 14.sp)
             Spacer(Modifier.height(12.dp))
             Row(
                 Modifier.clip(RoundedCornerShape(50)).background(Gold).padding(horizontal = 14.dp, vertical = 7.dp),
                 verticalAlignment = Alignment.CenterVertically,
             ) {
-                Text("Deschide harta", color = GoldDark, fontWeight = FontWeight.Black)
+                Text(tr("Deschide harta", "Open map", "Térkép megnyitása"), color = GoldDark, fontWeight = FontWeight.Black)
                 Icon(Icons.Rounded.ChevronRight, null, tint = GoldDark)
             }
         }
@@ -225,7 +231,7 @@ private fun TileCard(tile: Tile, order: Int, modifier: Modifier, onClick: () -> 
             Icon(tile.icon, null, tint = tile.color, modifier = Modifier.size(26.dp))
         }
         Column {
-            Text(tile.title, color = Color.White, fontWeight = FontWeight.Black, fontSize = 15.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
+            Text(tile.title, color = Ink, fontWeight = FontWeight.Black, fontSize = 15.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
             Text(tile.subtitle, color = TextMuted, fontSize = 12.sp, maxLines = 2, overflow = TextOverflow.Ellipsis)
         }
     }

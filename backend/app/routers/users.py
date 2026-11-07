@@ -5,14 +5,15 @@ from sqlalchemy.orm import Session, joinedload
 from sqlalchemy.exc import IntegrityError
 import uuid
 from fastapi import File, UploadFile
+from pydantic import BaseModel, Field
 from ..serializers import photo_url
 from .. import usernames
 from .. import config
 from ..db import get_db
 from ..gamification import BADGES, MISSIONS, XP_PER_LEVEL, badge_progress, level, update_mayor
-from ..models import Badge, Checkin, Place, Report, ResetCode, User, Vote
+from ..models import Badge, Checkin, Feedback, Place, Report, ResetCode, User, Vote
 from ..schemas import AVATAR_COLORS, AVATAR_EMOJIS, MissionOut, ProfileOut, UpdateMeIn
-from ..security import get_current_user
+from ..security import get_current_user, hash_password, verify_password
 from ..serializers import badge_out, badge_placeholder, place_out
 
 router = APIRouter(prefix="/users", tags=["users"])
@@ -106,6 +107,33 @@ def delete_avatar(user: User = Depends(get_current_user), db: Session = Depends(
     return _profile(db, user)
 
 
+class PasswordIn(BaseModel):
+    old_password: str = ""
+    new_password: str = Field(min_length=6, max_length=100)
+
+
+@router.post("/me/password")
+def change_password(body: PasswordIn, user: User = Depends(get_current_user), db: Session = Depends(get_db)):
+    """Schimbă parola. Conturile doar-Google (fără parolă) își pot seta una fără parola veche."""
+    if user.password_hash and not verify_password(body.old_password, user.password_hash):
+        raise HTTPException(400, "Parola actuală nu e corectă.")
+    user.password_hash = hash_password(body.new_password)
+    db.commit()
+    return {"detail": "Parola a fost schimbată."}
+
+
+@router.get("/me/stats")
+def my_stats(user: User = Depends(get_current_user), db: Session = Depends(get_db)):
+    """Scorurile mele pentru Setări: locul în clasament și sesizările trimise / rezolvate."""
+    rank = (db.scalar(select(func.count()).select_from(User).where(User.xp > user.xp)) or 0) + 1
+    total = db.scalar(select(func.count()).select_from(User)) or 0
+    reports = db.scalar(select(func.count()).select_from(Report).where(Report.user_id == user.id)) or 0
+    solved = db.scalar(select(func.count()).select_from(Report).where(Report.user_id == user.id,
+                                                                      Report.status == "rezolvat")) or 0
+    return {"rank": rank, "total_users": total, "reports": reports, "reports_resolved": solved,
+            "member_since": user.created_at.date().isoformat()}
+
+
 @router.delete("/me", status_code=204)
 def delete_me(user: User = Depends(get_current_user), db: Session = Depends(get_db)):
     """Șterge definitiv contul și toate datele lui (check-in-uri, poze, voturi, insigne)."""
@@ -123,6 +151,7 @@ def delete_me(user: User = Depends(get_current_user), db: Session = Depends(get_
     db.execute(delete(Badge).where(Badge.user_id == uid))
     db.execute(delete(ResetCode).where(ResetCode.user_id == uid))
     db.execute(delete(Report).where(Report.user_id == uid))
+    db.execute(delete(Feedback).where(Feedback.user_id == uid))
     db.flush()
 
     # recalculăm contoarele și primarii locurilor atinse

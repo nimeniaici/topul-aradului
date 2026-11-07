@@ -1,5 +1,6 @@
 package ro.hack4arad.topul.ui.place
 
+import ro.hack4arad.topul.ui.theme.Scrim
 import android.annotation.SuppressLint
 import android.webkit.WebChromeClient
 import android.webkit.WebView
@@ -49,7 +50,7 @@ fun Tour3DScreen(placeId: Int, onBack: () -> Unit) {
         AndroidView(factory = { webView }, modifier = Modifier.fillMaxSize())
         IconButton(
             onClick = onBack,
-            colors = IconButtonDefaults.iconButtonColors(containerColor = Night.copy(alpha = 0.7f), contentColor = Color.White),
+            colors = IconButtonDefaults.iconButtonColors(containerColor = Scrim.copy(alpha = 0.7f), contentColor = Color.White),
             modifier = Modifier.align(Alignment.TopEnd).padding(12.dp).clip(CircleShape),
         ) { Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Înapoi") }
     }

@@ -6,7 +6,7 @@ def test_app_page_before_and_after_upload(client, monkeypatch):
     monkeypatch.setattr(config, "ADMIN_TOKEN", "secret-admin")
     assert client.get("/descarca").status_code in (200, 404)  # depinde dacă alt test a urcat deja
     page = client.get("/app")
-    assert page.status_code == 200 and "TOPUL ARADULUI" in page.text
+    assert page.status_code == 200 and "CITYCONNECT ARAD" in page.text
 
     assert client.post("/admin/apk", files={"file": ("x.apk", b"PK", "application/octet-stream")},
                        headers={"X-Admin-Token": "gresit"}).status_code == 403

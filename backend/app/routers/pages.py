@@ -25,9 +25,9 @@ def _page(title: str, body: str) -> HTMLResponse:
     html = f"""<!doctype html>
 <html lang="ro"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>{title} · Topul Aradului</title><style>{_STYLE}</style></head>
+<title>{title} · CityConnect Arad</title><style>{_STYLE}</style></head>
 <body><main>
-<nav><a href="/despre">👑 Topul Aradului</a><a href="/confidentialitate">Confidențialitate</a><a href="/termeni">Termeni</a></nav>
+<nav><a href="/despre">CityConnect Arad</a><a href="/confidentialitate">Confidențialitate</a><a href="/termeni">Termeni</a></nav>
 {body}
 <p class="muted" style="margin-top:40px">Contact: <a href="mailto:{CONTACT}">{CONTACT}</a> · Actualizat: {UPDATED}</p>
 </main></body></html>"""
@@ -37,7 +37,7 @@ def _page(title: str, body: str) -> HTMLResponse:
 @router.get("/despre", response_class=HTMLResponse)
 def about():
     return _page("Despre", """
-<h1>👑 Topul Aradului</h1>
+<h1>CityConnect Arad</h1>
 <p class="muted">Proiect pentru Hack4Arad 2026 · Universitatea „Aurel Vlaicu” din Arad</p>
 <p>Harta Aradului votată de arădeni. Descoperi restaurante, cafenele, parcuri și obiective,
 faci check-in când ești acolo, votezi în dueluri „care e mai bun?” și cucerești titlul de
@@ -59,7 +59,7 @@ faci check-in când ești acolo, votezi în dueluri „care e mai bun?” și cu
 def privacy():
     return _page("Politica de confidențialitate", """
 <h1>Politica de confidențialitate</h1>
-<p>Această pagină explică ce date colectează aplicația <b>Topul Aradului</b>, de ce și cum le poți șterge.</p>
+<p>Această pagină explică ce date colectează aplicația <b>CityConnect Arad</b>, de ce și cum le poți șterge.</p>
 
 <h2>Ce date colectăm</h2>
 <ul>
@@ -107,7 +107,7 @@ def terms():
     return _page("Termeni de utilizare", """
 <h1>Termeni de utilizare</h1>
 <ul>
-<li>Topul Aradului este un proiect demonstrativ realizat pentru hackathonul Hack4Arad 2026 și este oferit „ca atare”.</li>
+<li>CityConnect Arad este un proiect demonstrativ realizat pentru hackathonul Hack4Arad 2026 și este oferit „ca atare”.</li>
 <li>Folosește aplicația cu bun-simț: fără locații simulate, fără conturi multiple pentru a influența clasamentele.</li>
 <li>Pozele încărcate trebuie să fie ale tale și potrivite pentru public. Ne rezervăm dreptul de a șterge conținut nepotrivit.</li>
 <li>Clasamentele reflectă voturile comunității și nu sunt recenzii oficiale ale localurilor.</li>

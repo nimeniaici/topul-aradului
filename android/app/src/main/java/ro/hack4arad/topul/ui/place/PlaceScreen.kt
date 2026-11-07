@@ -1,5 +1,7 @@
 package ro.hack4arad.topul.ui.place
 
+import ro.hack4arad.topul.ui.theme.Scrim
+import ro.hack4arad.topul.ui.theme.Ink
 import ro.hack4arad.topul.ui.theme.Mint
 import androidx.compose.material.icons.rounded.Directions
 import ro.hack4arad.topul.util.navigateTo
@@ -193,12 +195,12 @@ fun PlaceScreen(onBack: () -> Unit, onTour3D: (Int) -> Unit = {}, vm: PlaceViewM
                     )
                 }
                 Column(Modifier.padding(horizontal = 16.dp)) {
-                    Text(place.name, color = Color.White, fontSize = 30.sp, fontWeight = FontWeight.Black)
+                    Text(place.name, color = Ink, fontSize = 30.sp, fontWeight = FontWeight.Black)
                     if (place.address.isNotBlank()) Text(place.address, color = TextMuted)
 
                     Row(Modifier.fillMaxWidth().padding(vertical = 16.dp), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                         Stat("${place.rating.roundToInt()}", "rating", Gold, Modifier.weight(1f))
-                        Stat("${place.checkinCount}", "check-in-uri", Color.White, Modifier.weight(1f))
+                        Stat("${place.checkinCount}", "check-in-uri", Ink, Modifier.weight(1f))
                         Stat("${place.wins}/${place.duels}", "dueluri", Pink, Modifier.weight(1f))
                     }
 
@@ -214,7 +216,7 @@ fun PlaceScreen(onBack: () -> Unit, onTour3D: (Int) -> Unit = {}, vm: PlaceViewM
                                     Text("Tu ești Primarul aici", color = Gold, fontWeight = FontWeight.Black, fontSize = 18.sp)
                                     Text("Revino des ca să nu-ți ia nimeni tronul.", color = Lilac)
                                 } else {
-                                    Text("Primar: @${place.mayorName}", color = Color.White, fontWeight = FontWeight.Black, fontSize = 18.sp)
+                                    Text("Primar: @${place.mayorName}", color = Ink, fontWeight = FontWeight.Black, fontSize = 18.sp)
                                     Text("Fă mai multe check-in-uri ca să-i iei tronul.", color = Lilac)
                                 }
                             }
@@ -281,7 +283,7 @@ fun PlaceScreen(onBack: () -> Unit, onTour3D: (Int) -> Unit = {}, vm: PlaceViewM
                         },
                         enabled = !vm.busy,
                         modifier = Modifier.fillMaxWidth().padding(top = 8.dp).height(52.dp),
-                    ) { Icon(Icons.Rounded.PhotoCamera, null, tint = Color.White); Text("  Check-in cu poză · +5 XP bonus", color = Color.White) }
+                    ) { Icon(Icons.Rounded.PhotoCamera, null, tint = Ink); Text("  Check-in cu poză · +5 XP bonus", color = Ink) }
 
                     // navigare până la loc, ca în Google Maps
                     val navContext = LocalContext.current
@@ -324,7 +326,7 @@ fun PlaceScreen(onBack: () -> Unit, onTour3D: (Int) -> Unit = {}, vm: PlaceViewM
 
         IconButton(
             onClick = onBack,
-            colors = IconButtonDefaults.iconButtonColors(containerColor = Night.copy(alpha = 0.7f), contentColor = Color.White),
+            colors = IconButtonDefaults.iconButtonColors(containerColor = Scrim.copy(alpha = 0.7f), contentColor = Color.White),
             modifier = Modifier.padding(12.dp).clip(CircleShape),
         ) { Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Înapoi") }
 

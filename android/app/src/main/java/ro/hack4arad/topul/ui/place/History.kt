@@ -1,5 +1,7 @@
 package ro.hack4arad.topul.ui.place
 
+import ro.hack4arad.topul.ui.theme.Scrim
+import ro.hack4arad.topul.ui.theme.Ink
 import android.content.ActivityNotFoundException
 import android.content.Intent
 import android.speech.tts.TextToSpeech
@@ -132,7 +134,7 @@ fun AudioGuide(story: String, modifier: Modifier = Modifier) {
                     speaking -> "Ascultă… (atinge ca să oprești)"
                     else -> "Ascultă povestea locului"
                 },
-                color = Color.White, fontWeight = FontWeight.Black, fontSize = 16.sp,
+                color = Ink, fontWeight = FontWeight.Black, fontSize = 16.sp,
             )
             Text(
                 if (missingVoice) "Telefonul nu are încă vocea în română. Atinge ca s-o descarci."
@@ -196,7 +198,7 @@ fun ThenAndNow(place: PlaceDetail, old: OldPhoto, modifier: Modifier = Modifier)
             Text(old.year, color = Night, fontWeight = FontWeight.Black,
                 modifier = Modifier.align(Alignment.TopStart).padding(10.dp).clip(RoundedCornerShape(50)).background(Gold).padding(horizontal = 10.dp, vertical = 4.dp))
             Text("Azi", color = Color.White, fontWeight = FontWeight.Black,
-                modifier = Modifier.align(Alignment.TopEnd).padding(10.dp).clip(RoundedCornerShape(50)).background(Night.copy(alpha = 0.8f)).padding(horizontal = 10.dp, vertical = 4.dp))
+                modifier = Modifier.align(Alignment.TopEnd).padding(10.dp).clip(RoundedCornerShape(50)).background(Scrim.copy(alpha = 0.8f)).padding(horizontal = 10.dp, vertical = 4.dp))
             // linia + mânerul
             val x = with(density) { (widthPx * split).toDp() }
             Canvas(Modifier.fillMaxSize()) {

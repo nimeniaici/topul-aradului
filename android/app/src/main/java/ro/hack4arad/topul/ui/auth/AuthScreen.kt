@@ -1,5 +1,6 @@
 package ro.hack4arad.topul.ui.auth
 
+import ro.hack4arad.topul.ui.theme.Ink
 import androidx.compose.runtime.remember
 import ro.hack4arad.topul.ui.components.UsernameField
 import ro.hack4arad.topul.R
@@ -146,11 +147,11 @@ fun AuthScreen(vm: AuthViewModel = viewModel()) {
         Spacer(Modifier.height(36.dp))
         Image(painterResource(R.drawable.ic_launcher_foreground), contentDescription = null, modifier = Modifier.size(140.dp))
         Text(
-            "TOPUL ARADULUI",
+            "CITYCONNECT ARAD",
             style = MaterialTheme.typography.headlineMedium,
             color = Gold, fontWeight = FontWeight.Black, letterSpacing = 2.sp,
         )
-        Text("Cucerește orașul. Devino Primar.", color = Color.White, textAlign = TextAlign.Center)
+        Text("Orașul tău, conectat. Joacă, semnalează, descoperă.", color = Ink, textAlign = TextAlign.Center)
         Spacer(Modifier.height(16.dp))
         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
             Pill("Check-in", Pink, Color.White)

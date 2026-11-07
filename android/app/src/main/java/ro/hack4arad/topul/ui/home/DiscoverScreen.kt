@@ -1,5 +1,7 @@
 package ro.hack4arad.topul.ui.home
 
+import ro.hack4arad.topul.ui.theme.Scrim
+import ro.hack4arad.topul.ui.theme.Ink
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -64,9 +66,9 @@ fun DiscoverScreen(onBack: () -> Unit, onPlace: (Int) -> Unit) {
     }
     Column(Modifier.fillMaxSize()) {
         Row(Modifier.fillMaxWidth().padding(8.dp), verticalAlignment = Alignment.CenterVertically) {
-            IconButton(onClick = onBack) { Icon(Icons.AutoMirrored.Rounded.ArrowBack, "Înapoi", tint = Color.White) }
+            IconButton(onClick = onBack) { Icon(Icons.AutoMirrored.Rounded.ArrowBack, "Înapoi", tint = Ink) }
             Column {
-                Text("Descoperă Aradul", color = Color.White, fontSize = 22.sp, fontWeight = FontWeight.Black)
+                Text("Descoperă Aradul", color = Ink, fontSize = 22.sp, fontWeight = FontWeight.Black)
                 Text("Trecut vs prezent · ghid audio · tur 3D", color = TextMuted, fontSize = 13.sp)
             }
         }
@@ -93,7 +95,7 @@ private fun DiscoverCard(p: DiscoverPlace, onClick: () -> Unit) {
         } else {
             PlacePhoto(p.id, p.name, p.lat, p.lng, p.category, p.photoUrl, Modifier.fillMaxSize())
         }
-        Box(Modifier.fillMaxSize().background(Brush.verticalGradient(0.35f to Color.Transparent, 1f to Night.copy(alpha = 0.95f))))
+        Box(Modifier.fillMaxSize().background(Brush.verticalGradient(0.35f to Color.Transparent, 1f to Scrim.copy(alpha = 0.92f))))
         Column(Modifier.align(Alignment.BottomStart).padding(14.dp)) {
             Text(p.name, color = Color.White, fontWeight = FontWeight.Black, fontSize = 19.sp)
             Row(horizontalArrangement = Arrangement.spacedBy(6.dp), modifier = Modifier.padding(top = 6.dp)) {

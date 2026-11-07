@@ -117,4 +117,13 @@ interface Api {
 
     @DELETE("users/me/avatar")
     suspend fun deleteAvatar(): Profile
+
+    @POST("users/me/password")
+    suspend fun changePassword(@Body body: PasswordIn): MessageOut
+
+    @GET("users/me/stats")
+    suspend fun myStats(): MyStats
+
+    @POST("feedback")
+    suspend fun sendFeedback(@Body body: FeedbackIn): MessageOut
 }

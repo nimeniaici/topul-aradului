@@ -1,5 +1,7 @@
 package ro.hack4arad.topul.ui.components
 
+import ro.hack4arad.topul.ui.theme.NightDeep
+import ro.hack4arad.topul.ui.theme.Ink
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
@@ -94,19 +96,12 @@ fun categoryIcon(code: String): ImageVector = when (code) {
 
 /** Culoarea neon a fiecărei categorii (markere, carduri, chenare). */
 fun categoryColor(code: String): Color = when (code) {
-    "fastfood" -> Color(0xFFFF8A3D)
-    "restaurant" -> Pink
-    "cafenea" -> Color(0xFFC08A5B)
-    "cofetarie" -> Color(0xFFFF9ECF)
-    "gelaterie" -> Color(0xFF7FE3FF)
-    "terasa" -> Mint
-    "bar" -> Violet
-    "obiectiv" -> Electric
-    "manastire" -> Lilac
-    "natura" -> Leaf
-    "mall" -> Gold
-    "eveniment" -> Gold
-    else -> Violet
+    // toate categoriile folosesc nuanțe din aceeași familie (paleta aleasă), ca să fie armonios
+    "fastfood", "bar", "manastire" -> Violet
+    "restaurant", "terasa", "mall" -> Electric
+    "cafenea", "cofetarie", "gelaterie" -> Leaf
+    "obiectiv", "natura", "eveniment" -> NightDeep
+    else -> Gold
 }
 
 /**
@@ -154,7 +149,7 @@ fun CategoryChips(
 ) {
     val colors = FilterChipDefaults.filterChipColors(
         containerColor = Panel,
-        labelColor = Color.White,
+        labelColor = Ink,
         iconColor = TextMuted,
         selectedContainerColor = Gold,
         selectedLabelColor = GoldDark,

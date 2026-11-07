@@ -1,5 +1,6 @@
 package ro.hack4arad.topul.ui.map
 
+import ro.hack4arad.topul.ui.theme.Ink
 import ro.hack4arad.topul.ui.reports.reportKind
 import ro.hack4arad.topul.ui.reports.REPORT_KINDS
 import androidx.compose.foundation.rememberScrollState
@@ -341,7 +342,7 @@ fun MapScreen(onPlace: (Int) -> Unit, onOpenReports: () -> Unit = {}, vm: MapVie
         if (vm.message != null) { kotlinx.coroutines.delay(3500); vm.message = null }
     }
 
-    var look by rememberSaveable { mutableStateOf(MapLook.DARK) }
+    var look by rememberSaveable { mutableStateOf(MapLook.LIGHT) }
     var listMode by rememberSaveable { mutableStateOf(false) }
     var showHeat by rememberSaveable { mutableStateOf(false) }
     var reporting by remember { mutableStateOf(false) }
@@ -509,7 +510,7 @@ private fun MapMenu(
     onCategory: (String?) -> Unit, onReport: () -> Unit, onMyReports: () -> Unit,
 ) {
     Column(Modifier.fillMaxWidth().verticalScroll(rememberScrollState()).padding(horizontal = 16.dp).padding(bottom = 28.dp)) {
-        Text("Meniu hartă", color = Color.White, fontSize = 22.sp, fontWeight = FontWeight.Black,
+        Text("Meniu hartă", color = Ink, fontSize = 22.sp, fontWeight = FontWeight.Black,
             modifier = Modifier.padding(start = 4.dp, bottom = 8.dp))
         MenuRow(Icons.Rounded.ReportProblem, "Semnalează o problemă", "Groapă, furtună, inundație, vandalism…", Pink, onClick = onReport)
         MenuRow(Icons.Rounded.Assignment, "Sesizările mele", "Vezi ce a răspuns Primăria", Lilac, onClick = onMyReports)
@@ -525,7 +526,7 @@ private fun MapMenu(
             MapLook.entries.forEach { l ->
                 val on = l == look
                 Text(
-                    l.label, color = if (on) GoldDark else Color.White, fontWeight = FontWeight.Bold, textAlign = TextAlign.Center,
+                    l.label, color = if (on) GoldDark else Ink, fontWeight = FontWeight.Bold, textAlign = TextAlign.Center,
                     modifier = Modifier.weight(1f).clip(RoundedCornerShape(14.dp)).background(if (on) Gold else Panel)
                         .clickable { onLook(l) }.padding(vertical = 12.dp),
                 )
@@ -552,7 +553,7 @@ private fun MenuRow(
         }
         Spacer(Modifier.width(12.dp))
         Column(Modifier.weight(1f)) {
-            Text(title, color = Color.White, fontWeight = FontWeight.Bold, fontSize = 16.sp)
+            Text(title, color = Ink, fontWeight = FontWeight.Bold, fontSize = 16.sp)
             Text(subtitle, color = TextMuted, fontSize = 13.sp)
         }
         Icon(Icons.Rounded.ChevronRight, null, tint = TextMuted)
@@ -573,10 +574,10 @@ private fun CategoryGrid(categories: List<Category>, selected: String?, onSelect
                 ) {
                     Icon(
                         if (c == null) Icons.Rounded.Apps else categoryIcon(c.code), null,
-                        tint = if (on) GoldDark else (c?.let { categoryColor(it.code) } ?: Color.White),
+                        tint = if (on) GoldDark else (c?.let { categoryColor(it.code) } ?: Ink),
                     )
                     Text(
-                        c?.label ?: "Toate", color = if (on) GoldDark else Color.White, fontSize = 12.sp, fontWeight = FontWeight.Bold,
+                        c?.label ?: "Toate", color = if (on) GoldDark else Ink, fontSize = 12.sp, fontWeight = FontWeight.Bold,
                         maxLines = 1, overflow = TextOverflow.Ellipsis, modifier = Modifier.padding(horizontal = 4.dp),
                     )
                 }
@@ -652,13 +653,13 @@ fun formatDistance(m: Double): String = if (m < 1000) "${m.roundToInt()} m" else
 private fun CarouselCard(place: Place, busy: Boolean, onOpen: () -> Unit, onCheckIn: () -> Unit) {
     val me = Network.session.userId
     Column(
-        Modifier.fillMaxWidth().clip(RoundedCornerShape(22.dp)).background(Night)
+        Modifier.fillMaxWidth().clip(RoundedCornerShape(22.dp)).background(Panel)
             .border(1.dp, categoryColor(place.category).copy(alpha = 0.6f), RoundedCornerShape(22.dp))
             .clickable(onClick = onOpen),
     ) {
         Box(Modifier.fillMaxWidth().height(118.dp)) {
             PlacePhoto(place, Modifier.fillMaxSize(), iconSize = 40.dp)
-            Box(Modifier.fillMaxSize().background(Brush.verticalGradient(0.45f to Color.Transparent, 1f to Night)))
+            Box(Modifier.fillMaxSize().background(Brush.verticalGradient(0.55f to Color.Transparent, 1f to Panel)))
             Row(
                 Modifier.align(Alignment.TopStart).padding(10.dp).clip(RoundedCornerShape(50))
                     .background(Night.copy(alpha = 0.8f)).padding(horizontal = 8.dp, vertical = 3.dp),
@@ -670,7 +671,7 @@ private fun CarouselCard(place: Place, busy: Boolean, onOpen: () -> Unit, onChec
             }
         }
         Column(Modifier.padding(horizontal = 14.dp, vertical = 10.dp)) {
-            Text(place.name, color = Color.White, fontWeight = FontWeight.Black, fontSize = 17.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
+            Text(place.name, color = Ink, fontWeight = FontWeight.Black, fontSize = 17.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Icon(Icons.Rounded.WorkspacePremium, null, tint = if (place.mayorId == null) Gold else TextMuted, modifier = Modifier.size(14.dp))
                 Spacer(Modifier.width(4.dp))
@@ -692,7 +693,7 @@ private fun CarouselCard(place: Place, busy: Boolean, onOpen: () -> Unit, onChec
                     else Text(if (place.mayorId == null) "Cucerește tronul" else "Fă check-in", fontSize = 14.sp)
                 }
                 OutlinedButton(onClick = onOpen, modifier = Modifier.height(42.dp), contentPadding = PaddingValues(horizontal = 12.dp)) {
-                    Text("Detalii", color = Color.White, fontSize = 14.sp)
+                    Text("Detalii", color = Ink, fontSize = 14.sp)
                 }
                 // „Du-mă acolo”: navigare ca în Google Maps
                 val navContext = LocalContext.current
@@ -802,7 +803,7 @@ private fun PlacesFeed(places: List<Place>, onPlace: (Int) -> Unit, topPadding: 
             Column(Modifier.fillMaxWidth().clip(RoundedCornerShape(20.dp)).background(Panel).clickable { onPlace(p.id) }) {
                 PlacePhoto(p, Modifier.fillMaxWidth().height(150.dp), iconSize = 44.dp)
                 Column(Modifier.padding(14.dp)) {
-                    Text(p.name, color = Color.White, fontWeight = FontWeight.Black, fontSize = 17.sp)
+                    Text(p.name, color = Ink, fontWeight = FontWeight.Black, fontSize = 17.sp)
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         Icon(categoryIcon(p.category), null, tint = categoryColor(p.category), modifier = Modifier.size(15.dp))
                         Spacer(Modifier.width(5.dp))
@@ -833,7 +834,7 @@ private fun ReportForm(busy: Boolean, onSend: (String, String, ByteArray?) -> Un
         Row(verticalAlignment = Alignment.CenterVertically) {
             Icon(Icons.Rounded.ReportProblem, null, tint = Pink, modifier = Modifier.size(26.dp))
             Spacer(Modifier.width(10.dp))
-            Text("Semnalează o problemă", color = Color.White, fontSize = 22.sp, fontWeight = FontWeight.Black)
+            Text("Semnalează o problemă", color = Ink, fontSize = 22.sp, fontWeight = FontWeight.Black)
         }
         Text("Ajunge direct la Primăria Aradului, cu poza și locul exact. +10 XP, iar +20 XP când e rezolvată.", color = TextMuted, fontSize = 13.sp)
         Spacer(Modifier.height(14.dp))
@@ -849,7 +850,7 @@ private fun ReportForm(busy: Boolean, onSend: (String, String, ByteArray?) -> Un
                     ) {
                         Icon(k.icon, null, tint = if (on) Color.White else if (k.urgent) Pink else Lilac, modifier = Modifier.size(26.dp))
                         Spacer(Modifier.height(4.dp))
-                        Text(k.label, color = Color.White, fontSize = 11.sp, fontWeight = FontWeight.Bold,
+                        Text(k.label, color = if (on) Color.White else Ink, fontSize = 11.sp, fontWeight = FontWeight.Bold,
                             textAlign = TextAlign.Center, maxLines = 2, lineHeight = 13.sp)
                     }
                 }
@@ -872,9 +873,9 @@ private fun ReportForm(busy: Boolean, onSend: (String, String, ByteArray?) -> Un
             onClick = { val u = newPhotoUri(context); photoUri = u; camera.launch(u) },
             modifier = Modifier.fillMaxWidth().height(48.dp),
         ) {
-            Icon(Icons.Rounded.CameraAlt, null, tint = Color.White)
+            Icon(Icons.Rounded.CameraAlt, null, tint = Ink)
             Spacer(Modifier.width(8.dp))
-            Text(if (photoTaken) "Poză adăugată · refă" else "Adaugă poză", color = Color.White)
+            Text(if (photoTaken) "Poză adăugată · refă" else "Adaugă poză", color = Ink)
         }
         Spacer(Modifier.height(12.dp))
         Button(
@@ -931,7 +932,7 @@ private fun SearchBar(query: String, onChange: (String) -> Unit, modifier: Modif
             if (query.isEmpty()) Text("Caută un loc, ex. pizza, cafenea, KFC", color = TextMuted, fontSize = 15.sp, maxLines = 1)
             BasicTextField(
                 value = query, onValueChange = onChange, singleLine = true,
-                textStyle = TextStyle(color = Color.White, fontSize = 15.sp),
+                textStyle = TextStyle(color = Ink, fontSize = 15.sp),
                 cursorBrush = SolidColor(Gold),
                 keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search),
                 keyboardActions = KeyboardActions(onSearch = { focus.clearFocus() }),

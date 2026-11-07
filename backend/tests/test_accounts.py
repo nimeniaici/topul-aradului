@@ -134,3 +134,15 @@ def test_existing_sqlite_db_gets_new_columns(tmp_path):
         dbmod.engine = old
     cols = {c["name"] for c in sa.inspect(eng).get_columns("users")}
     assert {"google_sub", "avatar_emoji", "avatar_color"} <= cols
+
+
+def test_setari_parola_feedback_scoruri(client):
+    h = _register(client, "setari@test.ro", password="veche123")
+    assert client.post("/users/me/password", json={"old_password": "gresita", "new_password": "noua1234"}, headers=h).status_code == 400
+    assert client.post("/users/me/password", json={"old_password": "veche123", "new_password": "noua1234"}, headers=h).status_code == 200
+    assert client.post("/auth/login", json={"email": "setari@test.ro", "password": "noua1234"}).status_code == 200
+    r = client.post("/feedback", json={"kind": "bug", "message": "Harta se încarcă greu", "app_version": "1.0"}, headers=h)
+    assert r.status_code == 201
+    assert client.post("/feedback", json={"kind": "bug", "message": "din nou"}, headers=h).status_code == 429
+    st = client.get("/users/me/stats", headers=h).json()
+    assert st["rank"] >= 1 and st["reports"] == 0 and st["total_users"] >= 1

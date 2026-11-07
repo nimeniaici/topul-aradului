@@ -70,7 +70,7 @@ def app_page():
     return HTMLResponse(f"""<!doctype html>
 <html lang="ro"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Descarcă Topul Aradului</title>
+<title>Descarcă CityConnect Arad</title>
 <style>
   body {{ margin: 0; background: #0F1226; color: #E6E8FF; font: 16px/1.6 system-ui, -apple-system, Roboto, sans-serif; }}
   main {{ max-width: 520px; margin: 0 auto; padding: 40px 20px 56px; text-align: center; }}
@@ -89,7 +89,7 @@ def app_page():
 </style></head>
 <body><main>
   <div class="crown">👑</div>
-  <h1>TOPUL ARADULUI</h1>
+  <h1>CITYCONNECT ARAD</h1>
   <p class="tag">Cucerește orașul. Devino Primar.</p>
   {button}
   {meta}

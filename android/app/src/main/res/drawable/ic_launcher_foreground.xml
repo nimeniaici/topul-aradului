@@ -1,30 +1,31 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Coroana „Topul Aradului” (zona sigură a iconiței adaptive e cercul central de 66dp) -->
+<!-- Logo CityConnect Arad: pin argintiu (orașul) legat de noduri (comunitatea), cu o mică coroană
+     (moștenirea „Topul Aradului”). Zona sigură a iconiței adaptive e cercul central de 66dp. -->
 <vector xmlns:android="http://schemas.android.com/apk/res/android"
     android:width="108dp"
     android:height="108dp"
     android:viewportWidth="108"
     android:viewportHeight="108">
-    <!-- corpul coroanei -->
+    <!-- legăturile spre noduri -->
     <path
-        android:fillColor="#FFFFD23F"
-        android:pathData="M31,68 L29,42 L42,53 L54,33 L66,53 L79,42 L77,68 Z" />
-    <!-- baza -->
+        android:strokeColor="#99D5D7E0"
+        android:strokeWidth="2"
+        android:strokeLineCap="round"
+        android:pathData="M54,48 L29,66 M54,48 L79,66 M54,48 L54,25" />
+    <!-- nodurile -->
     <path
-        android:fillColor="#FFFFD23F"
-        android:pathData="M31,71 L77,71 L77,78 Q77,79 76,79 L32,79 Q31,79 31,78 Z" />
-    <!-- pietre -->
+        android:fillColor="#FFD5D7E0"
+        android:pathData="M29,66 m-4.5,0 a4.5,4.5 0 1,0 9,0 a4.5,4.5 0 1,0 -9,0 M79,66 m-4.5,0 a4.5,4.5 0 1,0 9,0 a4.5,4.5 0 1,0 -9,0 M54,25 m-4,0 a4,4 0 1,0 8,0 a4,4 0 1,0 -8,0" />
+    <!-- pinul -->
     <path
-        android:fillColor="#FFFF3D81"
-        android:pathData="M54,52 m-4,0 a4,4 0 1,0 8,0 a4,4 0 1,0 -8,0" />
+        android:fillColor="#FFF4F5F9"
+        android:pathData="M54,84 C50,78 37,63 37,50 A17,17 0 1,1 71,50 C71,63 58,78 54,84 Z" />
+    <!-- interiorul pinului -->
     <path
-        android:fillColor="#FF2EE6A6"
-        android:pathData="M41,61 m-3,0 a3,3 0 1,0 6,0 a3,3 0 1,0 -6,0" />
+        android:fillColor="#FF0E0E40"
+        android:pathData="M54,50 m-10,0 a10,10 0 1,0 20,0 a10,10 0 1,0 -20,0" />
+    <!-- coroana mică -->
     <path
-        android:fillColor="#FF4D7CFF"
-        android:pathData="M67,61 m-3,0 a3,3 0 1,0 6,0 a3,3 0 1,0 -6,0" />
-    <!-- vârfuri -->
-    <path
-        android:fillColor="#FFFFD23F"
-        android:pathData="M29,40 m-3,0 a3,3 0 1,0 6,0 a3,3 0 1,0 -6,0 M54,31 m-3.5,0 a3.5,3.5 0 1,0 7,0 a3.5,3.5 0 1,0 -7,0 M79,40 m-3,0 a3,3 0 1,0 6,0 a3,3 0 1,0 -6,0" />
+        android:fillColor="#FFD5D7E0"
+        android:pathData="M47.5,53.5 L46.5,45.5 L50.5,48.5 L54,43.5 L57.5,48.5 L61.5,45.5 L60.5,53.5 Z" />
 </vector>

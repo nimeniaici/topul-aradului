@@ -1,5 +1,7 @@
 package ro.hack4arad.topul.util
 
+import ro.hack4arad.topul.ui.theme.ThemeState
+import androidx.compose.ui.graphics.toArgb
 import android.content.Context
 import android.content.Intent
 import android.graphics.Bitmap
@@ -33,9 +35,10 @@ import kotlin.math.max
 object ShareCard {
     private const val W = 1080
     private const val H = 1920
-    private val NIGHT = 0xFF0F1226.toInt()
-    private val GOLD = 0xFFFFD23F.toInt()
-    private val LILAC = 0xFFC9CCF2.toInt()
+    // culorile vin din paleta aleasă: fundal închis + nuanța cea mai deschisă
+    private val NIGHT get() = ThemeState.palette.deep.toArgb()
+    private val GOLD get() = ThemeState.palette.a4.toArgb()
+    private val LILAC get() = ThemeState.palette.a3.toArgb()
 
     suspend fun share(context: Context, placeId: Int, mayor: Boolean): Boolean {
         val file = runCatching { render(context, placeId, mayor) }.getOrNull() ?: return false
@@ -44,7 +47,7 @@ object ShareCard {
         val send = Intent(Intent.ACTION_SEND).apply {
             type = "image/png"
             putExtra(Intent.EXTRA_STREAM, uri)
-            putExtra(Intent.EXTRA_TEXT, "Joacă și tu Topul Aradului: $link")
+            putExtra(Intent.EXTRA_TEXT, "Joacă și tu Topul Aradului în CityConnect Arad: $link")
             addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
         }
         context.startActivity(Intent.createChooser(send, "Arată-le prietenilor").addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
@@ -74,10 +77,10 @@ object ShareCard {
             })
             c.drawRoundRect(photoRect, 56f, 56f, Paint(Paint.ANTI_ALIAS_FLAG).apply { this.shader = shader })
         } else {
-            c.drawRoundRect(photoRect, 56f, 56f, Paint(Paint.ANTI_ALIAS_FLAG).apply { color = 0xFF1B2045.toInt() })
+            c.drawRoundRect(photoRect, 56f, 56f, Paint(Paint.ANTI_ALIAS_FLAG).apply { color = ThemeState.palette.a1.toArgb() })
         }
         c.drawRoundRect(photoRect, 56f, 56f, Paint(Paint.ANTI_ALIAS_FLAG).apply {
-            shader = LinearGradient(0f, photoRect.top + 500f, 0f, photoRect.bottom, 0x000F1226, NIGHT, Shader.TileMode.CLAMP)
+            shader = LinearGradient(0f, photoRect.top + 500f, 0f, photoRect.bottom, NIGHT and 0x00FFFFFF, NIGHT, Shader.TileMode.CLAMP)
         })
         c.drawRoundRect(photoRect, 56f, 56f, Paint(Paint.ANTI_ALIAS_FLAG).apply {
             style = Paint.Style.STROKE; strokeWidth = 8f; color = GOLD
@@ -85,7 +88,7 @@ object ShareCard {
 
         // antetul
         val brand = text(46f, GOLD, bold = true).apply { letterSpacing = 0.25f; textAlign = Paint.Align.CENTER }
-        c.drawText("TOPUL ARADULUI", W / 2f, 110f, brand)
+        c.drawText("CITYCONNECT ARAD", W / 2f, 110f, brand)
 
         // mesajul principal
         val headline = if (mayor) "Sunt Primarul la" else "Am fost la"
@@ -103,8 +106,8 @@ object ShareCard {
         // jos: invitație + link
         val pill = RectF(140f, H - 230f, W - 140f, H - 120f)
         c.drawRoundRect(pill, 60f, 60f, Paint(Paint.ANTI_ALIAS_FLAG).apply { color = GOLD })
-        c.drawText("Descarcă Topul Aradului", W / 2f, pill.centerY() + 18f,
-            text(48f, 0xFF3A2C00.toInt(), bold = true).apply { textAlign = Paint.Align.CENTER })
+        c.drawText("Descarcă CityConnect Arad", W / 2f, pill.centerY() + 18f,
+            text(48f, NIGHT, bold = true).apply { textAlign = Paint.Align.CENTER })
         c.drawText("Hack4Arad 2026 · Promovează Județul Arad", W / 2f, H - 60f,
             text(34f, 0xFF7A80A8.toInt(), bold = false).apply { textAlign = Paint.Align.CENTER })
 

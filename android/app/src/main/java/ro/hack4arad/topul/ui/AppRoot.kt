@@ -1,5 +1,9 @@
 package ro.hack4arad.topul.ui
 
+import ro.hack4arad.topul.ui.theme.tr
+import ro.hack4arad.topul.ui.settings.SettingsScreen
+import ro.hack4arad.topul.ui.theme.PanelHigh
+import androidx.compose.ui.graphics.Color
 import androidx.compose.material.icons.filled.Home
 import ro.hack4arad.topul.ui.reports.MyReportsScreen
 import ro.hack4arad.topul.ui.home.DiscoverScreen
@@ -51,14 +55,14 @@ import ro.hack4arad.topul.ui.place.PlaceScreen
 import ro.hack4arad.topul.ui.place.Tour3DScreen
 import ro.hack4arad.topul.ui.profile.ProfileScreen
 
-private data class Tab(val route: String, val label: String, val icon: ImageVector)
+private data class Tab(val route: String, val label: () -> String, val icon: ImageVector)
 
 private val tabs = listOf(
-    Tab("home", "Acasă", Icons.Default.Home),
-    Tab("map", "Hartă", Icons.Default.Place),
-    Tab("duels", "Dueluri", Icons.Default.ThumbUp),
-    Tab("top", "Top", Icons.Default.Star),
-    Tab("profile", "Profil", Icons.Default.Person),
+    Tab("home", { tr("Acasă", "Home", "Kezdőlap") }, Icons.Default.Home),
+    Tab("map", { tr("Hartă", "Map", "Térkép") }, Icons.Default.Place),
+    Tab("duels", { tr("Dueluri", "Duels", "Párbaj") }, Icons.Default.ThumbUp),
+    Tab("top", { "Top" }, Icons.Default.Star),
+    Tab("profile", { tr("Profil", "Profile", "Profil") }, Icons.Default.Person),
 )
 
 @Composable
@@ -104,6 +108,7 @@ private fun MainScaffold() {
     }
 
     Scaffold(
+        containerColor = Color.Transparent, // se vede fundalul cu gradient circular al temei
         snackbarHost = { SnackbarHost(snackbar) },
         bottomBar = {
             if (tabs.any { it.route == route }) {
@@ -111,16 +116,16 @@ private fun MainScaffold() {
                     tabs.forEach { tab ->
                         NavigationBarItem(
                             colors = NavigationBarItemDefaults.colors(
-                                selectedIconColor = GoldDark,
-                                selectedTextColor = Gold,
-                                indicatorColor = Gold,
-                                unselectedIconColor = TextMuted,
-                                unselectedTextColor = TextMuted,
+                                selectedIconColor = NightDeep,
+                                selectedTextColor = Color.White,
+                                indicatorColor = PanelHigh,
+                                unselectedIconColor = Color.White.copy(alpha = 0.6f),
+                                unselectedTextColor = Color.White.copy(alpha = 0.6f),
                             ),
                             selected = route == tab.route,
                             onClick = { goTab(tab.route) },
                             icon = { Icon(tab.icon, contentDescription = null) },
-                            label = { Text(tab.label) },
+                            label = { Text(tab.label()) },
                         )
                     }
                 }
@@ -141,6 +146,7 @@ private fun MainScaffold() {
             }
             composable("map") { MapScreen(onPlace = openPlace, onOpenReports = { nav.navigate("reports") }) }
             composable("reports") { MyReportsScreen(onBack = { nav.popBackStack() }, onNew = newReport) }
+            composable("settings") { SettingsScreen(onBack = { nav.popBackStack() }) }
             composable("discover") { DiscoverScreen(onBack = { nav.popBackStack() }, onPlace = openPlace) }
             composable("duels") { DuelScreen() }
             composable("top") { LeaderboardScreen(onPlace = openPlace) }

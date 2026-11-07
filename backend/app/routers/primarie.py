@@ -8,7 +8,7 @@ router = APIRouter(tags=["primarie"])
 _PAGE = r"""<!doctype html>
 <html lang="ro"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Panoul Primăriei · Topul Aradului</title>
+<title>Panoul Primăriei · CityConnect Arad</title>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
 <style>
   :root { --bg:#0F1226; --panel:#1B2045; --panel2:#232a58; --line:#2E3566; --text:#fff; --muted:#9AA0D0;
@@ -69,7 +69,7 @@ _PAGE = r"""<!doctype html>
 </form></div>
 
 <header><h1>Panoul <b>Primăriei Arad</b></h1>
-  <span style="color:var(--muted)">· sesizări de la cetățeni prin Topul Aradului</span>
+  <span style="color:var(--muted)">· sesizări de la cetățeni prin CityConnect Arad</span>
   <span class="live"><i></i> live</span></header>
 <section class="stats">
   <div class="stat"><b id="sTotal">0</b><span>sesizări în total</span></div>

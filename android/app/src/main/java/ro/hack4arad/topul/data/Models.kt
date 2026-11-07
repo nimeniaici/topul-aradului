@@ -176,3 +176,8 @@ data class ReportCreated(val report: Report, val xpGained: Int, val totalXp: Int
 
 /** O vizită din jurnalul meu (check-in). */
 data class MyCheckin(val id: Int, val placeId: Int, val placeName: String, val photoUrl: String?, val createdAt: String)
+
+
+data class PasswordIn(val oldPassword: String, val newPassword: String)
+data class MyStats(val rank: Int, val totalUsers: Int, val reports: Int, val reportsResolved: Int, val memberSince: String)
+data class FeedbackIn(val kind: String, val message: String, val appVersion: String, val device: String)
