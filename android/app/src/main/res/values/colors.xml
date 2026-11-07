@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <color name="night">#FF0E0E40</color>
-    <color name="splash">#FF8E1352</color>
+    <color name="splash">#FFFFE9F8</color>
+    <color name="icon_bg">#FFFFE9F8</color>
     <color name="night_deep">#FF0A0C1C</color>
     <color name="gold">#FFFFD23F</color>
 </resources>

@@ -289,3 +289,14 @@ fun SectionTitle(text: String, modifier: Modifier = Modifier) {
         Text(text, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Black)
     }
 }
+
+
+/** Logo-ul CityConnect Arad, în varianta paletei alese (Setări → Interfața). */
+@Composable
+fun AppLogo(size: Dp, modifier: Modifier = Modifier) {
+    androidx.compose.foundation.Image(
+        painter = androidx.compose.ui.res.painterResource(ro.hack4arad.topul.ui.theme.ThemeState.palette.logo),
+        contentDescription = "CityConnect Arad",
+        modifier = modifier.size(size).clip(RoundedCornerShape(size * 0.24f)),
+    )
+}

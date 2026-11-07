@@ -1,5 +1,6 @@
 package ro.hack4arad.topul.ui.auth
 
+import ro.hack4arad.topul.ui.components.AppLogo
 import ro.hack4arad.topul.ui.theme.Ink
 import androidx.compose.runtime.remember
 import ro.hack4arad.topul.ui.components.UsernameField
@@ -145,7 +146,7 @@ fun AuthScreen(vm: AuthViewModel = viewModel()) {
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         Spacer(Modifier.height(36.dp))
-        Image(painterResource(R.drawable.logo_full), contentDescription = "CityConnect Arad", modifier = Modifier.size(150.dp))
+        AppLogo(150.dp)
         Text(
             "CITYCONNECT ARAD",
             style = MaterialTheme.typography.headlineMedium,

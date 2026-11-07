@@ -1,6 +1,8 @@
 package ro.hack4arad.topul.ui.theme
 
 import android.content.Context
+import androidx.annotation.DrawableRes
+import ro.hack4arad.topul.R
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
@@ -32,16 +34,17 @@ data class AppPalette(
     val a4: Color,     // foarte deschis: chips, borduri, fundaluri subtile
     val center: Color, // centrul fundalului
     val edge: Color,   // marginea fundalului (gradient circular)
+    @DrawableRes val logo: Int, // logo-ul CityConnect în culorile paletei
 )
 
 val PALETTES = listOf(
-    AppPalette(2, "Amurg violet", Color(0xFF1B1240), Color(0xFF4A2C99), Color(0xFF6C4BD1), Color(0xFF9C7FEA), Color(0xFFE3D7FF), Color.White, Color(0xFFD9D3EA)),
-    AppPalette(3, "Mureș", Color(0xFF0B2E33), Color(0xFF145C66), Color(0xFF1F8A8A), Color(0xFF5DB7A4), Color(0xFFB8E0D2), Color.White, Color(0xFFCFDDDA)),
-    AppPalette(4, "Cărămidă și nisip", Color(0xFF3A1E12), Color(0xFF9C3D22), Color(0xFFC2622D), Color(0xFFE0A04A), Color(0xFFF3D3A2), Color(0xFFFFFDF8), Color(0xFFE9DCC8)),
-    AppPalette(5, "Trandafir și prună", Color(0xFF3A1230), Color(0xFF7A2457), Color(0xFFA8407A), Color(0xFFD67BA3), Color(0xFFF6D3E0), Color.White, Color(0xFFEAD7DF)),
-    AppPalette(6, "Argint pur", Color(0xFF0E0E40), Color(0xFF2A2D5C), Color(0xFF4B4F7A), Color(0xFF8A8DA6), Color(0xFFD5D7E0), Color.White, Color(0xFFA6A6A6)),
+    AppPalette(1, "Argint pur", Color(0xFF0E0E40), Color(0xFF2A2D5C), Color(0xFF4B4F7A), Color(0xFF8A8DA6), Color(0xFFD5D7E0), Color.White, Color(0xFFA6A6A6), R.drawable.logo_p1),
+    AppPalette(2, "Amurg violet", Color(0xFF1B1240), Color(0xFF4A2C99), Color(0xFF6C4BD1), Color(0xFF9C7FEA), Color(0xFFE3D7FF), Color.White, Color(0xFFD9D3EA), R.drawable.logo_p2),
+    AppPalette(3, "Trandafir și prună", Color(0xFF3A1230), Color(0xFF7A2457), Color(0xFFA8407A), Color(0xFFD67BA3), Color(0xFFF6D3E0), Color.White, Color(0xFFEAD7DF), R.drawable.logo_p3),
+    AppPalette(4, "Cărămidă și nisip", Color(0xFF3A1E12), Color(0xFF9C3D22), Color(0xFFC2622D), Color(0xFFE0A04A), Color(0xFFF3D3A2), Color(0xFFFFFDF8), Color(0xFFE9DCC8), R.drawable.logo_p4),
+    AppPalette(5, "Mureș", Color(0xFF0B2E33), Color(0xFF145C66), Color(0xFF1F8A8A), Color(0xFF5DB7A4), Color(0xFFB8E0D2), Color.White, Color(0xFFCFDDDA), R.drawable.logo_p5),
 )
-const val DEFAULT_PALETTE = 6
+const val DEFAULT_PALETTE = 3 // Trandafir și prună
 
 /** Setările de aspect (paleta), ținute minte pe telefon. */
 object ThemeState {
@@ -49,12 +52,12 @@ object ThemeState {
         private set
 
     fun init(context: Context) {
-        val id = context.getSharedPreferences("settings", Context.MODE_PRIVATE).getInt("palette", DEFAULT_PALETTE)
+        val id = context.getSharedPreferences("settings", Context.MODE_PRIVATE).getInt("palette_v2", DEFAULT_PALETTE)
         palette = PALETTES.firstOrNull { it.id == id } ?: palette
     }
 
     fun select(context: Context, id: Int) {
-        context.getSharedPreferences("settings", Context.MODE_PRIVATE).edit().putInt("palette", id).apply()
+        context.getSharedPreferences("settings", Context.MODE_PRIVATE).edit().putInt("palette_v2", id).apply()
         palette = PALETTES.firstOrNull { it.id == id } ?: palette
     }
 }

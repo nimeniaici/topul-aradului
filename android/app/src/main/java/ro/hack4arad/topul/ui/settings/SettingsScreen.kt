@@ -1,5 +1,14 @@
 package ro.hack4arad.topul.ui.settings
 
+import androidx.compose.material.icons.rounded.Explore
+import androidx.compose.material.icons.rounded.TaskAlt
+import androidx.compose.material.icons.rounded.ReportProblem
+import androidx.compose.material.icons.rounded.Verified
+import androidx.compose.material.icons.rounded.WorkspacePremium
+import androidx.compose.material.icons.rounded.PinDrop
+import androidx.compose.material.icons.rounded.Leaderboard
+import androidx.compose.material.icons.rounded.MilitaryTech
+import androidx.compose.material.icons.rounded.Bolt
 import android.content.Intent
 import android.net.Uri
 import android.os.Build
@@ -155,21 +164,21 @@ fun SettingsScreen(onBack: () -> Unit) {
             val p = profile
             val s = stats
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                Score("${p?.xp ?: 0}", "XP", Modifier.weight(1f))
-                Score("${p?.level ?: 1}", tr("nivel", "level", "szint"), Modifier.weight(1f))
-                Score(s?.let { "#${it.rank}" } ?: "–", tr("în Arad", "in Arad", "Aradon"), Modifier.weight(1f))
+                Score(Icons.Rounded.Bolt, "${p?.xp ?: 0}", "XP", Modifier.weight(1f))
+                Score(Icons.Rounded.MilitaryTech, "${p?.level ?: 1}", tr("nivel", "level", "szint"), Modifier.weight(1f))
+                Score(Icons.Rounded.Leaderboard, s?.let { "#${it.rank}" } ?: "–", tr("în Arad", "in Arad", "Aradon"), Modifier.weight(1f))
             }
             Spacer(Modifier.height(8.dp))
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                Score("${p?.checkins ?: 0}", "check-in", Modifier.weight(1f))
-                Score("${p?.mayorOf?.size ?: 0}", tr("tronuri", "thrones", "trón"), Modifier.weight(1f))
-                Score("${p?.badges?.size ?: 0}", tr("insigne", "badges", "jelvény"), Modifier.weight(1f))
+                Score(Icons.Rounded.PinDrop, "${p?.checkins ?: 0}", "check-in", Modifier.weight(1f))
+                Score(Icons.Rounded.WorkspacePremium, "${p?.mayorOf?.size ?: 0}", tr("tronuri", "thrones", "trón"), Modifier.weight(1f))
+                Score(Icons.Rounded.Verified, "${p?.badges?.size ?: 0}", tr("insigne", "badges", "jelvény"), Modifier.weight(1f))
             }
             Spacer(Modifier.height(8.dp))
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                Score("${s?.reports ?: 0}", tr("sesizări", "reports", "bejelentés"), Modifier.weight(1f))
-                Score("${s?.reportsResolved ?: 0}", tr("rezolvate", "resolved", "megoldva"), Modifier.weight(1f))
-                Score("${p?.placesVisited ?: 0}", tr("locuri", "places", "hely"), Modifier.weight(1f))
+                Score(Icons.Rounded.ReportProblem, "${s?.reports ?: 0}", tr("sesizări", "reports", "bejelentés"), Modifier.weight(1f))
+                Score(Icons.Rounded.TaskAlt, "${s?.reportsResolved ?: 0}", tr("rezolvate", "resolved", "megoldva"), Modifier.weight(1f))
+                Score(Icons.Rounded.Explore, "${p?.placesVisited ?: 0}", tr("locuri", "places", "hely"), Modifier.weight(1f))
             }
             s?.let { Text(tr("Membru din ", "Member since ", "Tag óta: ") + it.memberSince + " · ${it.totalUsers} " + tr("arădeni în joc", "players", "játékos"),
                 color = TextMuted, fontSize = 12.sp, modifier = Modifier.padding(top = 10.dp)) }
@@ -201,10 +210,10 @@ fun SettingsScreen(onBack: () -> Unit) {
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
                     // previzualizare: fundalul circular + cele 5 nuanțe
-                    Box(Modifier.size(44.dp).clip(RoundedCornerShape(12.dp))
-                        .background(Brush.radialGradient(listOf(pal.center, pal.center, pal.edge))), contentAlignment = Alignment.Center) {
-                        Box(Modifier.size(20.dp).clip(CircleShape).background(pal.deep))
-                    }
+                    androidx.compose.foundation.Image(
+                        androidx.compose.ui.res.painterResource(pal.logo), contentDescription = pal.name,
+                        modifier = Modifier.size(52.dp).clip(RoundedCornerShape(14.dp)),
+                    )
                     Spacer(Modifier.width(10.dp))
                     Column(Modifier.weight(1f)) {
                         Text("${pal.id} · ${pal.name}", color = Ink, fontWeight = FontWeight.Bold)
@@ -294,9 +303,14 @@ private fun Card(content: @Composable () -> Unit) {
 }
 
 @Composable
-private fun Score(value: String, label: String, modifier: Modifier) {
+private fun Score(icon: ImageVector, value: String, label: String, modifier: Modifier) {
     Column(modifier.clip(RoundedCornerShape(14.dp)).background(Track.copy(alpha = 0.6f)).padding(vertical = 10.dp),
         horizontalAlignment = Alignment.CenterHorizontally) {
+        // iconița realizării, într-un cerc în culorile paletei
+        Box(Modifier.size(34.dp).clip(CircleShape).background(Ink), contentAlignment = Alignment.Center) {
+            Icon(icon, null, tint = Color.White, modifier = Modifier.size(19.dp))
+        }
+        Spacer(Modifier.height(6.dp))
         Text(value, color = Ink, fontWeight = FontWeight.Black, fontSize = 20.sp)
         Text(label, color = TextMuted, fontSize = 12.sp)
     }

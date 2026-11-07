@@ -6,6 +6,6 @@
         <item name="android:navigationBarColor">@color/night_deep</item>
         <!-- ecranul de pornire (Android 12+): coroana aurie pe fundal de noapte -->
         <item name="android:windowSplashScreenBackground">@color/splash</item>
-        <item name="android:windowSplashScreenAnimatedIcon">@drawable/ic_launcher_foreground</item>
+        <item name="android:windowSplashScreenAnimatedIcon">@mipmap/ic_launcher_fg</item>
     </style>
 </resources>

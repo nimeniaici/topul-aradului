@@ -1,5 +1,6 @@
 package ro.hack4arad.topul.ui.home
 
+import ro.hack4arad.topul.ui.components.AppLogo
 import ro.hack4arad.topul.ui.iasmi.IasmiOrb
 import androidx.compose.material.icons.rounded.Settings
 import ro.hack4arad.topul.ui.theme.tr
@@ -142,6 +143,11 @@ fun HomeScreen(onOpen: (HomeTarget) -> Unit) {
     )
 
     Column(Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(16.dp)) {
+        Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.padding(bottom = 12.dp)) {
+            AppLogo(40.dp)
+            Spacer(Modifier.width(10.dp))
+            Text("CityConnect Arad", color = Ink, fontWeight = FontWeight.Black, fontSize = 18.sp)
+        }
         Header(profile)
         Spacer(Modifier.height(14.dp))
         // bara „Întreab-o pe Iasmi” (asistentul AI), mereu sus
