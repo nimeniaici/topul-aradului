@@ -145,7 +145,7 @@ fun AuthScreen(vm: AuthViewModel = viewModel()) {
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         Spacer(Modifier.height(36.dp))
-        Image(painterResource(R.drawable.ic_launcher_foreground), contentDescription = null, modifier = Modifier.size(140.dp))
+        Image(painterResource(R.drawable.logo_full), contentDescription = "CityConnect Arad", modifier = Modifier.size(150.dp))
         Text(
             "CITYCONNECT ARAD",
             style = MaterialTheme.typography.headlineMedium,

@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Logo CityConnect Arad: silueta reală a Primăriei Arad (după o fotografie frontală) și litera C. Generat. -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:aapt="http://schemas.android.com/aapt"
+    android:width="200dp" android:height="200dp" android:viewportWidth="200" android:viewportHeight="200">
+    <clip-path android:pathData="M44,0h112a44,44 0 0 1 44,44v112a44,44 0 0 1 -44,44h-112a44,44 0 0 1 -44,-44v-112a44,44 0 0 1 44,-44Z" />
+    <path android:pathData="M0,0h200v200h-200Z">
+        <aapt:attr name="android:fillColor">
+            <gradient android:type="linear" android:startX="0" android:startY="0" android:endX="200" android:endY="200">
+                <item android:offset="0" android:color="#FF460E40" />
+                <item android:offset="0.5" android:color="#FFB01658" />
+                <item android:offset="1" android:color="#FFF06614" />
+            </gradient>
+        </aapt:attr>
+    </path>
+    <path android:pathData="M156.7,64.4A74,74 0 1 0 156.7,159.6" android:strokeWidth="17" android:strokeLineCap="round" android:fillColor="#00000000">
+        <aapt:attr name="android:strokeColor">
+            <gradient android:type="linear" android:startX="20" android:startY="20" android:endX="180" android:endY="180">
+                <item android:offset="0" android:color="#FFFEF08A" />
+                <item android:offset="0.5" android:color="#FFFDBA74" />
+                <item android:offset="1" android:color="#FFFB7185" />
+            </gradient>
+        </aapt:attr>
+    </path>
+    <path android:fillColor="#FFFFF5EB" android:pathData="M99.6,12h0.8v19h-0.8Z M98,38.8Q98,33.5 100,31Q102,33.5 102,38.8Z M93.5,44.6L100,38.6L106.5,44.6Z M93,44.4h14v12.6h-14Z M87.2,56.6h25.6v1.6h-25.6Z M88.2,58h23.6v8.4h-23.6Z M89.4,66.2h21.2v10.2h-21.2Z M86.8,76.2h26.4v1.4h-26.4Z M87.6,77.4h24.8v3.4h-24.8Z M88.6,80.6h22.8v24.6h-22.8Z M74.2,111.4L100,103.6L125.8,111.4Z M75,111.2h50v67.6h-50Z M-40,136h115.5v42.8h-115.5Z M124.5,136h115.5v42.8h-115.5Z M17,136L20,126L46,126L49,136Z M-40,134.6h115.5v1.6h-115.5Z M124.5,134.6h115.5v1.6h-115.5Z" />
+    <path android:fillColor="#FF8C1450" android:pathData="M98.6,54.6V51.8a1.4,1.4 0 0 1 2.8,0V54.6Z M96.9,62.2a3.1,3.1 0 1 0 6.2,0a3.1,3.1 0 1 0 -6.2,0Z M98,88.2L100,86.2L102,88.2Z M98.6,88.8h2.8v3.6h-2.8Z M92.8,75V69.60000000000001a1.7,1.7 0 0 1 3.4,0V75Z M98.3,75V69.60000000000001a1.7,1.7 0 0 1 3.4,0V75Z M103.8,75V69.60000000000001a1.7,1.7 0 0 1 3.4,0V75Z M83.2,118.6h2.6v8.4h-2.6Z M86.6,118.6h2.6v8.4h-2.6Z M97,118.6h2.6v8.4h-2.6Z M100.4,118.6h2.6v8.4h-2.6Z M110.8,118.6h2.6v8.4h-2.6Z M114.2,118.6h2.6v8.4h-2.6Z M75,129.4h50v0.9h-50Z M75,155.6h50v0.9h-50Z M82,153V143.4a4.5,4.5 0 0 1 9,0V153Z M95.5,153V143.4a4.5,4.5 0 0 1 9,0V153Z M109,153V143.4a4.5,4.5 0 0 1 9,0V153Z M82,178.8V167.0a4.5,4.5 0 0 1 9,0V178.8Z M95.5,178.8V167.0a4.5,4.5 0 0 1 9,0V178.8Z M109,178.8V167.0a4.5,4.5 0 0 1 9,0V178.8Z M8,152V146.0a2.0,2.0 0 0 1 4,0V152Z M20,152V146.0a2.0,2.0 0 0 1 4,0V152Z M32,152V146.0a2.0,2.0 0 0 1 4,0V152Z M44,152V146.0a2.0,2.0 0 0 1 4,0V152Z M56,152V146.0a2.0,2.0 0 0 1 4,0V152Z M66,152V146.0a2.0,2.0 0 0 1 4,0V152Z M130,152V146.0a2.0,2.0 0 0 1 4,0V152Z M140,152V146.0a2.0,2.0 0 0 1 4,0V152Z M152,152V146.0a2.0,2.0 0 0 1 4,0V152Z M164,152V146.0a2.0,2.0 0 0 1 4,0V152Z M176,152V146.0a2.0,2.0 0 0 1 4,0V152Z M188,152V146.0a2.0,2.0 0 0 1 4,0V152Z M8,171V164.0a2.0,2.0 0 0 1 4,0V171Z M20,171V164.0a2.0,2.0 0 0 1 4,0V171Z M32,171V164.0a2.0,2.0 0 0 1 4,0V171Z M44,171V164.0a2.0,2.0 0 0 1 4,0V171Z M56,171V164.0a2.0,2.0 0 0 1 4,0V171Z M66,171V164.0a2.0,2.0 0 0 1 4,0V171Z M130,171V164.0a2.0,2.0 0 0 1 4,0V171Z M140,171V164.0a2.0,2.0 0 0 1 4,0V171Z M152,171V164.0a2.0,2.0 0 0 1 4,0V171Z M164,171V164.0a2.0,2.0 0 0 1 4,0V171Z M176,171V164.0a2.0,2.0 0 0 1 4,0V171Z M188,171V164.0a2.0,2.0 0 0 1 4,0V171Z" />
+    <path android:pathData="M54,54A74,74 0 0 0 64.4,176.7A74,74 0 0 0 156.7,159.6" android:strokeWidth="17" android:strokeLineCap="round" android:fillColor="#00000000">
+        <aapt:attr name="android:strokeColor">
+            <gradient android:type="linear" android:startX="20" android:startY="20" android:endX="180" android:endY="180">
+                <item android:offset="0" android:color="#FFFEF08A" />
+                <item android:offset="0.5" android:color="#FFFDBA74" />
+                <item android:offset="1" android:color="#FFFB7185" />
+            </gradient>
+        </aapt:attr>
+    </path>
+</vector>

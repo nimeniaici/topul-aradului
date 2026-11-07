@@ -131,3 +131,7 @@ Lista se regenerează cu `backend/tools/build_seed_from_osm.py`.
 2. `SKIP_DISTANCE_CHECK=true` pe server, ca juriul să poată face check-in din sală.
 3. Dați juriului APK-ul (QR) → își fac cont → check-in la „Hack4Arad @ Complex M” → apar **live** pe heatmap-ul de pe proiector.
 4. Arătați un duel → clasamentul se schimbă imediat.
+
+## Logo
+Silueta Primăriei Arad din logo e desenată după fotografia „Arad, urbodomo 15” (Aisano, domeniu public, Wikimedia Commons).
+Fotografiile vechi din „Trecut vs prezent” sunt de pe Wikimedia Commons (Fortepan și altele); autorii și licențele apar în aplicație.
