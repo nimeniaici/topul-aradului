@@ -1,5 +1,6 @@
 package ro.hack4arad.topul.util
 
+import ro.hack4arad.topul.util.runCatching
 import com.google.gson.JsonParser
 import retrofit2.HttpException
 import java.io.IOException

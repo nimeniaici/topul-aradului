@@ -1,5 +1,6 @@
 package ro.hack4arad.topul.util
 
+import ro.hack4arad.topul.util.runCatching
 import android.Manifest
 import android.annotation.SuppressLint
 import android.content.Context

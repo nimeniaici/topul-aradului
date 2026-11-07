@@ -1,5 +1,6 @@
 package ro.hack4arad.topul.ui.reports
 
+import ro.hack4arad.topul.util.runCatching
 import ro.hack4arad.topul.ui.theme.t
 import ro.hack4arad.topul.ui.theme.Ink
 import androidx.compose.foundation.background

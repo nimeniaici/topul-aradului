@@ -1,5 +1,6 @@
 package ro.hack4arad.topul.ui.city
 
+import ro.hack4arad.topul.util.runCatching
 import android.content.Intent
 import android.net.Uri
 import androidx.compose.foundation.background

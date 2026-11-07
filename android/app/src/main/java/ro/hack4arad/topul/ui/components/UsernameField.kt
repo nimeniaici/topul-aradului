@@ -1,5 +1,6 @@
 package ro.hack4arad.topul.ui.components
 
+import ro.hack4arad.topul.util.runCatching
 import ro.hack4arad.topul.ui.theme.t
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.fillMaxWidth

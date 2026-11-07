@@ -1,5 +1,6 @@
 package ro.hack4arad.topul.util
 
+import ro.hack4arad.topul.util.runCatching
 import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory

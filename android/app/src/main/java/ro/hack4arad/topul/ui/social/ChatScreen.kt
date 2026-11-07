@@ -1,5 +1,6 @@
 package ro.hack4arad.topul.ui.social
 
+import ro.hack4arad.topul.util.runCatching
 import androidx.compose.material.icons.rounded.Group
 import ro.hack4arad.topul.ui.theme.OnInk
 import androidx.compose.foundation.background

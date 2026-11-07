@@ -1,5 +1,6 @@
 package ro.hack4arad.topul.ui.duels
 
+import ro.hack4arad.topul.util.runCatching
 import ro.hack4arad.topul.ui.theme.t
 import ro.hack4arad.topul.ui.theme.Pink
 import ro.hack4arad.topul.ui.theme.Scrim

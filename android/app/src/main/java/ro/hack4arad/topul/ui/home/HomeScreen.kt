@@ -1,5 +1,6 @@
 package ro.hack4arad.topul.ui.home
 
+import ro.hack4arad.topul.util.runCatching
 import androidx.compose.material.icons.rounded.HowToVote
 import androidx.compose.material.icons.rounded.LocalPharmacy
 import androidx.compose.material.icons.rounded.Landscape

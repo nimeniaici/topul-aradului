@@ -1,5 +1,6 @@
 package ro.hack4arad.topul.ui.transit
 
+import ro.hack4arad.topul.util.runCatching
 import ro.hack4arad.topul.ui.theme.OnInk
 import android.content.Intent
 import android.graphics.Bitmap

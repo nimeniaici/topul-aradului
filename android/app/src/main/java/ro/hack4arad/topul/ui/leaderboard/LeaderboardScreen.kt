@@ -1,5 +1,6 @@
 package ro.hack4arad.topul.ui.leaderboard
 
+import ro.hack4arad.topul.util.runCatching
 import ro.hack4arad.topul.ui.theme.t
 import ro.hack4arad.topul.ui.theme.NightDeep
 import ro.hack4arad.topul.ui.theme.Scrim

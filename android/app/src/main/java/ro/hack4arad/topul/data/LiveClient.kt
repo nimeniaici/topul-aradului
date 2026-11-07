@@ -1,5 +1,6 @@
 package ro.hack4arad.topul.data
 
+import ro.hack4arad.topul.util.runCatching
 import com.google.gson.Gson
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers

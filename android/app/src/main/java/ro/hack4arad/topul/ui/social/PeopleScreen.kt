@@ -1,5 +1,6 @@
 package ro.hack4arad.topul.ui.social
 
+import ro.hack4arad.topul.util.runCatching
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable

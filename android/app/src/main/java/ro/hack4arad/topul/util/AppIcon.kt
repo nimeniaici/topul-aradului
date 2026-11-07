@@ -1,5 +1,6 @@
 package ro.hack4arad.topul.util
 
+import ro.hack4arad.topul.util.runCatching
 import android.content.ComponentName
 import android.content.Context
 import android.content.pm.PackageManager

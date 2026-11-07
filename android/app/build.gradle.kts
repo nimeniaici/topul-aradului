@@ -19,8 +19,8 @@ android {
         applicationId = "ro.hack4arad.topul"
         minSdk = 26
         targetSdk = 35
-        versionCode = 18
-        versionName = "1.8"
+        versionCode = 19
+        versionName = "1.8.1"
 
         // Client ID OAuth de tip „Web application” (același ca GOOGLE_CLIENT_IDS pe server)
         buildConfigField("String", "GOOGLE_WEB_CLIENT_ID", "\"${localProps.getProperty("GOOGLE_WEB_CLIENT_ID", "").trim()}\"")

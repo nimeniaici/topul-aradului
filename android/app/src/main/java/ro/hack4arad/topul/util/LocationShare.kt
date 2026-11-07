@@ -1,5 +1,6 @@
 package ro.hack4arad.topul.util
 
+import ro.hack4arad.topul.util.runCatching
 import android.content.Context
 import ro.hack4arad.topul.data.LatLngIn
 import ro.hack4arad.topul.data.Network

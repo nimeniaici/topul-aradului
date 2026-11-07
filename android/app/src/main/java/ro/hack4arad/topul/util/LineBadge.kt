@@ -1,5 +1,6 @@
 package ro.hack4arad.topul.util
 
+import ro.hack4arad.topul.util.runCatching
 import android.graphics.Bitmap
 import android.graphics.Canvas
 import android.graphics.Paint

@@ -1,5 +1,6 @@
 package ro.hack4arad.topul.ui.map
 
+import ro.hack4arad.topul.util.runCatching
 import androidx.compose.material.icons.rounded.School
 import ro.hack4arad.topul.ui.theme.t
 import androidx.compose.material.icons.rounded.Celebration

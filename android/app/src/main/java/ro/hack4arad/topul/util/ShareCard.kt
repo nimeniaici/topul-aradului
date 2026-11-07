@@ -1,5 +1,6 @@
 package ro.hack4arad.topul.util
 
+import ro.hack4arad.topul.util.runCatching
 import ro.hack4arad.topul.ui.theme.ThemeState
 import androidx.compose.ui.graphics.toArgb
 import android.content.Context

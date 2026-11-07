@@ -1,5 +1,6 @@
 package ro.hack4arad.topul.ui.iasmi
 
+import ro.hack4arad.topul.util.runCatching
 import androidx.compose.animation.core.RepeatMode
 import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.infiniteRepeatable
