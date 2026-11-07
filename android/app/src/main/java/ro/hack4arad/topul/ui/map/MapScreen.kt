@@ -1,5 +1,15 @@
 package ro.hack4arad.topul.ui.map
 
+import ro.hack4arad.topul.ui.reports.reportKind
+import ro.hack4arad.topul.ui.reports.REPORT_KINDS
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
+import ro.hack4arad.topul.ui.theme.Electric
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.material.icons.rounded.Assignment
+import androidx.compose.material.icons.rounded.Apps
+import androidx.compose.material.icons.rounded.Menu
+import ro.hack4arad.topul.ui.home.HomeActions
 import androidx.compose.material.icons.rounded.Directions
 import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.FilledIconButton
@@ -316,7 +326,7 @@ class MapViewModel : ViewModel() {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun MapScreen(onPlace: (Int) -> Unit, vm: MapViewModel = viewModel()) {
+fun MapScreen(onPlace: (Int) -> Unit, onOpenReports: () -> Unit = {}, vm: MapViewModel = viewModel()) {
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
     var hasPermission by remember { mutableStateOf(hasLocationPermission(context)) }
@@ -352,66 +362,82 @@ fun MapScreen(onPlace: (Int) -> Unit, vm: MapViewModel = viewModel()) {
         }
     }
 
+    // ce a cerut utilizatorul din meniul „Acasă” (listă, o categorie, formularul de sesizare)
+    LaunchedEffect(Unit) {
+        HomeActions.takeMap()?.let { req ->
+            if (req.list) listMode = true
+            req.category?.let { if (vm.selectedCategory != it) vm.selectCategory(it) }
+            if (req.report) reporting = true
+        }
+    }
+    var menuOpen by remember { mutableStateOf(false) }
+    // caruselul apare doar după ce alegi un loc (harta rămâne curată, pe tot ecranul)
+    var selecting by rememberSaveable { mutableStateOf(false) }
+    // anunțul live apare câteva secunde, apoi dispare
+    var liveText by remember { mutableStateOf<String?>(null) }
+    LaunchedEffect(vm.ticker.firstOrNull()) {
+        val t = vm.ticker.firstOrNull() ?: return@LaunchedEffect
+        liveText = t
+        kotlinx.coroutines.delay(4000)
+        liveText = null
+    }
+
     Box(Modifier.fillMaxSize()) {
         if (listMode || !BuildConfig.HAS_MAPS_KEY) {
-            PlacesFeed(shown, onPlace, topPadding = 270.dp)
+            PlacesFeed(shown, onPlace, topPadding = 84.dp)
         } else {
             PlacesMap(
                 vm = vm, places = shown, camera = camera, look = look, hasPermission = hasPermission, showHeat = showHeat,
-                highlightedId = carouselPlace?.id,
-                onPlaceTap = { p -> shown.indexOfFirst { it.id == p.id }.takeIf { it >= 0 }?.let { scope.launch { pager.animateScrollToPage(it) } } },
+                highlightedId = if (selecting) carouselPlace?.id else null,
+                bottomPadding = if (selecting) 270.dp else 16.dp,
+                onPlaceTap = { p ->
+                    shown.indexOfFirst { it.id == p.id }.takeIf { it >= 0 }?.let {
+                        selecting = true
+                        scope.launch { pager.animateScrollToPage(it) }
+                    }
+                },
+                onMapTap = { selecting = false },
             )
         }
 
-        // ---- sus: jucător, bandă live, categorii
-        Column(Modifier.fillMaxWidth().padding(top = 8.dp)) {
-            vm.profile?.let { PlayerHud(it, Modifier.padding(horizontal = 12.dp)) }
-            LiveTicker(vm.ticker.firstOrNull(), Modifier.padding(horizontal = 12.dp, vertical = 8.dp))
-            SearchBar(query, { query = it }, Modifier.padding(start = 12.dp, end = 12.dp, bottom = 8.dp))
+        // ---- sus: doar căutarea + butonul de meniu
+        Column(Modifier.fillMaxWidth().padding(top = 10.dp, start = 12.dp, end = 12.dp)) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                SearchBar(query, { query = it; if (it.isNotBlank()) selecting = true }, Modifier.weight(1f))
+                Spacer(Modifier.width(10.dp))
+                SmallFloatingActionButton(
+                    onClick = { menuOpen = true },
+                    containerColor = Gold, contentColor = GoldDark,
+                    modifier = Modifier.size(48.dp),
+                ) { Icon(Icons.Rounded.Menu, "Meniu hartă") }
+            }
+            vm.selectedCategory?.let { code ->
+                val label = vm.categories.firstOrNull { it.code == code }?.label ?: code
+                Row(
+                    Modifier.padding(top = 8.dp).clip(RoundedCornerShape(50)).background(Gold)
+                        .clickable { vm.selectCategory(null) }.padding(horizontal = 12.dp, vertical = 6.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    Icon(categoryIcon(code), null, tint = GoldDark, modifier = Modifier.size(16.dp))
+                    Text("  $label  ", color = GoldDark, fontWeight = FontWeight.Bold, fontSize = 13.sp)
+                    Icon(Icons.Rounded.Close, "Scoate filtrul", tint = GoldDark, modifier = Modifier.size(16.dp))
+                }
+            }
             if (query.isNotBlank() && shown.isEmpty()) {
                 Text("Niciun loc nu se potrivește cu „$query”", color = Lilac, fontSize = 13.sp,
-                    modifier = Modifier.padding(horizontal = 20.dp, vertical = 4.dp))
+                    modifier = Modifier.padding(horizontal = 8.dp, vertical = 6.dp))
             }
-            CategoryChips(vm.categories, vm.selectedCategory, vm::selectCategory)
-            vm.message?.let {
+            (vm.message ?: liveText)?.let {
                 Text(
-                    it, color = Color.White,
-                    modifier = Modifier.padding(12.dp).fillMaxWidth().clip(RoundedCornerShape(14.dp))
-                        .background(Violet.copy(alpha = 0.95f)).padding(12.dp),
+                    it, color = Color.White, fontSize = 13.sp,
+                    modifier = Modifier.padding(top = 8.dp).fillMaxWidth().clip(RoundedCornerShape(14.dp))
+                        .background((if (vm.message != null) Violet else NightDeep).copy(alpha = 0.92f)).padding(10.dp),
                 )
             }
         }
 
-        // ---- dreapta: unelte hartă
-        Column(
-            Modifier.align(Alignment.TopEnd).padding(end = 12.dp, top = 290.dp),
-            verticalArrangement = Arrangement.spacedBy(10.dp),
-        ) {
-            MapTool(if (listMode) Icons.Rounded.Map else Icons.Rounded.ViewAgenda, if (listMode) "Hartă" else "Listă") { listMode = !listMode }
-            if (!listMode) {
-                MapTool(Icons.Rounded.Layers, look.label) { look = MapLook.entries[(look.ordinal + 1) % MapLook.entries.size] }
-                MapTool(Icons.Rounded.LocalFireDepartment, "Agitație", active = showHeat) {
-                    showHeat = !showHeat
-                    if (showHeat) vm.loadHeat()
-                }
-                if (hasPermission) MapTool(Icons.Rounded.MyLocation, "Eu") {
-                    vm.myLocation?.let { scope.launch { camera.animate(CameraUpdateFactory.newLatLngZoom(it, 16f), 350) } }
-                }
-            }
-        }
-
-        // ---- buton mare, mereu vizibil: semnalează o groapă / problemă
-        ExtendedFloatingActionButton(
-            onClick = { reporting = true },
-            icon = { Icon(Icons.Rounded.ReportProblem, null) },
-            text = { Text("Semnalează o groapă", fontWeight = FontWeight.Black) },
-            containerColor = Pink, contentColor = Color.White,
-            modifier = Modifier.align(Alignment.BottomStart)
-                .padding(start = 16.dp, bottom = if (!listMode && shown.isNotEmpty()) 290.dp else 16.dp),
-        )
-
-        // ---- jos: carusel cu poze (tragi și harta te urmează)
-        if (!listMode && shown.isNotEmpty()) {
+        // ---- jos: caruselul locului ales (tragi și harta te urmează); atingi harta ca să-l ascunzi
+        if (!listMode && selecting && shown.isNotEmpty()) {
             HorizontalPager(
                 state = pager,
                 pageSize = PageSize.Fixed(300.dp),
@@ -434,6 +460,30 @@ fun MapScreen(onPlace: (Int) -> Unit, vm: MapViewModel = viewModel()) {
         vm.celebration?.let { (result, name) -> CheckinCelebration(result, name, onDismiss = { vm.celebration = null }) }
     }
 
+    if (menuOpen) {
+        ModalBottomSheet(
+            onDismissRequest = { menuOpen = false },
+            sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true),
+            containerColor = Night,
+        ) {
+            MapMenu(
+                vm = vm, listMode = listMode, look = look, showHeat = showHeat, hasPermission = hasPermission,
+                onList = { listMode = !listMode; menuOpen = false },
+                onLook = { look = it },
+                onHeat = { showHeat = !showHeat; if (showHeat) vm.loadHeat() },
+                onMe = {
+                    menuOpen = false
+                    listMode = false
+                    if (!hasPermission) permissionLauncher.launch(LOCATION_PERMISSIONS)
+                    else vm.myLocation?.let { scope.launch { camera.animate(CameraUpdateFactory.newLatLngZoom(it, 16f), 350) } }
+                },
+                onCategory = { vm.selectCategory(it) },
+                onReport = { menuOpen = false; reporting = true },
+                onMyReports = { menuOpen = false; onOpenReports() },
+            )
+        }
+    }
+
     if (reporting) {
         ModalBottomSheet(
             onDismissRequest = { reporting = false },
@@ -447,6 +497,91 @@ fun MapScreen(onPlace: (Int) -> Unit, vm: MapViewModel = viewModel()) {
                     vm.sendReport(category, description, fix, photo) { reporting = false }
                 }
             }
+        }
+    }
+}
+
+/** Meniul hărții: o listă cu tot ce era înainte butoane peste hartă. */
+@Composable
+private fun MapMenu(
+    vm: MapViewModel, listMode: Boolean, look: MapLook, showHeat: Boolean, hasPermission: Boolean,
+    onList: () -> Unit, onLook: (MapLook) -> Unit, onHeat: () -> Unit, onMe: () -> Unit,
+    onCategory: (String?) -> Unit, onReport: () -> Unit, onMyReports: () -> Unit,
+) {
+    Column(Modifier.fillMaxWidth().verticalScroll(rememberScrollState()).padding(horizontal = 16.dp).padding(bottom = 28.dp)) {
+        Text("Meniu hartă", color = Color.White, fontSize = 22.sp, fontWeight = FontWeight.Black,
+            modifier = Modifier.padding(start = 4.dp, bottom = 8.dp))
+        MenuRow(Icons.Rounded.ReportProblem, "Semnalează o problemă", "Groapă, furtună, inundație, vandalism…", Pink, onClick = onReport)
+        MenuRow(Icons.Rounded.Assignment, "Sesizările mele", "Vezi ce a răspuns Primăria", Lilac, onClick = onMyReports)
+        MenuRow(if (listMode) Icons.Rounded.Map else Icons.Rounded.ViewAgenda, if (listMode) "Arată harta" else "Arată ca listă",
+            "Toate locurile, cu poze", Mint, onClick = onList)
+        MenuRow(Icons.Rounded.MyLocation, "Unde sunt eu", if (hasPermission) "Centrează harta pe tine" else "Permite locația",
+            Electric, onClick = onMe)
+        MenuRow(Icons.Rounded.LocalFireDepartment, "Agitație acum",
+            if (showHeat) "Pornită: unde sunt oamenii acum" else "Unde sunt oamenii acum", Gold, active = showHeat, onClick = onHeat)
+
+        Text("Stil hartă", color = TextMuted, fontSize = 13.sp, modifier = Modifier.padding(top = 14.dp, bottom = 8.dp, start = 4.dp))
+        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            MapLook.entries.forEach { l ->
+                val on = l == look
+                Text(
+                    l.label, color = if (on) GoldDark else Color.White, fontWeight = FontWeight.Bold, textAlign = TextAlign.Center,
+                    modifier = Modifier.weight(1f).clip(RoundedCornerShape(14.dp)).background(if (on) Gold else Panel)
+                        .clickable { onLook(l) }.padding(vertical = 12.dp),
+                )
+            }
+        }
+
+        Text("Ce vrei să vezi", color = TextMuted, fontSize = 13.sp, modifier = Modifier.padding(top = 16.dp, bottom = 8.dp, start = 4.dp))
+        CategoryGrid(vm.categories, vm.selectedCategory, onCategory)
+    }
+}
+
+@Composable
+private fun MenuRow(
+    icon: androidx.compose.ui.graphics.vector.ImageVector, title: String, subtitle: String, color: Color,
+    active: Boolean = false, onClick: () -> Unit,
+) {
+    Row(
+        Modifier.fillMaxWidth().padding(vertical = 4.dp).clip(RoundedCornerShape(18.dp))
+            .background(if (active) color.copy(alpha = 0.18f) else Panel).clickable(onClick = onClick).padding(12.dp),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Box(Modifier.size(42.dp).clip(CircleShape).background(color.copy(alpha = 0.18f)), contentAlignment = Alignment.Center) {
+            Icon(icon, null, tint = color)
+        }
+        Spacer(Modifier.width(12.dp))
+        Column(Modifier.weight(1f)) {
+            Text(title, color = Color.White, fontWeight = FontWeight.Bold, fontSize = 16.sp)
+            Text(subtitle, color = TextMuted, fontSize = 13.sp)
+        }
+        Icon(Icons.Rounded.ChevronRight, null, tint = TextMuted)
+    }
+}
+
+@Composable
+private fun CategoryGrid(categories: List<Category>, selected: String?, onSelect: (String?) -> Unit) {
+    val all = listOf<Category?>(null) + categories
+    all.chunked(3).forEach { row ->
+        Row(Modifier.fillMaxWidth().padding(bottom = 8.dp), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            row.forEach { c ->
+                val on = c?.code == selected
+                Column(
+                    Modifier.weight(1f).clip(RoundedCornerShape(16.dp)).background(if (on) Gold else Panel)
+                        .clickable { onSelect(c?.code) }.padding(vertical = 10.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                ) {
+                    Icon(
+                        if (c == null) Icons.Rounded.Apps else categoryIcon(c.code), null,
+                        tint = if (on) GoldDark else (c?.let { categoryColor(it.code) } ?: Color.White),
+                    )
+                    Text(
+                        c?.label ?: "Toate", color = if (on) GoldDark else Color.White, fontSize = 12.sp, fontWeight = FontWeight.Bold,
+                        maxLines = 1, overflow = TextOverflow.Ellipsis, modifier = Modifier.padding(horizontal = 4.dp),
+                    )
+                }
+            }
+            repeat(3 - row.size) { Spacer(Modifier.weight(1f)) }
         }
     }
 }
@@ -581,7 +716,9 @@ private fun PlacesMap(
     hasPermission: Boolean,
     showHeat: Boolean,
     highlightedId: Int?,
+    bottomPadding: androidx.compose.ui.unit.Dp = 16.dp,
     onPlaceTap: (Place) -> Unit,
+    onMapTap: () -> Unit = {},
 ) {
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
@@ -592,7 +729,8 @@ private fun PlacesMap(
     GoogleMap(
         modifier = Modifier.fillMaxSize(),
         cameraPositionState = camera,
-        contentPadding = PaddingValues(top = 200.dp, bottom = 250.dp),
+        contentPadding = PaddingValues(top = 70.dp, bottom = bottomPadding),
+        onMapClick = { onMapTap() },
         properties = MapProperties(
             isMyLocationEnabled = hasPermission,
             mapType = if (look == MapLook.SATELLITE) MapType.HYBRID else MapType.NORMAL,
@@ -679,10 +817,6 @@ private fun PlacesFeed(places: List<Place>, onPlace: (Int) -> Unit, topPadding: 
     }
 }
 
-private val REPORT_CATEGORIES = listOf(
-    "groapa" to "Groapă în drum", "trotuar" to "Trotuar stricat", "iluminat" to "Iluminat stricat",
-    "gunoi" to "Gunoi / mizerie", "semnalizare" to "Semn sau semafor", "altele" to "Altceva",
-)
 
 /** Formularul de sesizare: categorie, descriere, poză. Poziția = unde ești acum (lângă problemă). */
 @Composable
@@ -695,24 +829,38 @@ private fun ReportForm(busy: Boolean, onSend: (String, String, ByteArray?) -> Un
     var photoTaken by remember { mutableStateOf(false) }
     val camera = rememberLauncherForActivityResult(ActivityResultContracts.TakePicture()) { ok -> photoTaken = ok }
 
-    Column(Modifier.fillMaxWidth().padding(horizontal = 20.dp).padding(bottom = 28.dp)) {
+    Column(Modifier.fillMaxWidth().verticalScroll(rememberScrollState()).padding(horizontal = 20.dp).padding(bottom = 28.dp)) {
         Row(verticalAlignment = Alignment.CenterVertically) {
             Icon(Icons.Rounded.ReportProblem, null, tint = Pink, modifier = Modifier.size(26.dp))
             Spacer(Modifier.width(10.dp))
             Text("Semnalează o problemă", color = Color.White, fontSize = 22.sp, fontWeight = FontWeight.Black)
         }
-        Text("Ajunge pe harta orașului, cu poza și locul exact. +10 XP", color = TextMuted, fontSize = 13.sp)
+        Text("Ajunge direct la Primăria Aradului, cu poza și locul exact. +10 XP, iar +20 XP când e rezolvată.", color = TextMuted, fontSize = 13.sp)
         Spacer(Modifier.height(14.dp))
-        LazyRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-            items(REPORT_CATEGORIES) { (code, label) ->
-                FilterChip(
-                    selected = category == code, onClick = { category = code }, label = { Text(label) },
-                    colors = FilterChipDefaults.filterChipColors(
-                        containerColor = Panel, labelColor = Color.White, selectedContainerColor = Pink, selectedLabelColor = Color.White,
-                    ),
-                    border = null, shape = RoundedCornerShape(50),
-                )
+        // grilă cu toate tipurile de alerte (cele urgente au un semn roșu)
+        REPORT_KINDS.chunked(3).forEach { row ->
+            Row(Modifier.fillMaxWidth().padding(bottom = 8.dp), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                row.forEach { k ->
+                    val on = category == k.code
+                    Column(
+                        Modifier.weight(1f).height(84.dp).clip(RoundedCornerShape(16.dp))
+                            .background(if (on) Pink else Panel).clickable { category = k.code }.padding(6.dp),
+                        horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.Center,
+                    ) {
+                        Icon(k.icon, null, tint = if (on) Color.White else if (k.urgent) Pink else Lilac, modifier = Modifier.size(26.dp))
+                        Spacer(Modifier.height(4.dp))
+                        Text(k.label, color = Color.White, fontSize = 11.sp, fontWeight = FontWeight.Bold,
+                            textAlign = TextAlign.Center, maxLines = 2, lineHeight = 13.sp)
+                    }
+                }
             }
+        }
+        if (reportKind(category).urgent) {
+            Text(
+                "Dacă cineva e în pericol chiar acum, sună la 112. Sesizarea ajunge la Primărie, nu la salvare.",
+                color = Gold, fontSize = 12.sp,
+                modifier = Modifier.fillMaxWidth().clip(RoundedCornerShape(12.dp)).background(Gold.copy(alpha = 0.12f)).padding(10.dp),
+            )
         }
         Spacer(Modifier.height(12.dp))
         OutlinedTextField(

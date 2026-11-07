@@ -30,3 +30,14 @@ def test_tester_can_check_in_from_anywhere(client, monkeypatch):
     assert client.post("/checkins", data=far, headers=h).status_code == 400
     monkeypatch.setattr(config, "TESTER_EMAILS", {"testerita@test.ro"})
     assert client.post("/checkins", data=far, headers=h).status_code == 201
+
+
+def test_alerte_noi_si_sesizarile_mele(client, auth):
+    cats = {c["code"]: c for c in client.get("/reports/categories").json()}
+    assert cats["furtuna"]["urgent"] and not cats["gunoi"]["urgent"] and "vandalism" in cats
+    r = client.post("/reports", data={"category": "furtuna", "lat": 46.17, "lng": 21.31, "description": "Copac căzut pe trotuar"},
+                    headers=auth)
+    assert r.status_code == 201 and r.json()["report"]["urgent"] is True
+    mine = client.get("/reports/mine", headers=auth).json()
+    assert [m["category"] for m in mine] == ["furtuna"] and mine[0]["status_label"] == "Nouă"
+    assert client.get("/reports/mine").status_code == 401

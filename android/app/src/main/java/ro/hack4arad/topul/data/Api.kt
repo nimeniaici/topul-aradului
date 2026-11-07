@@ -88,6 +88,12 @@ interface Api {
     @GET("reports")
     suspend fun reports(@Query("days") days: Int = 30): List<Report>
 
+    @GET("reports/mine")
+    suspend fun myReports(): List<Report>
+
+    @GET("places/discover")
+    suspend fun discover(): List<DiscoverPlace>
+
     @Multipart
     @POST("reports")
     suspend fun createReport(

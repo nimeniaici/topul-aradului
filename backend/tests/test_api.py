@@ -175,3 +175,9 @@ def test_poveste_si_poza_veche(client):
     names = {p["name"] for p in json.load(open(place_extras._DIR / "seed_places.json", encoding="utf-8"))}
     assert set(place_extras._load("place_stories.json")) <= names
     assert set(place_extras._load("old_photos.json")) <= names
+
+
+def test_descopera_aradul(client):
+    items = client.get("/places/discover").json()
+    assert items and items[0]["old_photo"] is not None
+    assert all(i["has_story"] or i["has_3d"] or i["old_photo"] for i in items)

@@ -1,5 +1,12 @@
 package ro.hack4arad.topul.ui
 
+import androidx.compose.material.icons.filled.Home
+import ro.hack4arad.topul.ui.reports.MyReportsScreen
+import ro.hack4arad.topul.ui.home.DiscoverScreen
+import ro.hack4arad.topul.ui.home.MapRequest
+import ro.hack4arad.topul.ui.home.HomeActions
+import ro.hack4arad.topul.ui.home.HomeTarget
+import ro.hack4arad.topul.ui.home.HomeScreen
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Person
@@ -47,6 +54,7 @@ import ro.hack4arad.topul.ui.profile.ProfileScreen
 private data class Tab(val route: String, val label: String, val icon: ImageVector)
 
 private val tabs = listOf(
+    Tab("home", "Acasă", Icons.Default.Home),
     Tab("map", "Hartă", Icons.Default.Place),
     Tab("duels", "Dueluri", Icons.Default.ThumbUp),
     Tab("top", "Top", Icons.Default.Star),
@@ -88,6 +96,13 @@ private fun MainScaffold() {
         }
     }
 
+    // schimbă tab-ul păstrând starea fiecăruia (harta rămâne unde ai lăsat-o)
+    fun goTab(r: String) = nav.navigate(r) {
+        popUpTo(nav.graph.findStartDestination().id) { saveState = true }
+        launchSingleTop = true
+        restoreState = true
+    }
+
     Scaffold(
         snackbarHost = { SnackbarHost(snackbar) },
         bottomBar = {
@@ -103,13 +118,7 @@ private fun MainScaffold() {
                                 unselectedTextColor = TextMuted,
                             ),
                             selected = route == tab.route,
-                            onClick = {
-                                nav.navigate(tab.route) {
-                                    popUpTo(nav.graph.findStartDestination().id) { saveState = true }
-                                    launchSingleTop = true
-                                    restoreState = true
-                                }
-                            },
+                            onClick = { goTab(tab.route) },
                             icon = { Icon(tab.icon, contentDescription = null) },
                             label = { Text(tab.label) },
                         )
@@ -118,9 +127,21 @@ private fun MainScaffold() {
             }
         },
     ) { padding ->
-        NavHost(nav, startDestination = "map", modifier = Modifier.padding(padding)) {
+        NavHost(nav, startDestination = "home", modifier = Modifier.padding(padding)) {
             val openPlace: (Int) -> Unit = { id -> nav.navigate("place/$id") }
-            composable("map") { MapScreen(onPlace = openPlace) }
+            val newReport = { HomeActions.pendingMap = MapRequest(report = true); goTab("map") }
+            composable("home") {
+                HomeScreen(onOpen = { target ->
+                    when (target) {
+                        is HomeTarget.Tab -> goTab(target.route)
+                        is HomeTarget.Map -> { HomeActions.pendingMap = target.request; goTab("map") }
+                        is HomeTarget.Screen -> nav.navigate(target.route)
+                    }
+                })
+            }
+            composable("map") { MapScreen(onPlace = openPlace, onOpenReports = { nav.navigate("reports") }) }
+            composable("reports") { MyReportsScreen(onBack = { nav.popBackStack() }, onNew = newReport) }
+            composable("discover") { DiscoverScreen(onBack = { nav.popBackStack() }, onPlace = openPlace) }
             composable("duels") { DuelScreen() }
             composable("top") { LeaderboardScreen(onPlace = openPlace) }
             composable("profile") { ProfileScreen(onPlace = openPlace) }

@@ -154,6 +154,22 @@ data class Report(
     val createdAt: String,
     val statusLabel: String? = null,
     val adminNote: String? = null,
+    val urgent: Boolean = false,
+    val updatedAt: String? = null,
+)
+
+/** Un loc din „Descoperă Aradul”: are ghid audio, poză veche sau tur 3D. */
+data class DiscoverPlace(
+    val id: Int,
+    val name: String,
+    val category: String,
+    val categoryLabel: String,
+    val lat: Double,
+    val lng: Double,
+    val photoUrl: String?,
+    val hasStory: Boolean,
+    @com.google.gson.annotations.SerializedName("has_3d") val has3d: Boolean,
+    val oldPhoto: OldPhoto?,
 )
 
 data class ReportCreated(val report: Report, val xpGained: Int, val totalXp: Int, val level: Int)

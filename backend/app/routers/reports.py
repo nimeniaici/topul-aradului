@@ -20,12 +20,20 @@ router = APIRouter(prefix="/reports", tags=["reports"])
 
 REPORT_CATEGORIES = {
     "groapa": "Groapă în drum",
+    "furtuna": "Copac căzut / pagube de furtună",
+    "inundatie": "Apă băltită / inundație",
+    "canal": "Capac de canal lipsă",
     "trotuar": "Trotuar stricat",
     "iluminat": "Iluminat stricat",
-    "gunoi": "Gunoi / mizerie",
     "semnalizare": "Semn sau semafor",
+    "vandalism": "Vandalism / mobilier urban distrus",
+    "gunoi": "Gunoi / mizerie",
+    "parcare": "Mașină parcată ilegal",
+    "animale": "Animale fără stăpân",
     "altele": "Altceva",
 }
+# cele care pot pune oameni în pericol apar primele la Primărie
+URGENT = {"furtuna", "inundatie", "canal", "semnalizare"}
 XP_REPORT = 10
 XP_RESOLVED = 20  # bonus când Primăria rezolvă problema semnalată de tine
 
@@ -42,6 +50,7 @@ class ReportOut(BaseModel):
     photo_url: str | None
     status: str
     status_label: str = ""
+    urgent: bool = False
     user_name: str
     created_at: datetime
     admin_note: str | None = None
@@ -58,13 +67,13 @@ class ReportCreated(BaseModel):
 def _out(r: Report) -> ReportOut:
     return ReportOut(id=r.id, category=r.category, category_label=REPORT_CATEGORIES.get(r.category, r.category),
                      description=r.description, lat=r.lat, lng=r.lng, photo_url=photo_url(r.photo_path),
-                     status=r.status, status_label=STATUSES.get(r.status, r.status), user_name=r.user.name,
+                     status=r.status, status_label=STATUSES.get(r.status, r.status), urgent=r.category in URGENT, user_name=r.user.name,
                      created_at=r.created_at, admin_note=r.admin_note, updated_at=r.updated_at)
 
 
 @router.get("/categories")
 def categories():
-    return [{"code": c, "label": l} for c, l in REPORT_CATEGORIES.items()]
+    return [{"code": c, "label": l, "urgent": c in URGENT} for c, l in REPORT_CATEGORIES.items()]
 
 
 @router.post("", response_model=ReportCreated, status_code=201)
@@ -101,6 +110,14 @@ async def create_report(
     background.add_task(hub.broadcast, {"type": "report", "lat": lat, "lng": lng, "place_name": out.category_label,
                                         "user_name": user.name})
     return ReportCreated(report=out, xp_gained=XP_REPORT, total_xp=user.xp, level=level(user.xp))
+
+
+@router.get("/mine", response_model=list[ReportOut])
+def my_reports(user: User = Depends(get_current_user), db: Session = Depends(get_db)):
+    """Sesizările mele, cu statusul și răspunsul Primăriei."""
+    rows = db.scalars(select(Report).options(joinedload(Report.user)).where(Report.user_id == user.id)
+                      .order_by(Report.created_at.desc()).limit(200)).all()
+    return [_out(r) for r in rows]
 
 
 @router.get("", response_model=list[ReportOut])

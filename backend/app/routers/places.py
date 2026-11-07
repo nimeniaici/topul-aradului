@@ -47,6 +47,22 @@ def list_places(
     return [place_out(p, d) for p, d in with_dist]
 
 
+@router.get("/discover")
+def discover(db: Session = Depends(get_db)):
+    """„Descoperă Aradul”: locurile cu ghid audio, poză veche (trecut vs prezent) sau tur 3D."""
+    out = []
+    for p in db.scalars(select(Place).order_by(Place.name)):
+        old = place_extras.old_photo(p.name)
+        has_story = place_extras.story(p.name) is not None
+        if not (old or has_story or p.splat_url):
+            continue
+        out.append({**place_out(p).model_dump(), "has_story": has_story, "has_3d": bool(p.splat_url),
+                    "old_photo": old})
+    # întâi cele cu poze vechi (cele mai spectaculoase), apoi turul 3D, apoi poveștile
+    out.sort(key=lambda d: (d["old_photo"] is None, not d["has_3d"]))
+    return out
+
+
 @router.get("/{place_id}", response_model=PlaceDetailOut)
 def place_detail(place_id: int, db: Session = Depends(get_db)):
     place = db.get(Place, place_id, options=[joinedload(Place.mayor)])
