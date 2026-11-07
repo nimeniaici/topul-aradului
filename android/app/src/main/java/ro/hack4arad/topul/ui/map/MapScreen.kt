@@ -1,5 +1,10 @@
 package ro.hack4arad.topul.ui.map
 
+import androidx.compose.material.icons.rounded.Directions
+import androidx.compose.material3.IconButtonDefaults
+import androidx.compose.material3.FilledIconButton
+import ro.hack4arad.topul.util.walkingMinutes
+import ro.hack4arad.topul.util.navigateTo
 import ro.hack4arad.topul.ui.theme.Track
 import androidx.compose.material3.ExtendedFloatingActionButton
 import androidx.compose.material.icons.rounded.Close
@@ -537,7 +542,7 @@ private fun CarouselCard(place: Place, busy: Boolean, onOpen: () -> Unit, onChec
                 Text(
                     listOfNotNull(
                         when (place.mayorId) { null -> "Tron liber"; me -> "Tu ești Primarul"; else -> "Primar: ${place.mayorName}" },
-                        place.distanceM?.let(::formatDistance),
+                        place.distanceM?.let { "${formatDistance(it)} · ${walkingMinutes(it)} min pe jos" },
                     ).joinToString(" · "),
                     color = if (place.mayorId == null) Gold else TextMuted, fontSize = 12.sp, maxLines = 1, overflow = TextOverflow.Ellipsis,
                 )
@@ -553,8 +558,14 @@ private fun CarouselCard(place: Place, busy: Boolean, onOpen: () -> Unit, onChec
                 }
                 OutlinedButton(onClick = onOpen, modifier = Modifier.height(42.dp), contentPadding = PaddingValues(horizontal = 12.dp)) {
                     Text("Detalii", color = Color.White, fontSize = 14.sp)
-                    Icon(Icons.Rounded.ChevronRight, null, tint = Color.White, modifier = Modifier.size(18.dp))
                 }
+                // „Du-mă acolo”: navigare ca în Google Maps
+                val navContext = LocalContext.current
+                FilledIconButton(
+                    onClick = { navigateTo(navContext, place.lat, place.lng) },
+                    modifier = Modifier.size(42.dp),
+                    colors = IconButtonDefaults.filledIconButtonColors(containerColor = Mint, contentColor = Night),
+                ) { Icon(Icons.Rounded.Directions, "Du-mă acolo") }
             }
         }
     }

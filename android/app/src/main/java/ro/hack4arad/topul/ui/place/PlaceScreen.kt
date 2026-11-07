@@ -1,5 +1,8 @@
 package ro.hack4arad.topul.ui.place
 
+import ro.hack4arad.topul.ui.theme.Mint
+import androidx.compose.material.icons.rounded.Directions
+import ro.hack4arad.topul.util.navigateTo
 import androidx.compose.material.icons.rounded.Share
 import ro.hack4arad.topul.util.ShareCard
 import androidx.compose.material.icons.rounded.ViewInAr
@@ -279,6 +282,14 @@ fun PlaceScreen(onBack: () -> Unit, onTour3D: (Int) -> Unit = {}, vm: PlaceViewM
                         enabled = !vm.busy,
                         modifier = Modifier.fillMaxWidth().padding(top = 8.dp).height(52.dp),
                     ) { Icon(Icons.Rounded.PhotoCamera, null, tint = Color.White); Text("  Check-in cu poză · +5 XP bonus", color = Color.White) }
+
+                    // navigare până la loc, ca în Google Maps
+                    val navContext = LocalContext.current
+                    Button(
+                        onClick = { navigateTo(navContext, place.lat, place.lng) },
+                        colors = ButtonDefaults.buttonColors(containerColor = Mint, contentColor = Night),
+                        modifier = Modifier.fillMaxWidth().padding(top = 8.dp).height(52.dp),
+                    ) { Icon(Icons.Rounded.Directions, null); Text("  Du-mă acolo", fontWeight = FontWeight.Bold) }
 
                     // ești Primar aici? arată-le prietenilor (card pentru Instagram Story)
                     if (place.mayorId != null && place.mayorId == Network.session.userId) {
